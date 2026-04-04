@@ -224,9 +224,17 @@ export default function BusinessTab() {
               {/* 操作区：购买按钮 */}
               {isUnlocked && (
                 <div className="flex items-center gap-2">
-                  {/* 手动贴膜按钮 / 生产中状态 */}
-                  {quantity > 0 && !bs.hasManager && (
-                    bs.progress > 0 ? (
+                  {/* 贴膜按钮 / 自动化图标 */}
+                  {quantity > 0 && (
+                    bs.hasManager ? (
+                      <div className="flex items-center gap-1 px-2.5 py-2 rounded-lg bg-cyan-600/20 text-cyan-400 text-xs font-bold select-none">
+                        <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="47" strokeLinecap="round" />
+                          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                        </svg>
+                        自动
+                      </div>
+                    ) : bs.progress > 0 ? (
                       <div className="px-3 py-2 rounded-lg bg-yellow-600/30 text-yellow-400 text-xs font-bold">
                         生产中…
                       </div>
