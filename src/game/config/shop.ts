@@ -1,0 +1,94 @@
+// ============================================================
+// 商城配置 (OfferDef)
+// ============================================================
+import { OfferDef } from '../types';
+
+export const SHOP_OFFERS: OfferDef[] = [
+  // 广告增益
+  {
+    id: 1,
+    name: '双倍收益',
+    description: '观看广告，4小时内全产线收益翻倍！',
+    cost: 0,
+    currency: 'cash',
+    icon: '📺',
+    rewards: [{ type: 'ad_buff_double_revenue', value: 14400, label: '4小时双倍收益' }],
+    oneTime: false,
+  },
+  {
+    id: 2,
+    name: '额外离线收益',
+    description: '观看广告，立即领取一次完整离线收益！',
+    cost: 0,
+    currency: 'cash',
+    icon: '⏰',
+    rewards: [{ type: 'ad_buff_extra_offline', value: 1, label: '额外离线收益×1' }],
+    oneTime: false,
+  },
+  {
+    id: 3,
+    name: '爆单潮',
+    description: '观看广告，触发30秒极速生产，所有产线速度×5！',
+    cost: 0,
+    currency: 'cash',
+    icon: '🚀',
+    rewards: [{ type: 'ad_buff_rush_order', value: 30, label: '30秒爆单潮' }],
+    oneTime: false,
+  },
+  // 钻石内购
+  {
+    id: 4,
+    name: '钻石新手包',
+    description: '超值！10颗钻石，新手必备',
+    cost: 6,
+    currency: 'real_money',
+    icon: '💎',
+    rewards: [{ type: 'diamond', value: 10, label: '钻石×10' }],
+    oneTime: true,
+  },
+  {
+    id: 5,
+    name: '钻石豪华包',
+    description: '超划算！50颗钻石，大亨之选',
+    cost: 25,
+    currency: 'real_money',
+    icon: '💎',
+    rewards: [{ type: 'diamond', value: 50, label: '钻石×50' }],
+    oneTime: false,
+  },
+  {
+    id: 6,
+    name: '永久去广告',
+    description: '一次购买，永久去除广告，直接领取所有增益！',
+    cost: 18,
+    currency: 'real_money',
+    icon: '🚫',
+    rewards: [{ type: 'no_ads', value: 1, label: '永久去广告' }],
+    oneTime: true,
+  },
+  {
+    id: 7,
+    name: '开服成长基金',
+    description: '购买后逐日返还大量钻石，总价值200颗！',
+    cost: 30,
+    currency: 'real_money',
+    icon: '📈',
+    rewards: [{ type: 'growth_fund', value: 200, label: '成长基金200钻石' }],
+    oneTime: true,
+  },
+  // 新手礼包（免费/低价）
+  {
+    id: 8,
+    name: '新手福利礼包',
+    description: '新手上路专属，包含启动资金和1颗钻石',
+    cost: 0,
+    currency: 'cash',
+    icon: '🎁',
+    rewards: [
+      { type: 'cash', value: 100, label: '现金×100' },
+      { type: 'diamond', value: 1, label: '钻石×1' },
+    ],
+    oneTime: true,
+    showCondition: { type: 'tutorial_complete', value: 0 },
+  },
+];
