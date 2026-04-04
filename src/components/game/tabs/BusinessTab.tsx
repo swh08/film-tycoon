@@ -149,12 +149,8 @@ export default function BusinessTab() {
         const nextMs = getNextMilestone(def, quantity);
 
         return (
-          <motion.div
+          <div
             key={def.id}
-            layout
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: def.id * 0.05 }}
             className={`
               rounded-xl overflow-hidden border transition-all duration-200
               ${isUnlocked
@@ -280,7 +276,7 @@ export default function BusinessTab() {
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
         );
       })}
     </div>
