@@ -228,21 +228,27 @@ export default function BusinessTab() {
               {/* 操作区：购买按钮 */}
               {isUnlocked && (
                 <div className="flex items-center gap-2">
-                  {/* 手动贴膜按钮 */}
-                  {quantity > 0 && (
-                    <button
-                      onClick={() => {
-                        manualProduce(def.id);
-                        if (tutorialStep === 'none') {
-                          advanceTutorial('first_tap');
-                        }
-                      }}
-                      className="px-3 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600
-                                 text-white text-xs font-bold active:scale-95 transition-transform
-                                 hover:from-green-500 hover:to-emerald-500 shadow-md shadow-green-900/30"
-                    >
-                      贴膜！
-                    </button>
+                  {/* 手动贴膜按钮 / 生产中状态 */}
+                  {quantity > 0 && !bs.hasManager && (
+                    bs.progress > 0 ? (
+                      <div className="px-3 py-2 rounded-lg bg-yellow-600/30 text-yellow-400 text-xs font-bold">
+                        生产中…
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          manualProduce(def.id);
+                          if (tutorialStep === 'none') {
+                            advanceTutorial('first_tap');
+                          }
+                        }}
+                        className="px-3 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600
+                                   text-white text-xs font-bold active:scale-95 transition-transform
+                                   hover:from-green-500 hover:to-emerald-500 shadow-md shadow-green-900/30"
+                      >
+                        贴膜！
+                      </button>
+                    )
                   )}
 
                   {/* 购买模式切换 */}

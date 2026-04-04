@@ -154,30 +154,14 @@ export const useGameStore = create<GameStore>((set, get) => {
         if (bsIdx === -1) return state;
         const bs = state.businesses[bsIdx];
         if (bs.quantity <= 0) return state;
+        // 已经在生产中，不允许重复点击
+        if (bs.progress > 0) return state;
 
-        const def = BUSINESSES.find(b => b.id === businessId);
-        if (!def) return state;
-
-        // 手动生产：直接完成一次，获得收益
-        const globalEffects = calcGlobalEffects(state.upgrades);
-        let revenue = def.baseRevenue * bs.quantity;
-        // 里程碑
-        for (const ms of def.milestones) {
-          if (bs.quantity >= ms.at) revenue *= ms.multiplier;
-        }
-        // 全局利润加成
-        revenue *= globalEffects.profitMultiplier;
-        // 转生加成
-        revenue *= calcPrestigeMultiplier(state.prestigePoints);
-        // 双倍
-        if (state.adBuffs.some(b => b.type === 'double_revenue')) revenue *= 2;
-
+        // 手动生产：启动进度条（不是直接给收益）
         const newBusinesses = [...state.businesses];
-        newBusinesses[bsIdx] = { ...bs, progress: 0 };
+        newBusinesses[bsIdx] = { ...bs, progress: 0.001 };
 
         return {
-          cash: state.cash + revenue,
-          totalEarned: state.totalEarned + revenue,
           totalManualTaps: state.totalManualTaps + 1,
           businesses: newBusinesses,
         };
@@ -370,7 +354,9 @@ export const useGameStore = create<GameStore>((set, get) => {
       let totalEarned = 0;
 
       const newBusinesses = state.businesses.map(bs => {
-        if (bs.quantity <= 0 || !bs.hasManager) return { ...bs };
+        if (bs.quantity <= 0) return { ...bs };
+        // 有店长的自动运行；没店长但progress>0说明手动启动过，也要走进度
+        if (!bs.hasManager && bs.progress <= 0) return { ...bs };
 
         const def = BUSINESSES.find(b => b.id === bs.businessId);
         if (!def) return { ...bs };
@@ -397,7 +383,8 @@ export const useGameStore = create<GameStore>((set, get) => {
           if (rushBuff) revenue *= 3;
 
           totalEarned += revenue;
-          return { ...bs, progress: 0 };
+          // 有店长：自动重启（progress=0.001）；没店长：停止（progress=0）
+          return { ...bs, progress: bs.hasManager ? 0.001 : 0 };
         }
 
         return { ...bs, progress: Math.min(newProgress, 0.999) };
