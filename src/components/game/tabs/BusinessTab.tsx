@@ -112,6 +112,14 @@ export default function BusinessTab() {
 
   return (
     <div className="flex flex-col gap-3 px-3 py-3 pb-4">
+      {/* 标题区 */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-bold text-yellow-400">🏪 我的生意</h2>
+        <span className="text-[10px] text-gray-400">
+          已解锁 {businesses.filter(b => b.quantity > 0).length}/{BUSINESSES.length}
+        </span>
+      </div>
+
       {/* 新手引导提示 */}
       {tutorialStep === 'first_tap' && (
         <motion.div
