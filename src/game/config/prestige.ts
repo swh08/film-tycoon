@@ -9,8 +9,8 @@ export const PRESTIGE_RULE: PrestigeRuleDef = {
   gainFormula: 'sqrt_total_earned',
   resetScope: ['cash', 'businesses', 'managers', 'global_upgrades', 'ad_bonuses'],
   permanentBonusCurve: {
-    perPoint: 0.02, // 每点渠道人脉+2%全局利润
-    maxMultiplier: 10, // 最大500点 = 10倍
+    perPoint: 0.05, // 每点渠道人脉+5%全局利润
+    maxMultiplier: 20, // 最大380点 = 20倍
   },
   unlockCondition: { type: 'total_earned', value: 100000000 },
 };
@@ -18,8 +18,8 @@ export const PRESTIGE_RULE: PrestigeRuleDef = {
 /** 计算转生可获得的人脉点数 */
 export function calcPrestigeGain(totalEarned: number): number {
   if (totalEarned <= 0) return 0;
-  // sqrt(totalEarned / 1000000), 至少给1点
-  const raw = Math.sqrt(totalEarned / 1000000);
+  // sqrt(totalEarned / 100000), 至少给1点
+  const raw = Math.sqrt(totalEarned / 100000);
   return Math.max(1, Math.floor(raw));
 }
 

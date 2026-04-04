@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { formatCash, formatNumber, calcTotalIncomePerSecond } from '@/game/formulas';
+import { calcPrestigeMultiplier } from '@/game/config/prestige';
 
 export default function TopHUD() {
   const cash = useGameStore(s => s.cash);
@@ -74,6 +75,7 @@ export default function TopHUD() {
           <div className="flex items-center gap-1">
             <span className="text-xs">🤝</span>
             <span className="text-xs font-bold text-orange-300 tabular-nums">{prestigePoints}</span>
+            <span className="text-[10px] text-orange-400/80">×{formatNumber(calcPrestigeMultiplier(prestigePoints))}</span>
           </div>
         )}
       </div>
