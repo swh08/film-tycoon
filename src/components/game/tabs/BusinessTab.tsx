@@ -332,32 +332,15 @@ export default function BusinessTab() {
                 </div>
               )}
 
-              {/* 下一个里程碑提示 + 专属升级入口 */}
-              <div className="flex items-center justify-between mb-1">
-                {nextMs && quantity > 0 ? (
-                  <span className="text-[10px] text-gray-500">
-                    🎯 {nextMs.at}级 → ×{nextMs.multiplier} (差{nextMs.at - quantity})
-                  </span>
-                ) : quantity > 0 ? (
-                  <span className="text-[10px] text-green-400">✨ 全部里程碑已达成</span>
-                ) : <span />}
-                {(() => {
-                  const bizUpgrades = BUSINESS_UPGRADES.filter(u => u.businessId === def.id);
-                  if (bizUpgrades.length === 0) return null;
-                  const purchased = bizUpgrades.filter(u => purchasedBusinessUpgrades.includes(u.id)).length;
-                  return (
-                    <button
-                      onClick={() => showBusinessUpgradePopup(def.id)}
-                      className={`text-[10px] hover:text-yellow-400 transition-colors
-                        ${purchased === bizUpgrades.length ? 'text-green-400' : 'text-blue-400'}`}
-                    >
-                      🔧{purchased}/{bizUpgrades.length}
-                    </button>
-                  );
-                })()}
-              </div>
+              {/* 下一个里程碑提示 */}
+              {nextMs && quantity > 0 && (
+                <div className="text-[10px] text-gray-500 mb-1">
+                  🎯 下一里程碑: {nextMs.at}级 (还差{nextMs.at - quantity})
+                  <span className="text-pink-400 ml-1">→ ×{nextMs.multiplier}</span>
+                </div>
+              )}
 
-              {/* 操作区：购买按钮 */}
+              {/* 操作区：贴膜/购买 + 专属升级 */}
               {isUnlocked && (
                 <div className="flex items-center gap-2">
                   {/* 贴膜按钮 / 自动化图标 */}
@@ -410,6 +393,32 @@ export default function BusinessTab() {
                     <br />
                     <span className="text-[10px] font-normal opacity-80">{formatCash(cost)}</span>
                   </button>
+
+                  {/* 专属升级按钮 */}
+                  {(() => {
+                    const bizUpgrades = BUSINESS_UPGRADES.filter(u => u.businessId === def.id);
+                    if (bizUpgrades.length === 0 || quantity === 0) return null;
+                    const purchased = bizUpgrades.filter(u => purchasedBusinessUpgrades.includes(u.id)).length;
+                    const allBought = purchased === bizUpgrades.length;
+                    const hasBuyable = bizUpgrades.some(u => !purchasedBusinessUpgrades.includes(u.id) && quantity >= u.unlockQuantity);
+                    return (
+                      <button
+                        onClick={() => showBusinessUpgradePopup(def.id)}
+                        className={`
+                          flex-shrink-0 px-2.5 py-2 rounded-lg text-xs font-bold transition-all duration-150
+                          active:scale-95 border
+                          ${allBought
+                            ? 'bg-green-600/20 border-green-500/30 text-green-400'
+                            : hasBuyable
+                              ? 'bg-gradient-to-r from-blue-600 to-indigo-500 border-blue-400/30 text-white shadow-md shadow-blue-900/30'
+                              : 'bg-gray-700 border-gray-600/30 text-gray-500'
+                          }
+                        `}
+                      >
+                        🔧 {purchased}/{bizUpgrades.length}
+                      </button>
+                    );
+                  })()}
                 </div>
               )}
             </div>
