@@ -4,6 +4,7 @@
 import { BusinessDef, CostCurve, Milestone, AdBuff } from './types';
 import { BUSINESSES } from './config/businesses';
 import { GLOBAL_UPGRADES } from './config/upgrades';
+import { ANGEL_UPGRADES } from './config/angel-upgrades';
 import { calcPrestigeMultiplier } from './config/prestige';
 import type { BusinessState, UpgradeState, GameState } from './types';
 
@@ -28,6 +29,18 @@ export function calcBuyCost(
   return Math.ceil(total);
 }
 
+/** 计算购买 N 个产线的总成本（含人脉升级折扣） */
+export function calcBuyCostWithDiscount(
+  businessDef: BusinessDef,
+  currentQuantity: number,
+  count: number = 1,
+  purchasedAngelUpgrades: number[] = [],
+): number {
+  const raw = calcBuyCost(businessDef, currentQuantity, count);
+  const angelEffects = calcAngelUpgradeEffects(purchasedAngelUpgrades);
+  return Math.ceil(raw * angelEffects.globalCostReduce);
+}
+
 /** 计算购买第 N+1 个产线的单价 */
 function calcSingleCost(businessDef: BusinessDef, owned: number): number {
   const { baseCost, costMultiplier, costCurve } = businessDef;
@@ -43,16 +56,18 @@ function calcSingleCost(businessDef: BusinessDef, owned: number): number {
   }
 }
 
-/** 计算最多能买多少个（给定预算） */
+/** 计算最多能买多少个（给定预算，含折扣） */
 export function calcMaxBuyable(
   businessDef: BusinessDef,
   currentQuantity: number,
   budget: number,
+  purchasedAngelUpgrades: number[] = [],
 ): number {
+  const angelEffects = calcAngelUpgradeEffects(purchasedAngelUpgrades);
   let count = 0;
   let totalCost = 0;
   while (true) {
-    const nextCost = calcSingleCost(businessDef, currentQuantity + count);
+    const nextCost = calcSingleCost(businessDef, currentQuantity + count) * angelEffects.globalCostReduce;
     if (totalCost + nextCost > budget) break;
     totalCost += nextCost;
     count++;
@@ -137,6 +152,11 @@ export function calcRevenuePerCycle(
   const globalEffects = calcGlobalEffects(state.upgrades);
   revenue *= globalEffects.profitMultiplier;
 
+  // 人脉升级加成（单产线+全局）
+  const angelEffects = calcAngelUpgradeEffects(state.purchasedAngelUpgrades || []);
+  revenue *= calcAngelBusinessProfitMult(businessDef.id, state.purchasedAngelUpgrades || []);
+  revenue *= angelEffects.globalProfitMult;
+
   // 转生永久加成
   revenue *= calcPrestigeMultiplier(state.prestigePoints);
 
@@ -162,6 +182,10 @@ export function calcCycleTime(
   // 全局升级周期缩减
   const globalEffects = calcGlobalEffects(state.upgrades);
   cycle *= globalEffects.cycleMultiplier;
+
+  // 人脉升级速度加成
+  const angelEffects = calcAngelUpgradeEffects(state.purchasedAngelUpgrades || []);
+  cycle *= angelEffects.globalCycleReduce;
 
   // 爆单潮（30秒极速，周期缩短80%）
   const rushBuff = adBuffs.find(b => b.type === 'rush_order');
@@ -264,6 +288,48 @@ export function calcMaxUpgradeLevels(
     if (count > 10000) break;
   }
   return count;
+}
+
+// === 人脉升级效果 ===
+
+/** 计算人脉升级的全局效果（利润倍率、成本折扣、速度加成） */
+export function calcAngelUpgradeEffects(purchasedAngelUpgrades: number[]) {
+  let globalProfitMult = 1;
+  let globalCostReduce = 1; // 乘数，0.75 = 降低25%
+  let globalCycleReduce = 1; // 乘数，0.70 = 减少30%
+
+  for (const id of purchasedAngelUpgrades) {
+    const def = ANGEL_UPGRADES.find(u => u.id === id);
+    if (!def) continue;
+
+    switch (def.effectType) {
+      case 'profit_mult_all':
+        globalProfitMult *= def.effectValue;
+        break;
+      case 'cost_reduce_all':
+        globalCostReduce *= (1 - def.effectValue);
+        break;
+      case 'cycle_reduce_all':
+        globalCycleReduce *= (1 - def.effectValue);
+        break;
+      // profit_mult_business 在 per-business 函数中处理
+    }
+  }
+
+  return { globalProfitMult, globalCostReduce, globalCycleReduce };
+}
+
+/** 计算人脉升级对单条产线的利润倍率 */
+export function calcAngelBusinessProfitMult(businessId: number, purchasedAngelUpgrades: number[]): number {
+  let mult = 1;
+  for (const id of purchasedAngelUpgrades) {
+    const def = ANGEL_UPGRADES.find(u => u.id === id);
+    if (!def || def.targetBusinessId !== businessId) continue;
+    if (def.effectType === 'profit_mult_business') {
+      mult *= def.effectValue;
+    }
+  }
+  return mult;
 }
 
 // === 数字格式化 ===

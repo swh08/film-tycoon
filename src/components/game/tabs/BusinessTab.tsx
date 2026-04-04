@@ -8,12 +8,13 @@ import { motion } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { BUSINESSES } from '@/game/config/businesses';
 import {
-  calcBuyCost,
+  calcBuyCostWithDiscount,
   calcMaxBuyable,
   calcMilestoneMultiplier,
   getNextMilestone,
   calcRevenuePerCycle,
   calcCycleTime,
+  calcAngelUpgradeEffects,
   formatCash,
   formatNumber,
   formatTime,
@@ -27,6 +28,7 @@ export default function BusinessTab() {
     adBuffs,
     upgrades,
     prestigePoints,
+    purchasedAngelUpgrades,
     buyBusiness,
     manualProduce,
     advanceTutorial,
@@ -83,7 +85,7 @@ export default function BusinessTab() {
       const def = BUSINESSES.find(b => b.id === businessId);
       const bs = businesses.find(b => b.businessId === businessId);
       if (def && bs) {
-        count = calcMaxBuyable(def, bs.quantity, cash);
+        count = calcMaxBuyable(def, bs.quantity, cash, purchasedAngelUpgrades);
       }
       if (count <= 0) return;
     }
@@ -97,7 +99,7 @@ export default function BusinessTab() {
         advanceTutorial('buy_10');
       }
     }
-  }, [buyMode, buyBusiness, tutorialStep, advanceTutorial, businesses, cash]);
+  }, [buyMode, buyBusiness, tutorialStep, advanceTutorial, businesses, cash, purchasedAngelUpgrades]);
 
   const BUY_MODES = [
     { value: 1, label: '×1' },
@@ -167,11 +169,11 @@ export default function BusinessTab() {
         const buyModeVal = buyMode;
         // 实际购买数量（最大模式动态计算）
         const actualBuyCount = buyModeVal === 0
-          ? calcMaxBuyable(def, quantity, cash)
+          ? calcMaxBuyable(def, quantity, cash, purchasedAngelUpgrades)
           : buyModeVal;
         const cost = quantity > 0 || def.id === 1
-          ? calcBuyCost(def, quantity, actualBuyCount)
-          : def.baseCost;
+          ? calcBuyCostWithDiscount(def, quantity, actualBuyCount, purchasedAngelUpgrades)
+          : Math.ceil(def.baseCost * (purchasedAngelUpgrades.length > 0 ? calcAngelUpgradeEffects(purchasedAngelUpgrades).globalCostReduce : 1));
         const canAfford = cash >= cost && actualBuyCount > 0;
 
         // 收益计算

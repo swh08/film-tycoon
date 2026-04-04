@@ -1,11 +1,13 @@
 // ============================================================
-// 人脉Tab — 转生系统 / 永久收益 / Meta进度
+// 人脉Tab — 转生系统 / 永久收益 / 人脉升级商店
 // ============================================================
 'use client';
 
 import { useGameStore } from '@/store/gameStore';
 import { PRESTIGE_RULE, calcPrestigeGain, calcPrestigeMultiplier } from '@/game/config/prestige';
-import { formatCash, formatNumber } from '@/game/formulas';
+import { ANGEL_UPGRADES } from '@/game/config/angel-upgrades';
+import { BUSINESSES } from '@/game/config/businesses';
+import { calcAngelUpgradeEffects, formatCash, formatNumber } from '@/game/formulas';
 import { usePopup } from '../PopupLayer';
 
 export default function PrestigeTab() {
@@ -14,6 +16,8 @@ export default function PrestigeTab() {
     prestigePoints,
     totalPrestigeCount,
     prestige,
+    purchasedAngelUpgrades,
+    buyAngelUpgrade,
   } = useGameStore();
 
   const { showPopup } = usePopup();
@@ -23,6 +27,18 @@ export default function PrestigeTab() {
   const nextMultiplier = calcPrestigeMultiplier(prestigePoints + gain);
   const canDoPrestige = gain >= 2;
   const unlockMet = totalEarned >= PRESTIGE_RULE.unlockCondition.value;
+
+  // 如果购买了人脉升级，计算消费后的实际倍率
+  const angelEffects = calcAngelUpgradeEffects(purchasedAngelUpgrades);
+  const angelProfitText = angelEffects.globalProfitMult > 1
+    ? ` + 人脉升级×${formatNumber(angelEffects.globalProfitMult)}`
+    : '';
+  const angelCostText = angelEffects.globalCostReduce < 1
+    ? `成本-${Math.round((1 - angelEffects.globalCostReduce) * 100)}%`
+    : '';
+  const angelSpeedText = angelEffects.globalCycleReduce < 1
+    ? `速度+${Math.round((1 - angelEffects.globalCycleReduce) * 100)}%`
+    : '';
 
   const handlePrestige = () => {
     if (!canDoPrestige) return;
@@ -55,7 +71,7 @@ export default function PrestigeTab() {
 
           <div className="text-[10px] text-white/50">
             ⚠️ 重置: 现金、产线、店长、升级、广告增益
-            <br />✅ 保留: 钻石、{PRESTIGE_RULE.currencyName}、商城一次性购买
+            <br />✅ 保留: 钻石、{PRESTIGE_RULE.currencyName}、人脉升级、商城一次性购买
           </div>
 
           <div className="flex gap-2 mt-4">
@@ -71,6 +87,46 @@ export default function PrestigeTab() {
       ),
     });
   };
+
+  const handleBuyAngelUpgrade = (upgradeId: number) => {
+    const def = ANGEL_UPGRADES.find(u => u.id === upgradeId);
+    if (!def) return;
+
+    showPopup({
+      id: `angel_upgrade_${upgradeId}`,
+      type: 'confirm',
+      content: (
+        <div className="text-center">
+          <div className="text-4xl mb-2">{def.icon}</div>
+          <h3 className="text-lg font-black mb-1">{def.name}</h3>
+          <p className="text-xs text-gray-400 mb-3">{def.description}</p>
+
+          <div className="bg-red-900/30 rounded-xl p-3 mb-4 border border-red-500/30">
+            <p className="text-sm font-bold text-red-400">
+              消耗 {def.cost} 🤝 {PRESTIGE_RULE.currencyName}
+            </p>
+            <p className="text-[10px] text-red-300/60 mt-1">
+              消耗后利润加成将从 ×{formatNumber(currentMultiplier)} 降至 ×{formatNumber(calcPrestigeMultiplier(prestigePoints - def.cost))}
+            </p>
+          </div>
+
+          <button
+            onClick={() => {
+              useGameStore.getState().buyAngelUpgrade(upgradeId);
+            }}
+            className="w-full py-2.5 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-red-500 
+                       text-white active:scale-95 transition-transform"
+          >
+            确认购买
+          </button>
+        </div>
+      ),
+    });
+  };
+
+  // 分类：产线加成 vs 全局加成
+  const businessUpgrades = ANGEL_UPGRADES.filter(u => u.effectType === 'profit_mult_business');
+  const globalUpgrades = ANGEL_UPGRADES.filter(u => u.effectType !== 'profit_mult_business');
 
   return (
     <div className="flex flex-col gap-4 px-3 py-3 pb-4">
@@ -100,9 +156,15 @@ export default function PrestigeTab() {
           {/* 永久加成 */}
           <div className="bg-black/20 rounded-xl p-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400">永久利润加成</span>
-              <span className="text-sm font-black text-green-400">×{formatNumber(currentMultiplier)}</span>
+              <span className="text-xs text-gray-400">利润加成（人脉）</span>
+              <span className="text-sm font-black text-green-400">×{formatNumber(currentMultiplier)}{angelProfitText}</span>
             </div>
+            {(angelCostText || angelSpeedText) && (
+              <div className="flex gap-3 mt-1 text-[10px]">
+                {angelCostText && <span className="text-blue-400">{angelCostText}</span>}
+                {angelSpeedText && <span className="text-cyan-400">{angelSpeedText}</span>}
+              </div>
+            )}
           </div>
 
           {/* 转生次数 */}
@@ -174,9 +236,133 @@ export default function PrestigeTab() {
         <div className="mt-4 space-y-1.5 text-[10px] text-gray-500">
           <h4 className="text-xs font-medium text-gray-400">转生说明</h4>
           <p>🔄 <span className="text-red-400">重置</span>: 现金、产线数量、店长雇佣、全局升级、广告增益</p>
-          <p>✅ <span className="text-green-400">保留</span>: 钻石、{PRESTIGE_RULE.currencyName}、已购买的一次性商品</p>
+          <p>✅ <span className="text-green-400">保留</span>: 钻石、{PRESTIGE_RULE.currencyName}、人脉升级、商城一次性购买</p>
           <p>📈 <span className="text-yellow-400">加成</span>: 每点{PRESTIGE_RULE.currencyName}永久+{(PRESTIGE_RULE.permanentBonusCurve.perPoint * 100).toFixed(1)}%全局利润</p>
           <p>🎁 <span className="text-cyan-400">赠送</span>: 转生后自动获得1个路边钢化膜摊</p>
+        </div>
+      </div>
+
+      {/* 人脉升级商店 */}
+      <div className="rounded-2xl p-4 bg-gray-800 border border-purple-600/40">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold text-white">🏪 人脉升级商店</h3>
+          <span className="text-[10px] text-yellow-400 font-bold">
+            已购买 {purchasedAngelUpgrades.length}/{ANGEL_UPGRADES.length}
+          </span>
+        </div>
+        <p className="text-[10px] text-gray-500 mb-3">
+          ⚠️ 消耗{PRESTIGE_RULE.currencyName}购买永久升级。购买会降低利润加成，但获得更强大的永久效果！
+        </p>
+
+        {/* 产线加成 */}
+        <div className="mb-4">
+          <h4 className="text-xs font-medium text-gray-400 mb-2 px-1">🏭 产线利润加成（×3）</h4>
+          <div className="flex flex-col gap-2">
+            {businessUpgrades.map(upgrade => {
+              const isPurchased = purchasedAngelUpgrades.includes(upgrade.id);
+              const business = BUSINESSES.find(b => b.id === upgrade.targetBusinessId);
+              const canAfford = !isPurchased && prestigePoints >= upgrade.cost;
+
+              return (
+                <div
+                  key={upgrade.id}
+                  className={`rounded-xl p-2.5 border transition-all duration-200
+                    ${isPurchased
+                      ? 'bg-green-900/20 border-green-500/30'
+                      : 'bg-gray-700/50 border-gray-600/30'
+                    }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg flex-shrink-0
+                      ${isPurchased ? 'bg-green-500/20' : 'bg-gray-700'}`}>
+                      {upgrade.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-white">
+                          {business?.icon} {upgrade.name}
+                        </span>
+                        {isPurchased ? (
+                          <span className="text-green-400 text-[10px] font-bold">✅ 已购买</span>
+                        ) : (
+                          <span className="text-yellow-400 text-[10px] font-bold">{upgrade.cost} 🤝</span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-gray-500">{upgrade.description}</p>
+                    </div>
+                    {!isPurchased && (
+                      <button
+                        onClick={() => handleBuyAngelUpgrade(upgrade.id)}
+                        disabled={!canAfford}
+                        className={`px-2 py-1.5 rounded-lg text-[10px] font-bold flex-shrink-0
+                          active:scale-95 transition-transform
+                          ${canAfford
+                            ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white'
+                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                          }`}
+                      >
+                        购买
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 全局加成 */}
+        <div>
+          <h4 className="text-xs font-medium text-gray-400 mb-2 px-1">🌟 全局永久升级</h4>
+          <div className="flex flex-col gap-2">
+            {globalUpgrades.map(upgrade => {
+              const isPurchased = purchasedAngelUpgrades.includes(upgrade.id);
+              const canAfford = !isPurchased && prestigePoints >= upgrade.cost;
+
+              return (
+                <div
+                  key={upgrade.id}
+                  className={`rounded-xl p-2.5 border transition-all duration-200
+                    ${isPurchased
+                      ? 'bg-green-900/20 border-green-500/30'
+                      : 'bg-gray-700/50 border-gray-600/30'
+                    }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg flex-shrink-0
+                      ${isPurchased ? 'bg-green-500/20' : 'bg-gray-700'}`}>
+                      {upgrade.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-white">{upgrade.name}</span>
+                        {isPurchased ? (
+                          <span className="text-green-400 text-[10px] font-bold">✅ 已购买</span>
+                        ) : (
+                          <span className="text-yellow-400 text-[10px] font-bold">{upgrade.cost} 🤝</span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-gray-500">{upgrade.description}</p>
+                    </div>
+                    {!isPurchased && (
+                      <button
+                        onClick={() => handleBuyAngelUpgrade(upgrade.id)}
+                        disabled={!canAfford}
+                        className={`px-2 py-1.5 rounded-lg text-[10px] font-bold flex-shrink-0
+                          active:scale-95 transition-transform
+                          ${canAfford
+                            ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white'
+                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                          }`}
+                      >
+                        购买
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 

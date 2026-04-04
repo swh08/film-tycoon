@@ -84,6 +84,18 @@ export interface PrestigeRuleDef {
   unlockCondition: { type: 'total_earned'; value: number };
 }
 
+/** 人脉升级定义 (AngelUpgradeDef) — 消耗人脉点数购买的永久升级 */
+export interface AngelUpgradeDef {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  cost: number; // 消耗的人脉点数
+  effectType: 'profit_mult_business' | 'profit_mult_all' | 'cost_reduce_all' | 'cycle_reduce_all';
+  effectValue: number;
+  targetBusinessId?: number; // 产线利润加成的目标产线ID
+}
+
 /** 商城礼包定义 (OfferDef) */
 export interface OfferDef {
   id: number;
@@ -183,6 +195,9 @@ export interface GameState {
 
   // UI偏好（跨tab/刷新持久化）
   buyMode: number; // 全局购买数量模式：1/10/100/0(最大)
+
+  // 人脉升级（永久，消耗人脉购买）
+  purchasedAngelUpgrades: number[];
 }
 
 /** 格式化数字用的后缀 */

@@ -6,7 +6,8 @@ import { BusinessState, UpgradeState, AdBuff, TutorialStep, GameState } from '..
 import { BUSINESSES } from '../game/config/businesses';
 import { MANAGERS } from '../game/config/managers';
 import { GLOBAL_UPGRADES } from '../game/config/upgrades';
-import { calcBuyCost, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects } from '../game/formulas';
+import { ANGEL_UPGRADES } from '../game/config/angel-upgrades';
+import { calcBuyCost, calcBuyCostWithDiscount, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects, calcAngelUpgradeEffects, calcAngelBusinessProfitMult } from '../game/formulas';
 import { calcPrestigeGain, calcPrestigeMultiplier } from '../game/config/prestige';
 
 const SAVE_KEY = 'screen_tycoon_save_v1';
@@ -34,6 +35,7 @@ function createInitialState(): GameState {
     lastOnlineTimestamp: Date.now(),
     tutorialStep: 'none',
     purchasedOffers: [],
+    purchasedAngelUpgrades: [],
     totalManualTaps: 0,
     totalPurchases: 0,
     startTime: Date.now(),
@@ -84,6 +86,9 @@ interface GameActions {
 
   // 升级全局升级
   buyUpgrade: (upgradeId: number, count?: number) => boolean;
+
+  // 购买人脉升级（消耗人脉点数）
+  buyAngelUpgrade: (upgradeId: number) => boolean;
 
 
   // 转生
@@ -184,7 +189,7 @@ export const useGameStore = create<GameStore>((set, get) => {
       if (bsIdx === -1) return false;
       const currentQty = state.businesses[bsIdx].quantity;
 
-      const cost = calcBuyCost(def, currentQty, count);
+      const cost = calcBuyCostWithDiscount(def, currentQty, count, state.purchasedAngelUpgrades);
       if (state.cash < cost) return false;
 
       set(s => {
@@ -271,6 +276,22 @@ export const useGameStore = create<GameStore>((set, get) => {
       return true;
     },
 
+    buyAngelUpgrade: (upgradeId: number) => {
+      const state = get();
+      if (state.purchasedAngelUpgrades.includes(upgradeId)) return false;
+
+      const def = ANGEL_UPGRADES.find(u => u.id === upgradeId);
+      if (!def) return false;
+      if (state.prestigePoints < def.cost) return false;
+
+      set(s => ({
+        prestigePoints: s.prestigePoints - def.cost,
+        purchasedAngelUpgrades: [...s.purchasedAngelUpgrades, upgradeId],
+      }));
+      get().save();
+      return true;
+    },
+
     prestige: () => {
       const state = get();
       const gain = calcPrestigeGain(state.totalEarned);
@@ -299,6 +320,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         totalManualTaps: 0,
         totalPurchases: 0,
         buyMode: s.buyMode, // UI偏好保留
+        purchasedAngelUpgrades: s.purchasedAngelUpgrades, // 人脉升级永久保留
       }));
       get().save();
     },
@@ -367,6 +389,9 @@ export const useGameStore = create<GameStore>((set, get) => {
       const completedBusinesses: number[] = [];
       let totalEarned = 0;
 
+      // 预计算人脉升级效果
+      const angelEffects = calcAngelUpgradeEffects(state.purchasedAngelUpgrades || []);
+
       const newBusinesses = state.businesses.map(bs => {
         if (bs.quantity <= 0) return { ...bs };
         // 有店长的自动运行；没店长但progress>0说明手动启动过，也要走进度
@@ -378,6 +403,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         // 计算实际周期
         const globalEffects = calcGlobalEffects(state.upgrades);
         let cycle = def.baseCycleSec * globalEffects.cycleMultiplier;
+        cycle *= angelEffects.globalCycleReduce;
         const rushBuff = state.adBuffs.find(b => b.type === 'rush_order');
         if (rushBuff) cycle *= 0.2;
         cycle = Math.max(0.05, cycle);
@@ -392,6 +418,8 @@ export const useGameStore = create<GameStore>((set, get) => {
             if (bs.quantity >= ms.at) revenue *= ms.multiplier;
           }
           revenue *= globalEffects.profitMultiplier;
+          revenue *= calcAngelBusinessProfitMult(bs.businessId, state.purchasedAngelUpgrades || []);
+          revenue *= angelEffects.globalProfitMult;
           revenue *= calcPrestigeMultiplier(state.prestigePoints);
           if (state.adBuffs.some(b => b.type === 'double_revenue')) revenue *= 2;
           if (rushBuff) revenue *= 3;
