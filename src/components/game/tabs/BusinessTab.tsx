@@ -31,8 +31,8 @@ export default function BusinessTab() {
     manualProduce,
     advanceTutorial,
     tutorialStep,
-    buyModes,
-    toggleBuyMode,
+    buyMode,
+    setBuyMode,
   } = useGameStore();
 
   const { showPopup } = usePopup();
@@ -77,7 +77,7 @@ export default function BusinessTab() {
   }, [businesses, tutorialStep, advanceTutorial, showPopup]);
 
   const handleBuy = useCallback((businessId: number) => {
-    let count = buyModes[businessId] ?? 1;
+    let count = buyMode;
     // 最大模式：动态计算能买多少
     if (count === 0) {
       const def = BUSINESSES.find(b => b.id === businessId);
@@ -97,27 +97,41 @@ export default function BusinessTab() {
         advanceTutorial('buy_10');
       }
     }
-  }, [buyModes, buyBusiness, tutorialStep, advanceTutorial, businesses, cash]);
+  }, [buyMode, buyBusiness, tutorialStep, advanceTutorial, businesses, cash]);
 
-  // 获取购买模式显示文字
-  const getBuyModeLabel = (mode: number) => {
-    switch (mode) {
-      case 1: return '×1';
-      case 10: return '×10';
-      case 100: return '×100';
-      case 0: return '最大';
-      default: return '×1';
-    }
-  };
+  const BUY_MODES = [
+    { value: 1, label: '×1' },
+    { value: 10, label: '×10' },
+    { value: 100, label: '×100' },
+    { value: 0, label: '最大' },
+  ];
 
   return (
     <div className="flex flex-col gap-3 px-3 py-3 pb-4">
       {/* 标题区 */}
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-bold text-yellow-400">🏪 我的生意</h2>
-        <span className="text-[10px] text-gray-400">
-          已解锁 {businesses.filter(b => b.quantity > 0).length}/{BUSINESSES.length}
-        </span>
+        <div className="flex items-center gap-2">
+          {/* 全局购买模式切换 */}
+          <div className="flex rounded-lg overflow-hidden border border-gray-600">
+            {BUY_MODES.map(m => (
+              <button
+                key={m.value}
+                onClick={() => setBuyMode(m.value)}
+                className={`px-2 py-1 text-[10px] font-bold transition-colors
+                  ${buyMode === m.value
+                    ? 'bg-yellow-600 text-white'
+                    : 'bg-gray-700 text-gray-400'
+                  }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+          <span className="text-[10px] text-gray-400">
+            {businesses.filter(b => b.quantity > 0).length}/{BUSINESSES.length}
+          </span>
+        </div>
       </div>
 
       {/* 新手引导提示 */}
@@ -150,7 +164,7 @@ export default function BusinessTab() {
         // 检查是否解锁
         const isUnlocked = checkUnlock(def.id, businesses, cash);
 
-        const buyModeVal = buyModes[def.id] ?? 1;
+        const buyModeVal = buyMode;
         // 实际购买数量（最大模式动态计算）
         const actualBuyCount = buyModeVal === 0
           ? calcMaxBuyable(def, quantity, cash)
@@ -274,15 +288,6 @@ export default function BusinessTab() {
                       </button>
                     )
                   )}
-
-                  {/* 购买模式切换 */}
-                  <button
-                    onClick={() => toggleBuyMode(def.id)}
-                    className="px-2 py-2 rounded-lg bg-gray-700 text-yellow-400 text-xs font-bold
-                               active:scale-95 transition-transform hover:bg-gray-600"
-                  >
-                    {getBuyModeLabel(buyModeVal)}
-                  </button>
 
                   {/* 购买按钮 */}
                   <button
