@@ -3,8 +3,8 @@
 // ============================================================
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 
 // 不使用SSR的组件
@@ -22,12 +22,25 @@ const ShopTab = dynamic(() => import('@/components/game/tabs/ShopTab'), { ssr: f
 import type { TabId } from '@/components/game/BottomTabs';
 import { useGameStore } from '@/store/gameStore';
 
+const TAB_INDEX: Record<TabId, number> = {
+  business: 0, upgrade: 1, manager: 2, prestige: 3, shop: 4,
+};
+
 export default function GamePage() {
   const [activeTab, setActiveTab] = useState<TabId>('business');
   const [isReady, setIsReady] = useState(false);
+  const [direction, setDirection] = useState(1);
   const updateProgress = useGameStore(s => s.updateProgress);
   const save = useGameStore(s => s.save);
   const lastTick = useRef<number>(Date.now());
+  const dirRef = useRef(1);
+
+  // Tab切换：计算滑动方向
+  const handleTabChange = useCallback((tab: TabId) => {
+    dirRef.current = TAB_INDEX[tab] >= TAB_INDEX[activeTab] ? 1 : -1;
+    setDirection(dirRef.current);
+    setActiveTab(tab);
+  }, [activeTab]);
 
   // 游戏主循环
   useEffect(() => {
@@ -37,7 +50,7 @@ export default function GamePage() {
 
     const gameLoop = () => {
       const now = Date.now();
-      const deltaSec = Math.min((now - lastTick.current) / 1000, 0.1); // 最大100ms防止大跳跃
+      const deltaSec = Math.min((now - lastTick.current) / 1000, 0.1);
       lastTick.current = now;
 
       if (deltaSec > 0) {
@@ -49,12 +62,10 @@ export default function GamePage() {
 
     animFrameId = requestAnimationFrame(gameLoop);
 
-    // 自动保存每30秒
     const saveInterval = setInterval(() => {
       save();
     }, 30000);
 
-    // 页面关闭时保存
     const handleBeforeUnload = () => {
       save();
     };
@@ -67,7 +78,6 @@ export default function GamePage() {
     };
   }, [isReady, updateProgress, save]);
 
-  // 等待客户端hydrated
   useEffect(() => {
     setIsReady(true);
   }, []);
@@ -90,15 +100,12 @@ export default function GamePage() {
     );
   }
 
-  const renderTab = () => {
-    switch (activeTab) {
-      case 'business': return <BusinessTab />;
-      case 'upgrade': return <UpgradeTab />;
-      case 'manager': return <ManagerTab />;
-      case 'prestige': return <PrestigeTab />;
-      case 'shop': return <ShopTab />;
-      default: return <BusinessTab />;
-    }
+  const TAB_COMPONENTS: Record<TabId, React.ReactNode> = {
+    business: <BusinessTab />,
+    upgrade: <UpgradeTab />,
+    manager: <ManagerTab />,
+    prestige: <PrestigeTab />,
+    shop: <ShopTab />,
   };
 
   return (
@@ -107,13 +114,23 @@ export default function GamePage() {
         {/* 顶部HUD */}
         <TopHUD />
 
-        {/* 主内容区 */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin">
-          {renderTab()}
+        {/* 主内容区 — 带切入动画 */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin relative">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, x: direction * 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction * -40 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+            >
+              {TAB_COMPONENTS[activeTab]}
+            </motion.div>
+          </AnimatePresence>
         </main>
 
         {/* 底部Tab */}
-        <BottomTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        <BottomTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
         {/* 离线收益弹窗 */}
         <OfflineRewardPopup />
