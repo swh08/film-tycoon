@@ -212,7 +212,7 @@ export default function BusinessTab() {
                   <div className="h-3 rounded-full bg-gray-700 overflow-hidden relative">
                     <motion.div
                       className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400"
-                      style={{ width: `${(bs.progress ?? 0) * 100}%` }}
+                      style={{ width: `${Math.min((bs.progress ?? 0) * 100, 100)}%` }}
                       transition={{ duration: 0.1 }}
                     />
                     {/* 店长标识 */}

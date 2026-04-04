@@ -410,7 +410,7 @@ export const useGameStore = create<GameStore>((set, get) => {
           return { ...bs, progress: bs.hasManager ? 0.001 : 0 };
         }
 
-        return { ...bs, progress: Math.min(newProgress, 0.999) };
+        return { ...bs, progress: newProgress };
       });
 
       if (completedBusinesses.length > 0 || totalEarned > 0) {
