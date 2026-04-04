@@ -5,16 +5,46 @@
 
 import { useGameStore } from '@/store/gameStore';
 import { GLOBAL_UPGRADES, UPGRADE_GROUP_INFO } from '@/game/config/upgrades';
-import { calcUpgradeCost, formatCash, formatNumber } from '@/game/formulas';
+import { calcUpgradeCostBulk, calcMaxUpgradeLevels, formatCash, formatNumber } from '@/game/formulas';
 import type { UpgradeGroup } from '@/game/types';
 
 const GROUP_ORDER: UpgradeGroup[] = ['equipment', 'channel', 'brand'];
 
+const BUY_MODES = [
+  { value: 1, label: '×1' },
+  { value: 10, label: '×10' },
+  { value: 100, label: '×100' },
+  { value: 0, label: '最大' },
+];
+
 export default function UpgradeTab() {
-  const { cash, diamonds, upgrades, buyUpgrade } = useGameStore();
+  const { cash, diamonds, upgrades, buyUpgrade, buyMode, setBuyMode } = useGameStore();
 
   return (
     <div className="flex flex-col gap-4 px-3 py-3 pb-4">
+      {/* 标题区 */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-bold text-yellow-400">⚡ 全局升级</h2>
+        <div className="flex items-center gap-2">
+          {/* 全局购买模式切换 */}
+          <div className="flex rounded-lg overflow-hidden border border-gray-600">
+            {BUY_MODES.map(m => (
+              <button
+                key={m.value}
+                onClick={() => setBuyMode(m.value)}
+                className={`px-2 py-1 text-[10px] font-bold transition-colors
+                  ${buyMode === m.value
+                    ? 'bg-yellow-600 text-white'
+                    : 'bg-gray-700 text-gray-400'
+                  }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {GROUP_ORDER.map(group => {
         const groupInfo = UPGRADE_GROUP_INFO[group];
         const groupUpgrades = GLOBAL_UPGRADES.filter(u => u.group === group);
@@ -34,10 +64,21 @@ export default function UpgradeTab() {
                 const uState = upgrades.find(u => u.upgradeId === def.id);
                 const level = uState?.level ?? 0;
                 const isMaxed = level >= def.maxLevel;
-                const cost = isMaxed ? 0 : calcUpgradeCost(def.id, level);
-                const canAfford = def.currency === 'cash'
-                  ? cash >= cost
-                  : diamonds >= cost;
+
+                // 计算实际购买级数
+                const budget = def.currency === 'cash' ? cash : diamonds;
+                const remainingLevels = def.maxLevel - level;
+                let actualCount: number;
+                if (isMaxed) {
+                  actualCount = 0;
+                } else if (buyMode === 0) {
+                  actualCount = calcMaxUpgradeLevels(def.id, level, def.maxLevel, budget);
+                } else {
+                  actualCount = Math.min(buyMode, remainingLevels);
+                }
+
+                const cost = actualCount > 0 ? calcUpgradeCostBulk(def.id, level, actualCount) : 0;
+                const canAfford = !isMaxed && actualCount > 0 && budget >= cost;
 
                 const costLabel = def.currency === 'cash'
                   ? formatCash(cost)
@@ -88,7 +129,7 @@ export default function UpgradeTab() {
                         {/* 升级按钮 */}
                         {!isMaxed && (
                           <button
-                            onClick={() => buyUpgrade(def.id)}
+                            onClick={() => buyUpgrade(def.id, actualCount)}
                             disabled={!canAfford}
                             className={`
                               w-full py-2 rounded-lg text-xs font-bold transition-all duration-150
@@ -99,7 +140,7 @@ export default function UpgradeTab() {
                               }
                             `}
                           >
-                            升级 → {costLabel}
+                            升级 ×{actualCount} → {costLabel}
                           </button>
                         )}
 

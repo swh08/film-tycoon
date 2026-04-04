@@ -6,7 +6,7 @@ import { BusinessState, UpgradeState, AdBuff, TutorialStep, GameState } from '..
 import { BUSINESSES } from '../game/config/businesses';
 import { MANAGERS } from '../game/config/managers';
 import { GLOBAL_UPGRADES } from '../game/config/upgrades';
-import { calcBuyCost, calcUpgradeCost, calcGlobalEffects } from '../game/formulas';
+import { calcBuyCost, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects } from '../game/formulas';
 import { calcPrestigeGain, calcPrestigeMultiplier } from '../game/config/prestige';
 
 const SAVE_KEY = 'screen_tycoon_save_v1';
@@ -83,7 +83,8 @@ interface GameActions {
   hireManager: (managerId: number) => boolean;
 
   // 升级全局升级
-  buyUpgrade: (upgradeId: number) => boolean;
+  buyUpgrade: (upgradeId: number, count?: number) => boolean;
+
 
   // 转生
   prestige: () => void;
@@ -239,7 +240,7 @@ export const useGameStore = create<GameStore>((set, get) => {
       return true;
     },
 
-    buyUpgrade: (upgradeId: number) => {
+    buyUpgrade: (upgradeId: number, count: number = 1) => {
       const state = get();
       const def = GLOBAL_UPGRADES.find(u => u.id === upgradeId);
       if (!def) return false;
@@ -248,15 +249,17 @@ export const useGameStore = create<GameStore>((set, get) => {
       if (uIdx === -1) return false;
 
       const currentLevel = state.upgrades[uIdx].level;
-      if (currentLevel >= def.maxLevel) return false;
+      // 限制不超过最大等级
+      const actualCount = Math.min(count, def.maxLevel - currentLevel);
+      if (actualCount <= 0) return false;
 
-      const cost = calcUpgradeCost(upgradeId, currentLevel);
+      const cost = calcUpgradeCostBulk(upgradeId, currentLevel, actualCount);
       if (def.currency === 'cash' && state.cash < cost) return false;
       if (def.currency === 'diamond' && state.diamonds < cost) return false;
 
       set(s => {
         const newUpgrades = [...s.upgrades];
-        newUpgrades[uIdx] = { ...newUpgrades[uIdx], level: currentLevel + 1 };
+        newUpgrades[uIdx] = { ...newUpgrades[uIdx], level: currentLevel + actualCount };
 
         return {
           upgrades: newUpgrades,

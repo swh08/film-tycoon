@@ -229,6 +229,43 @@ export function calcUpgradeCost(
   return Math.ceil(def.baseCost * Math.pow(def.costMultiplier, currentLevel));
 }
 
+/** 计算购买 N 级全局升级的总费用 */
+export function calcUpgradeCostBulk(
+  upgradeId: number,
+  currentLevel: number,
+  count: number,
+): number {
+  const def = GLOBAL_UPGRADES.find(g => g.id === upgradeId);
+  if (!def) return Infinity;
+  let total = 0;
+  for (let i = 0; i < count; i++) {
+    total += def.baseCost * Math.pow(def.costMultiplier, currentLevel + i);
+  }
+  return Math.ceil(total);
+}
+
+/** 计算最多能买多少级升级（给定预算） */
+export function calcMaxUpgradeLevels(
+  upgradeId: number,
+  currentLevel: number,
+  maxLevel: number,
+  budget: number,
+): number {
+  const def = GLOBAL_UPGRADES.find(g => g.id === upgradeId);
+  if (!def) return 0;
+  let count = 0;
+  let totalCost = 0;
+  const canBuy = maxLevel - currentLevel;
+  for (let i = 0; i < canBuy; i++) {
+    const cost = def.baseCost * Math.pow(def.costMultiplier, currentLevel + i);
+    if (totalCost + cost > budget) break;
+    totalCost += cost;
+    count++;
+    if (count > 10000) break;
+  }
+  return count;
+}
+
 // === 数字格式化 ===
 
 export function formatNumber(n: number): string {
