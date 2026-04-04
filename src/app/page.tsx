@@ -3,8 +3,8 @@
 // ============================================================
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 
 // 不使用SSR的组件
@@ -29,18 +29,9 @@ const TAB_INDEX: Record<TabId, number> = {
 export default function GamePage() {
   const [activeTab, setActiveTab] = useState<TabId>('business');
   const [isReady, setIsReady] = useState(false);
-  const [direction, setDirection] = useState(1);
   const updateProgress = useGameStore(s => s.updateProgress);
   const save = useGameStore(s => s.save);
   const lastTick = useRef<number>(Date.now());
-  const dirRef = useRef(1);
-
-  // Tab切换：计算滑动方向
-  const handleTabChange = useCallback((tab: TabId) => {
-    dirRef.current = TAB_INDEX[tab] >= TAB_INDEX[activeTab] ? 1 : -1;
-    setDirection(dirRef.current);
-    setActiveTab(tab);
-  }, [activeTab]);
 
   // 游戏主循环
   useEffect(() => {
@@ -114,23 +105,13 @@ export default function GamePage() {
         {/* 顶部HUD */}
         <TopHUD />
 
-        {/* 主内容区 — 带切入动画 */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin relative">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, x: direction * 60 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction * -40 }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
-            >
-              {TAB_COMPONENTS[activeTab]}
-            </motion.div>
-          </AnimatePresence>
+        {/* 主内容区 */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin">
+          {TAB_COMPONENTS[activeTab]}
         </main>
 
         {/* 底部Tab */}
-        <BottomTabs activeTab={activeTab} onTabChange={handleTabChange} />
+        <BottomTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* 离线收益弹窗 */}
         <OfflineRewardPopup />
