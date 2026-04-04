@@ -6,8 +6,8 @@ import { BusinessState, UpgradeState, AdBuff, TutorialStep, GameState } from '..
 import { BUSINESSES } from '../game/config/businesses';
 import { MANAGERS } from '../game/config/managers';
 import { GLOBAL_UPGRADES } from '../game/config/upgrades';
-import { calcBuyCost, calcUpgradeCost, calcPrestigeMultiplier, calcGlobalEffects } from '../game/formulas';
-import { calcPrestigeGain } from '../game/config/prestige';
+import { calcBuyCost, calcUpgradeCost, calcGlobalEffects } from '../game/formulas';
+import { calcPrestigeGain, calcPrestigeMultiplier } from '../game/config/prestige';
 
 const SAVE_KEY = 'screen_tycoon_save_v1';
 
