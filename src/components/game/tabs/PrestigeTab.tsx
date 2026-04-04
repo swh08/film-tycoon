@@ -92,7 +92,7 @@ export default function PrestigeTab() {
             <div className="h-2 rounded-full bg-gray-700">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400"
-                style={{ width: `${Math.min(100, (prestigePoints / 500) * 100)}%` }}
+                style={{ width: `${Math.min(100, prestigePoints > 0 ? (Math.log10(prestigePoints + 1) / Math.log10(1001)) * 100 : 0)}%` }}
               />
             </div>
           </div>
