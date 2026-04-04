@@ -84,6 +84,35 @@ export interface PrestigeRuleDef {
   unlockCondition: { type: 'total_earned'; value: number };
 }
 
+/** 产线专属升级定义 (BusinessUpgradeDef) — 用现金购买的单产线升级 */
+export interface BusinessUpgradeDef {
+  id: number;
+  businessId: number;
+  name: string;
+  description: string;
+  icon: string;
+  cost: number; // 一次性现金成本
+  effectType: 'profit_mult' | 'cycle_reduce';
+  effectValue: number; // profit_mult: 2=×2, cycle_reduce: 0.25=减25%
+  unlockQuantity: number; // 需要拥有多少该产线才显示
+}
+
+/** 成就定义 (AchievementDef) */
+export interface AchievementDef {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  condition: {
+    type: 'total_earned' | 'prestige_count' | 'business_quantity_min' | 'businesses_unlocked' | 'managers_hired' | 'manual_taps' | 'total_purchases' | 'angel_upgrades_bought' | 'business_upgrades_bought' | 'global_upgrade_level';
+    value: number;
+  };
+  reward?: {
+    type: 'cash' | 'diamond';
+    value: number;
+  };
+}
+
 /** 人脉升级定义 (AngelUpgradeDef) — 消耗人脉点数购买的永久升级 */
 export interface AngelUpgradeDef {
   id: number;
@@ -198,6 +227,13 @@ export interface GameState {
 
   // 人脉升级（永久，消耗人脉购买）
   purchasedAngelUpgrades: number[];
+
+  // 产线专属升级（永久，用现金购买，转生时重置）
+  purchasedBusinessUpgrades: number[];
+
+  // 成就系统
+  unlockedAchievements: string[];
+  lastAchievementCheck: number; // 上次成就检查时间戳
 }
 
 /** 格式化数字用的后缀 */

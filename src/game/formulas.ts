@@ -5,6 +5,8 @@ import { BusinessDef, CostCurve, Milestone, AdBuff } from './types';
 import { BUSINESSES } from './config/businesses';
 import { GLOBAL_UPGRADES } from './config/upgrades';
 import { ANGEL_UPGRADES } from './config/angel-upgrades';
+import { BUSINESS_UPGRADES } from './config/business-upgrades';
+import { ACHIEVEMENTS } from './config/achievements';
 import { calcPrestigeMultiplier } from './config/prestige';
 import type { BusinessState, UpgradeState, GameState } from './types';
 
@@ -152,6 +154,9 @@ export function calcRevenuePerCycle(
   const globalEffects = calcGlobalEffects(state.upgrades);
   revenue *= globalEffects.profitMultiplier;
 
+  // 产线专属升级利润加成
+  revenue *= calcBusinessUpgradeProfitMult(businessDef.id, state.purchasedBusinessUpgrades || []);
+
   // 人脉升级加成（单产线+全局）
   const angelEffects = calcAngelUpgradeEffects(state.purchasedAngelUpgrades || []);
   revenue *= calcAngelBusinessProfitMult(businessDef.id, state.purchasedAngelUpgrades || []);
@@ -182,6 +187,9 @@ export function calcCycleTime(
   // 全局升级周期缩减
   const globalEffects = calcGlobalEffects(state.upgrades);
   cycle *= globalEffects.cycleMultiplier;
+
+  // 产线专属升级速度加成
+  cycle *= calcBusinessUpgradeCycleReduce(businessDef.id, state.purchasedBusinessUpgrades || []);
 
   // 人脉升级速度加成
   const angelEffects = calcAngelUpgradeEffects(state.purchasedAngelUpgrades || []);
@@ -330,6 +338,86 @@ export function calcAngelBusinessProfitMult(businessId: number, purchasedAngelUp
     }
   }
   return mult;
+}
+
+// === 产线专属升级效果 ===
+
+/** 计算产线专属升级对单条产线的利润倍率 */
+export function calcBusinessUpgradeProfitMult(businessId: number, purchasedBusinessUpgrades: number[]): number {
+  let mult = 1;
+  for (const id of purchasedBusinessUpgrades) {
+    const def = BUSINESS_UPGRADES.find(u => u.id === id);
+    if (!def || def.businessId !== businessId) continue;
+    if (def.effectType === 'profit_mult') {
+      mult *= def.effectValue;
+    }
+  }
+  return mult;
+}
+
+/** 计算产线专属升级对单条产线的速度缩减乘数 */
+export function calcBusinessUpgradeCycleReduce(businessId: number, purchasedBusinessUpgrades: number[]): number {
+  let reduction = 1; // 乘数，0.75 = 减少25%
+  for (const id of purchasedBusinessUpgrades) {
+    const def = BUSINESS_UPGRADES.find(u => u.id === id);
+    if (!def || def.businessId !== businessId) continue;
+    if (def.effectType === 'cycle_reduce') {
+      reduction *= (1 - def.effectValue);
+    }
+  }
+  return reduction;
+}
+
+// === 成就检查 ===
+
+/** 检查成就条件是否满足 */
+export function checkAchievementConditions(state: any): string[] {
+  const newlyUnlocked: string[] = [];
+
+  for (const ach of ACHIEVEMENTS) {
+    // 已解锁的跳过
+    if (state.unlockedAchievements.includes(ach.id)) continue;
+
+    let met = false;
+    const cond = ach.condition;
+
+    switch (cond.type) {
+      case 'total_earned':
+        met = state.totalEarned >= cond.value;
+        break;
+      case 'prestige_count':
+        met = state.totalPrestigeCount >= cond.value;
+        break;
+      case 'business_quantity_min':
+        met = state.businesses.some((b: any) => b.quantity >= cond.value);
+        break;
+      case 'businesses_unlocked':
+        met = state.businesses.filter((b: any) => b.quantity > 0).length >= cond.value;
+        break;
+      case 'managers_hired':
+        met = state.hiredManagers.length >= cond.value;
+        break;
+      case 'manual_taps':
+        met = state.totalManualTaps >= cond.value;
+        break;
+      case 'total_purchases':
+        met = state.totalPurchases >= cond.value;
+        break;
+      case 'angel_upgrades_bought':
+        met = (state.purchasedAngelUpgrades || []).length >= cond.value;
+        break;
+      case 'business_upgrades_bought':
+        met = (state.purchasedBusinessUpgrades || []).length >= cond.value;
+        break;
+      case 'global_upgrade_level':
+        met = state.upgrades.some((u: any) => u.level >= cond.value);
+        break;
+    }
+
+    if (met) newlyUnlocked.push(ach.id);
+  }
+
+  return newlyUnlocked;
 }
 
 // === 数字格式化 ===

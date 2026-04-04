@@ -7,14 +7,20 @@ import { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { formatCash, formatNumber, calcTotalIncomePerSecond } from '@/game/formulas';
 import { calcPrestigeMultiplier } from '@/game/config/prestige';
+import { ACHIEVEMENTS } from '@/game/config/achievements';
 
-export default function TopHUD() {
+export interface TopHUDProps {
+  onAchievementOpen?: () => void;
+}
+
+export default function TopHUD({ onAchievementOpen }: TopHUDProps) {
   const cash = useGameStore(s => s.cash);
   const diamonds = useGameStore(s => s.diamonds);
   const adBuffs = useGameStore(s => s.adBuffs);
   const businesses = useGameStore(s => s.businesses);
   const upgrades = useGameStore(s => s.upgrades);
   const prestigePoints = useGameStore(s => s.prestigePoints);
+  const unlockedAchievements = useGameStore(s => s.unlockedAchievements);
 
   const [incomePerSec, setIncomePerSec] = useState(0);
   const [buffTimer, setBuffTimer] = useState('');
@@ -63,6 +69,21 @@ export default function TopHUD() {
                         animate-pulse shadow-md shadow-red-500/40">
           {buffTimer}
         </div>
+      )}
+
+      {/* 成就入口 */}
+      {onAchievementOpen && (
+        <button
+          onClick={onAchievementOpen}
+          className="relative flex items-center justify-center w-8 h-8 rounded-full bg-yellow-600/30 hover:bg-yellow-600/50 transition-colors"
+        >
+          <span className="text-sm">🏅</span>
+          {unlockedAchievements.length > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-green-500 text-[8px] font-black text-white flex items-center justify-center">
+              {unlockedAchievements.length}
+            </span>
+          )}
+        </button>
       )}
 
       {/* 钻石 & 人脉 */}

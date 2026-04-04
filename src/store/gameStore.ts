@@ -7,7 +7,9 @@ import { BUSINESSES } from '../game/config/businesses';
 import { MANAGERS } from '../game/config/managers';
 import { GLOBAL_UPGRADES } from '../game/config/upgrades';
 import { ANGEL_UPGRADES } from '../game/config/angel-upgrades';
-import { calcBuyCost, calcBuyCostWithDiscount, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects, calcAngelUpgradeEffects, calcAngelBusinessProfitMult } from '../game/formulas';
+import { calcBuyCost, calcBuyCostWithDiscount, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects, calcAngelUpgradeEffects, calcAngelBusinessProfitMult, checkAchievementConditions, calcBusinessUpgradeProfitMult, calcBusinessUpgradeCycleReduce } from '../game/formulas';
+import { BUSINESS_UPGRADES } from '../game/config/business-upgrades';
+import { ACHIEVEMENTS } from '../game/config/achievements';
 import { calcPrestigeGain, calcPrestigeMultiplier } from '../game/config/prestige';
 
 const SAVE_KEY = 'screen_tycoon_save_v1';
@@ -36,6 +38,9 @@ function createInitialState(): GameState {
     tutorialStep: 'none',
     purchasedOffers: [],
     purchasedAngelUpgrades: [],
+    purchasedBusinessUpgrades: [],
+    unlockedAchievements: [],
+    lastAchievementCheck: Date.now(),
     totalManualTaps: 0,
     totalPurchases: 0,
     startTime: Date.now(),
@@ -89,6 +94,12 @@ interface GameActions {
 
   // 购买人脉升级（消耗人脉点数）
   buyAngelUpgrade: (upgradeId: number) => boolean;
+
+  // 购买产线专属升级（消耗现金）
+  buyBusinessUpgrade: (upgradeId: number) => boolean;
+
+  // 检查并解锁成就（返回新解锁的成就ID列表）
+  checkAchievements: () => string[];
 
 
   // 转生
@@ -289,7 +300,67 @@ export const useGameStore = create<GameStore>((set, get) => {
         purchasedAngelUpgrades: [...s.purchasedAngelUpgrades, upgradeId],
       }));
       get().save();
+      // 检查成就
+      setTimeout(() => get().checkAchievements(), 100);
       return true;
+    },
+
+    buyBusinessUpgrade: (upgradeId: number) => {
+      const state = get();
+      if (state.purchasedBusinessUpgrades.includes(upgradeId)) return false;
+
+      const def = BUSINESS_UPGRADES.find(u => u.id === upgradeId);
+      if (!def) return false;
+
+      // 检查拥有数量是否满足解锁要求
+      const bs = state.businesses.find(b => b.businessId === def.businessId);
+      if (!bs || bs.quantity < def.unlockQuantity) return false;
+
+      if (state.cash < def.cost) return false;
+
+      set(s => ({
+        cash: s.cash - def.cost,
+        purchasedBusinessUpgrades: [...s.purchasedBusinessUpgrades, upgradeId],
+      }));
+      get().save();
+      setTimeout(() => get().checkAchievements(), 100);
+      return true;
+    },
+
+    checkAchievements: () => {
+      const state = get();
+      const now = Date.now();
+
+      // 节流：最多每3秒检查一次
+      if (now - state.lastAchievementCheck < 3000) return [];
+
+      const newlyUnlocked = checkAchievementConditions(state);
+      if (newlyUnlocked.length === 0) {
+        set({ lastAchievementCheck: now });
+        return [];
+      }
+
+      // 计算奖励
+      let totalCashReward = 0;
+      let totalDiamondReward = 0;
+      for (const id of newlyUnlocked) {
+        const ach = ACHIEVEMENTS.find(a => a.id === id);
+        if (ach?.reward) {
+          if (ach.reward.type === 'cash') totalCashReward += ach.reward.value;
+          if (ach.reward.type === 'diamond') totalDiamondReward += ach.reward.value;
+        }
+      }
+
+      set(s => ({
+        unlockedAchievements: [...s.unlockedAchievements, ...newlyUnlocked],
+        lastAchievementCheck: now,
+        cash: s.cash + totalCashReward,
+        totalEarned: s.totalEarned + totalCashReward,
+        diamonds: s.diamonds + totalDiamondReward,
+      }));
+      get().save();
+
+      return newlyUnlocked;
     },
 
     prestige: () => {
@@ -321,6 +392,8 @@ export const useGameStore = create<GameStore>((set, get) => {
         totalPurchases: 0,
         buyMode: s.buyMode, // UI偏好保留
         purchasedAngelUpgrades: s.purchasedAngelUpgrades, // 人脉升级永久保留
+        purchasedBusinessUpgrades: [], // 产线专属升级重置
+        unlockedAchievements: s.unlockedAchievements, // 成就永久保留
       }));
       get().save();
     },
@@ -403,6 +476,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         // 计算实际周期
         const globalEffects = calcGlobalEffects(state.upgrades);
         let cycle = def.baseCycleSec * globalEffects.cycleMultiplier;
+        cycle *= calcBusinessUpgradeCycleReduce(bs.businessId, state.purchasedBusinessUpgrades || []);
         cycle *= angelEffects.globalCycleReduce;
         const rushBuff = state.adBuffs.find(b => b.type === 'rush_order');
         if (rushBuff) cycle *= 0.2;
@@ -418,6 +492,7 @@ export const useGameStore = create<GameStore>((set, get) => {
             if (bs.quantity >= ms.at) revenue *= ms.multiplier;
           }
           revenue *= globalEffects.profitMultiplier;
+          revenue *= calcBusinessUpgradeProfitMult(bs.businessId, state.purchasedBusinessUpgrades || []);
           revenue *= calcAngelBusinessProfitMult(bs.businessId, state.purchasedAngelUpgrades || []);
           revenue *= angelEffects.globalProfitMult;
           revenue *= calcPrestigeMultiplier(state.prestigePoints);
@@ -443,6 +518,12 @@ export const useGameStore = create<GameStore>((set, get) => {
       }
 
       // 更新广告buff计时
+      // 定期检查成就（每3秒）
+      const now = Date.now();
+      if (now - state.lastAchievementCheck >= 3000) {
+        get().checkAchievements();
+      }
+
       if (state.adBuffs.length > 0) {
         get().tickAdBuffs(deltaSec);
       }

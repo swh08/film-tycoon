@@ -10,6 +10,7 @@ import TopHUD from '@/components/game/TopHUD';
 import BottomTabs, { type TabId } from '@/components/game/BottomTabs';
 import { PopupProvider } from '@/components/game/PopupLayer';
 import OfflineRewardPopup from '@/components/game/OfflineRewardPopup';
+import AchievementPanel from '@/components/game/AchievementPanel';
 
 import BusinessTab from '@/components/game/tabs/BusinessTab';
 import UpgradeTab from '@/components/game/tabs/UpgradeTab';
@@ -26,6 +27,7 @@ const TAB_INDEX: Record<TabId, number> = {
 export default function GamePage() {
   const [activeTab, setActiveTab] = useState<TabId>('business');
   const [isReady, setIsReady] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
   const updateProgress = useGameStore(s => s.updateProgress);
   const save = useGameStore(s => s.save);
   const lastTick = useRef<number>(Date.now());
@@ -100,7 +102,7 @@ export default function GamePage() {
     <PopupProvider>
       <div className="fixed inset-0 flex flex-col bg-gray-950 overflow-hidden select-none">
         {/* 顶部HUD */}
-        <TopHUD />
+        <TopHUD onAchievementOpen={() => setShowAchievements(true)} />
 
         {/* 主内容区 */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin">
@@ -112,6 +114,12 @@ export default function GamePage() {
 
         {/* 离线收益弹窗 */}
         <OfflineRewardPopup />
+
+        {/* 成就面板 */}
+        <AchievementPanel
+          isOpen={showAchievements}
+          onClose={() => setShowAchievements(false)}
+        />
       </div>
     </PopupProvider>
   );
