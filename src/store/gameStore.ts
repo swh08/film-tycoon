@@ -45,6 +45,7 @@ function createInitialState(): GameState {
     totalPurchases: 0,
     startTime: Date.now(),
     buyMode: 1,
+    activeTab: 'business' as string,
   };
 }
 
@@ -80,6 +81,9 @@ function saveToDisk(state: GameState) {
 // ============================================================
 
 interface GameActions {
+  // 切换Tab（UI状态）
+  setActiveTab: (tab: string) => void;
+
   // 手动贴膜（点击生产）
   manualProduce: (businessId: number) => void;
 
@@ -169,6 +173,11 @@ export const useGameStore = create<GameStore>((set, get) => {
   return {
     ...safeState,
     buyMode: safeState.buyMode ?? 1,
+    activeTab: 'business' as string,
+
+    setActiveTab: (tab: string) => {
+      set({ activeTab: tab });
+    },
 
     manualProduce: (businessId: number) => {
       set(state => {

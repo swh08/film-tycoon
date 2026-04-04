@@ -21,3 +21,24 @@ Stage Summary:
 - 收益计算完整集成：收益 = 基础×数量×里程碑×全局升级×产线专属升级×人脉升级×转生加成×广告buff
 - 周期计算完整集成：周期 = 基础×全局升级×产线专属升级×人脉升级×爆单潮
 - 编译通过，无报错
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: 修复转生弹窗：确认后关闭弹窗并切回生意tab（对标AC行为），同时修复静态JSX问题
+
+Work Log:
+- 在 gameStore.ts 添加 `activeTab` 状态和 `setActiveTab` action，让任意组件可切换tab
+- 更新 page.tsx：从 useState 改为使用 gameStore 的 activeTab/setActiveTab
+- 重写 PrestigeTab.tsx：
+  - 提取转生确认弹窗为 `PrestigeConfirmPopup` 响应式组件（使用 useGameStore 实时读取数据）
+  - 提取人脉升级购买弹窗为 `AngelUpgradePopup` 响应式组件
+  - 转生确认后：调用 prestige() → closePopup() → setActiveTab('business')，完全对标AC
+  - 人脉升级购买后：调用 buyAngelUpgrade() → closePopup()
+- 编译通过，无报错
+
+Stage Summary:
+- 转生流程已对标AC：确认转生 → 弹窗关闭 → 自动切回生意tab重新开始
+- 人脉升级购买后弹窗自动关闭
+- 两个弹窗都已改为响应式组件，不再有静态JSX问题
+- activeTab 状态从 page 局部状态迁移到全局 store，任何组件都可以控制 tab 切换

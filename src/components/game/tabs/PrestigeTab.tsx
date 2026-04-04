@@ -10,14 +10,119 @@ import { BUSINESSES } from '@/game/config/businesses';
 import { calcAngelUpgradeEffects, formatCash, formatNumber } from '@/game/formulas';
 import { usePopup } from '../PopupLayer';
 
+// ============================================================
+// 转生确认弹窗 — 响应式组件，数据实时更新
+// ============================================================
+function PrestigeConfirmPopup({ onConfirm }: { onConfirm: () => void }) {
+  const { closePopup } = usePopup();
+  const totalEarned = useGameStore(s => s.totalEarned);
+  const prestigePoints = useGameStore(s => s.prestigePoints);
+
+  const gain = calcPrestigeGain(totalEarned);
+  const nextMultiplier = calcPrestigeMultiplier(prestigePoints + gain);
+
+  const handleConfirm = () => {
+    useGameStore.getState().prestige();
+    closePopup();
+    useGameStore.getState().setActiveTab('business'); // AC行为：转生后回到生意tab
+  };
+
+  return (
+    <div className="text-center">
+      <div className="text-5xl mb-3">🔄</div>
+      <h3 className="text-xl font-black mb-2">确认转生？</h3>
+      <p className="text-sm text-white/80 mb-3">
+        你将卖掉当前所有商业版图，换取{PRESTIGE_RULE.currencyIcon}渠道人脉
+      </p>
+
+      <div className="bg-white/10 rounded-xl p-3 mb-4 text-left space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="text-white/70">当前{PRESTIGE_RULE.currencyName}:</span>
+          <span className="text-yellow-400 font-bold">{prestigePoints}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-white/70">本次获得:</span>
+          <span className="text-green-400 font-bold">+{gain} 🤝</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-white/70">转生后总加成:</span>
+          <span className="text-yellow-300 font-bold">×{formatNumber(nextMultiplier)}</span>
+        </div>
+      </div>
+
+      <div className="text-[10px] text-white/50">
+        ⚠️ 重置: 现金、产线、店长、升级、广告增益
+        <br />✅ 保留: 钻石、{PRESTIGE_RULE.currencyName}、人脉升级、商城一次性购买
+      </div>
+
+      <div className="flex gap-2 mt-4">
+        <button
+          onClick={handleConfirm}
+          className="flex-1 py-2.5 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-red-500 
+                     text-white active:scale-95 transition-transform"
+        >
+          确认转生
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// 人脉升级购买确认弹窗 — 响应式组件
+// ============================================================
+function AngelUpgradePopup({ upgradeId }: { upgradeId: number }) {
+  const { closePopup } = usePopup();
+  const prestigePoints = useGameStore(s => s.prestigePoints);
+  const purchasedAngelUpgrades = useGameStore(s => s.purchasedAngelUpgrades);
+  const isPurchased = purchasedAngelUpgrades.includes(upgradeId);
+  const def = ANGEL_UPGRADES.find(u => u.id === upgradeId);
+
+  if (!def || isPurchased) return null;
+
+  const currentMultiplier = calcPrestigeMultiplier(prestigePoints);
+  const nextMultiplier = calcPrestigeMultiplier(prestigePoints - def.cost);
+
+  const handleBuy = () => {
+    useGameStore.getState().buyAngelUpgrade(upgradeId);
+    closePopup();
+  };
+
+  return (
+    <div className="text-center">
+      <div className="text-4xl mb-2">{def.icon}</div>
+      <h3 className="text-lg font-black mb-1">{def.name}</h3>
+      <p className="text-xs text-gray-400 mb-3">{def.description}</p>
+
+      <div className="bg-red-900/30 rounded-xl p-3 mb-4 border border-red-500/30">
+        <p className="text-sm font-bold text-red-400">
+          消耗 {def.cost} 🤝 {PRESTIGE_RULE.currencyName}
+        </p>
+        <p className="text-[10px] text-red-300/60 mt-1">
+          消耗后利润加成将从 ×{formatNumber(currentMultiplier)} 降至 ×{formatNumber(nextMultiplier)}
+        </p>
+      </div>
+
+      <button
+        onClick={handleBuy}
+        className="w-full py-2.5 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-red-500 
+                   text-white active:scale-95 transition-transform"
+      >
+        确认购买
+      </button>
+    </div>
+  );
+}
+
+// ============================================================
+// PrestigeTab 主组件
+// ============================================================
 export default function PrestigeTab() {
   const {
     totalEarned,
     prestigePoints,
     totalPrestigeCount,
-    prestige,
     purchasedAngelUpgrades,
-    buyAngelUpgrade,
   } = useGameStore();
 
   const { showPopup } = usePopup();
@@ -46,81 +151,15 @@ export default function PrestigeTab() {
     showPopup({
       id: 'prestige_confirm',
       type: 'confirm',
-      content: (
-        <div className="text-center">
-          <div className="text-5xl mb-3">🔄</div>
-          <h3 className="text-xl font-black mb-2">确认转生？</h3>
-          <p className="text-sm text-white/80 mb-3">
-            你将卖掉当前所有商业版图，换取{PRESTIGE_RULE.currencyIcon}渠道人脉
-          </p>
-          
-          <div className="bg-white/10 rounded-xl p-3 mb-4 text-left space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-white/70">当前{PRESTIGE_RULE.currencyName}:</span>
-              <span className="text-yellow-400 font-bold">{prestigePoints}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-white/70">本次获得:</span>
-              <span className="text-green-400 font-bold">+{gain} 🤝</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-white/70">转生后总加成:</span>
-              <span className="text-yellow-300 font-bold">×{formatNumber(nextMultiplier)}</span>
-            </div>
-          </div>
-
-          <div className="text-[10px] text-white/50">
-            ⚠️ 重置: 现金、产线、店长、升级、广告增益
-            <br />✅ 保留: 钻石、{PRESTIGE_RULE.currencyName}、人脉升级、商城一次性购买
-          </div>
-
-          <div className="flex gap-2 mt-4">
-            <button
-              onClick={() => useGameStore.getState().prestige()}
-              className="flex-1 py-2.5 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-red-500 
-                         text-white active:scale-95 transition-transform"
-            >
-              确认转生
-            </button>
-          </div>
-        </div>
-      ),
+      content: <PrestigeConfirmPopup onConfirm={() => {}} />,
     });
   };
 
   const handleBuyAngelUpgrade = (upgradeId: number) => {
-    const def = ANGEL_UPGRADES.find(u => u.id === upgradeId);
-    if (!def) return;
-
     showPopup({
       id: `angel_upgrade_${upgradeId}`,
       type: 'confirm',
-      content: (
-        <div className="text-center">
-          <div className="text-4xl mb-2">{def.icon}</div>
-          <h3 className="text-lg font-black mb-1">{def.name}</h3>
-          <p className="text-xs text-gray-400 mb-3">{def.description}</p>
-
-          <div className="bg-red-900/30 rounded-xl p-3 mb-4 border border-red-500/30">
-            <p className="text-sm font-bold text-red-400">
-              消耗 {def.cost} 🤝 {PRESTIGE_RULE.currencyName}
-            </p>
-            <p className="text-[10px] text-red-300/60 mt-1">
-              消耗后利润加成将从 ×{formatNumber(currentMultiplier)} 降至 ×{formatNumber(calcPrestigeMultiplier(prestigePoints - def.cost))}
-            </p>
-          </div>
-
-          <button
-            onClick={() => {
-              useGameStore.getState().buyAngelUpgrade(upgradeId);
-            }}
-            className="w-full py-2.5 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-red-500 
-                       text-white active:scale-95 transition-transform"
-          >
-            确认购买
-          </button>
-        </div>
-      ),
+      content: <AngelUpgradePopup upgradeId={upgradeId} />,
     });
   };
 

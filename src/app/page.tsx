@@ -25,7 +25,8 @@ const TAB_INDEX: Record<TabId, number> = {
 };
 
 export default function GamePage() {
-  const [activeTab, setActiveTab] = useState<TabId>('business');
+  const activeTab = useGameStore(s => s.activeTab) as TabId;
+  const setActiveTab = useGameStore(s => s.setActiveTab);
   const [isReady, setIsReady] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
   const updateProgress = useGameStore(s => s.updateProgress);
@@ -110,7 +111,7 @@ export default function GamePage() {
         </main>
 
         {/* 底部Tab */}
-        <BottomTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        <BottomTabs activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab)} />
 
         {/* 离线收益弹窗 */}
         <OfflineRewardPopup />
