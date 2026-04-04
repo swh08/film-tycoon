@@ -22,6 +22,90 @@ import {
 } from '@/game/formulas';
 import { usePopup } from '@/components/game/PopupLayer';
 
+// ============================================================
+// 产线专属升级弹窗内容 — 独立组件，实时订阅 store
+// ============================================================
+function BusinessUpgradePopupContent({ businessId }: { businessId: number }) {
+  const cash = useGameStore(s => s.cash);
+  const businesses = useGameStore(s => s.businesses);
+  const purchasedBusinessUpgrades = useGameStore(s => s.purchasedBusinessUpgrades);
+
+  const businessDef = BUSINESSES.find(b => b.id === businessId);
+  if (!businessDef) return null;
+  const upgrades = BUSINESS_UPGRADES.filter(u => u.businessId === businessId);
+  const quantity = businesses.find(b => b.businessId === businessId)?.quantity ?? 0;
+
+  return (
+    <div className="max-h-[70vh] overflow-y-auto">
+      <div className="text-center mb-3">
+        <span className="text-3xl">{businessDef.icon}</span>
+        <h3 className="text-base font-black text-white mt-1">{businessDef.name} 专属升级</h3>
+        <p className="text-[10px] text-gray-400">当前等级: ×{quantity}</p>
+      </div>
+      <div className="flex flex-col gap-2">
+        {upgrades.map(upgrade => {
+          const isPurchased = purchasedBusinessUpgrades.includes(upgrade.id);
+          const canSee = quantity >= upgrade.unlockQuantity;
+          const canAfford = cash >= upgrade.cost;
+
+          return (
+            <div
+              key={upgrade.id}
+              className={`rounded-xl p-3 border transition-all
+                ${isPurchased
+                  ? 'bg-green-900/20 border-green-500/30'
+                  : canSee
+                    ? 'bg-gray-700/50 border-gray-600/30'
+                    : 'bg-gray-800/30 border-gray-700/20 opacity-50'
+                }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0
+                  ${isPurchased ? 'bg-green-500/20' : 'bg-gray-700'}`}>
+                  {isPurchased ? '✅' : canSee ? upgrade.icon : '🔒'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-white">{upgrade.name}</span>
+                    {isPurchased ? (
+                      <span className="text-green-400 text-[10px] font-bold">已购买</span>
+                    ) : canSee ? (
+                      <span className={`text-[10px] font-bold ${canAfford ? 'text-yellow-400' : 'text-gray-500'}`}>
+                        {formatCash(upgrade.cost)}
+                      </span>
+                    ) : (
+                      <span className="text-gray-600 text-[10px]">×{upgrade.unlockQuantity}解锁</span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{upgrade.description}</p>
+                  {!canSee && (
+                    <p className="text-[10px] text-gray-600">拥有{upgrade.unlockQuantity}级后解锁</p>
+                  )}
+                </div>
+              </div>
+              {canSee && !isPurchased && (
+                <button
+                  onClick={() => {
+                    useGameStore.getState().buyBusinessUpgrade(upgrade.id);
+                  }}
+                  disabled={!canAfford}
+                  className={`mt-2 w-full py-2 rounded-lg text-xs font-bold transition-all active:scale-[0.97]
+                    ${canAfford
+                      ? 'bg-gradient-to-r from-yellow-600 to-amber-500 text-white hover:from-yellow-500 hover:to-amber-400'
+                      : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                    }`}
+                >
+                  购买 · {formatCash(upgrade.cost)}
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function BusinessTab() {
   const {
     cash,
@@ -31,7 +115,6 @@ export default function BusinessTab() {
     prestigePoints,
     purchasedAngelUpgrades,
     purchasedBusinessUpgrades,
-    buyBusinessUpgrade,
     buyBusiness,
     manualProduce,
     advanceTutorial,
@@ -45,83 +128,10 @@ export default function BusinessTab() {
 
   // 显示产线专属升级弹窗
   const showBusinessUpgradePopup = (businessId: number) => {
-    const businessDef = BUSINESSES.find(b => b.id === businessId);
-    if (!businessDef) return;
-    const upgrades = BUSINESS_UPGRADES.filter(u => u.businessId === businessId);
-    const quantity = businesses.find(b => b.businessId === businessId)?.quantity ?? 0;
-
     showPopup({
       id: `biz_upgrades_${businessId}`,
       type: 'info',
-      content: (
-        <div className="max-h-[70vh] overflow-y-auto">
-          <div className="text-center mb-3">
-            <span className="text-3xl">{businessDef.icon}</span>
-            <h3 className="text-base font-black text-white mt-1">{businessDef.name} 专属升级</h3>
-            <p className="text-[10px] text-gray-400">当前等级: ×{quantity}</p>
-          </div>
-          <div className="flex flex-col gap-2">
-            {upgrades.map(upgrade => {
-              const isPurchased = purchasedBusinessUpgrades.includes(upgrade.id);
-              const canSee = quantity >= upgrade.unlockQuantity;
-              const canAfford = cash >= upgrade.cost;
-
-              return (
-                <div
-                  key={upgrade.id}
-                  className={`rounded-xl p-3 border transition-all
-                    ${isPurchased
-                      ? 'bg-green-900/20 border-green-500/30'
-                      : canSee
-                        ? 'bg-gray-700/50 border-gray-600/30'
-                        : 'bg-gray-800/30 border-gray-700/20 opacity-50'
-                    }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0
-                      ${isPurchased ? 'bg-green-500/20' : 'bg-gray-700'}`}>
-                      {isPurchased ? '✅' : canSee ? upgrade.icon : '🔒'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white">{upgrade.name}</span>
-                        {isPurchased ? (
-                          <span className="text-green-400 text-[10px] font-bold">已购买</span>
-                        ) : canSee ? (
-                          <span className={`text-[10px] font-bold ${canAfford ? 'text-yellow-400' : 'text-gray-500'}`}>
-                            {formatCash(upgrade.cost)}
-                          </span>
-                        ) : (
-                          <span className="text-gray-600 text-[10px]">×{upgrade.unlockQuantity}解锁</span>
-                        )}
-                      </div>
-                      <p className="text-[10px] text-gray-400 mt-0.5">{upgrade.description}</p>
-                      {!canSee && (
-                        <p className="text-[10px] text-gray-600">拥有{upgrade.unlockQuantity}级后解锁</p>
-                      )}
-                    </div>
-                  </div>
-                  {canSee && !isPurchased && (
-                    <button
-                      onClick={() => {
-                        useGameStore.getState().buyBusinessUpgrade(upgrade.id);
-                      }}
-                      disabled={!canAfford}
-                      className={`mt-2 w-full py-2 rounded-lg text-xs font-bold transition-all active:scale-[0.97]
-                        ${canAfford
-                          ? 'bg-gradient-to-r from-yellow-600 to-amber-500 text-white hover:from-yellow-500 hover:to-amber-400'
-                          : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                        }`}
-                    >
-                      购买 · {formatCash(upgrade.cost)}
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ),
+      content: <BusinessUpgradePopupContent businessId={businessId} />,
     });
   };
 
