@@ -175,7 +175,7 @@ export default function PrestigeTab() {
           <h4 className="text-xs font-medium text-gray-400">转生说明</h4>
           <p>🔄 <span className="text-red-400">重置</span>: 现金、产线数量、店长雇佣、全局升级、广告增益</p>
           <p>✅ <span className="text-green-400">保留</span>: 钻石、{PRESTIGE_RULE.currencyName}、已购买的一次性商品</p>
-          <p>📈 <span className="text-yellow-400">加成</span>: 每点{PRESTIGE_RULE.currencyName}永久+2%全局利润</p>
+          <p>📈 <span className="text-yellow-400">加成</span>: 每点{PRESTIGE_RULE.currencyName}永久+{(PRESTIGE_RULE.permanentBonusCurve.perPoint * 100).toFixed(1)}%全局利润</p>
           <p>🎁 <span className="text-cyan-400">赠送</span>: 转生后自动获得1个路边钢化膜摊</p>
         </div>
       </div>
