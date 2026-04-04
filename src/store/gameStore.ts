@@ -37,6 +37,7 @@ function createInitialState(): GameState {
     totalManualTaps: 0,
     totalPurchases: 0,
     startTime: Date.now(),
+    buyModes: {},
   };
 }
 
@@ -107,6 +108,9 @@ interface GameActions {
   addCash: (amount: number) => void;
   addDiamonds: (amount: number) => void;
 
+  // 购买模式切换
+  toggleBuyMode: (businessId: number) => void;
+
   // 生产进度更新（每帧调用）
   updateProgress: (deltaSec: number) => { completedBusinesses: number[]; totalEarned: number };
 
@@ -145,8 +149,14 @@ export const useGameStore = create<GameStore>((set, get) => {
       : createInitialState().upgrades,
   };
 
+  // 初始化buyModes默认值
+  const defaultBuyModes: Record<number, number> = {};
+  BUSINESSES.forEach(b => { defaultBuyModes[b.id] = 1; });
+  const mergedBuyModes = { ...defaultBuyModes, ...(safeState.buyModes || {}) };
+
   return {
     ...safeState,
+    buyModes: mergedBuyModes,
 
     manualProduce: (businessId: number) => {
       set(state => {
@@ -290,6 +300,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         tutorialStep: 'none' as TutorialStep,
         totalManualTaps: 0,
         totalPurchases: 0,
+        buyModes: s.buyModes, // UI偏好保留
       }));
       get().save();
     },
@@ -346,6 +357,18 @@ export const useGameStore = create<GameStore>((set, get) => {
 
     addDiamonds: (amount) => {
       set(s => ({ diamonds: s.diamonds + amount }));
+    },
+
+    toggleBuyMode: (businessId: number) => {
+      set(s => {
+        const modes = [1, 10, 100, 0]; // 0 = 最大
+        const current = s.buyModes[businessId] ?? 1;
+        const nextIdx = (modes.indexOf(current) + 1) % modes.length;
+        return {
+          buyModes: { ...s.buyModes, [businessId]: modes[nextIdx] },
+        };
+      });
+      get().save();
     },
 
     updateProgress: (deltaSec: number) => {

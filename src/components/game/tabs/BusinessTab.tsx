@@ -3,8 +3,8 @@
 // ============================================================
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useRef, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { BUSINESSES } from '@/game/config/businesses';
 import {
@@ -19,7 +19,6 @@ import {
   formatTime,
 } from '@/game/formulas';
 import { usePopup } from '@/components/game/PopupLayer';
-import type { TutorialStep } from '@/game/types';
 
 export default function BusinessTab() {
   const {
@@ -32,14 +31,11 @@ export default function BusinessTab() {
     manualProduce,
     advanceTutorial,
     tutorialStep,
+    buyModes,
+    toggleBuyMode,
   } = useGameStore();
 
   const { showPopup } = usePopup();
-  const [buyMode, setBuyMode] = useState<Record<number, number>>(() => {
-    const init: Record<number, number> = {};
-    BUSINESSES.forEach(b => { init[b.id] = 1; });
-    return init;
-  });
   const prevMilestones = useRef<Record<number, number>>({});
 
   // 检查里程碑达成
@@ -81,7 +77,16 @@ export default function BusinessTab() {
   }, [businesses, tutorialStep, advanceTutorial, showPopup]);
 
   const handleBuy = useCallback((businessId: number) => {
-    const count = buyMode[businessId] ?? 1;
+    let count = buyModes[businessId] ?? 1;
+    // 最大模式：动态计算能买多少
+    if (count === 0) {
+      const def = BUSINESSES.find(b => b.id === businessId);
+      const bs = businesses.find(b => b.businessId === businessId);
+      if (def && bs) {
+        count = calcMaxBuyable(def, bs.quantity, cash);
+      }
+      if (count <= 0) return;
+    }
     const success = buyBusiness(businessId, count);
 
     // 新手引导：买到第10份
@@ -92,15 +97,17 @@ export default function BusinessTab() {
         advanceTutorial('buy_10');
       }
     }
-  }, [buyMode, buyBusiness, tutorialStep, advanceTutorial]);
+  }, [buyModes, buyBusiness, tutorialStep, advanceTutorial, businesses, cash]);
 
-  const toggleBuyMode = (businessId: number) => {
-    setBuyMode(prev => {
-      const current = prev[businessId] ?? 1;
-      const modes = [1, 10, 100];
-      const nextIdx = (modes.indexOf(current) + 1) % modes.length;
-      return { ...prev, [businessId]: modes[nextIdx] };
-    });
+  // 获取购买模式显示文字
+  const getBuyModeLabel = (mode: number) => {
+    switch (mode) {
+      case 1: return '×1';
+      case 10: return '×10';
+      case 100: return '×100';
+      case 0: return '最大';
+      default: return '×1';
+    }
   };
 
   return (
@@ -135,12 +142,15 @@ export default function BusinessTab() {
         // 检查是否解锁
         const isUnlocked = checkUnlock(def.id, businesses, cash);
 
-        const buyCount = buyMode[def.id] ?? 1;
+        const buyModeVal = buyModes[def.id] ?? 1;
+        // 实际购买数量（最大模式动态计算）
+        const actualBuyCount = buyModeVal === 0
+          ? calcMaxBuyable(def, quantity, cash)
+          : buyModeVal;
         const cost = quantity > 0 || def.id === 1
-          ? calcBuyCost(def, quantity, buyCount)
+          ? calcBuyCost(def, quantity, actualBuyCount)
           : def.baseCost;
-        const canAfford = cash >= cost;
-        const maxBuy = calcMaxBuyable(def, quantity, cash);
+        const canAfford = cash >= cost && actualBuyCount > 0;
 
         // 收益计算
         const cycleTime = quantity > 0 ? calcCycleTime(def, { upgrades, prestigePoints, adBuffs } as any, adBuffs) : def.baseCycleSec;
@@ -263,7 +273,7 @@ export default function BusinessTab() {
                     className="px-2 py-2 rounded-lg bg-gray-700 text-yellow-400 text-xs font-bold
                                active:scale-95 transition-transform hover:bg-gray-600"
                   >
-                    ×{buyCount}
+                    {getBuyModeLabel(buyModeVal)}
                   </button>
 
                   {/* 购买按钮 */}
@@ -279,7 +289,7 @@ export default function BusinessTab() {
                       }
                     `}
                   >
-                    购买 ×{buyCount}
+                    购买 {buyModeVal === 0 ? `×${actualBuyCount}` : `×${actualBuyCount}`}
                     <br />
                     <span className="text-[10px] font-normal opacity-80">{formatCash(cost)}</span>
                   </button>

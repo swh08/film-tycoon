@@ -180,6 +180,9 @@ export interface GameState {
   totalManualTaps: number;
   totalPurchases: number;
   startTime: number;
+
+  // UI偏好（跨tab/刷新持久化）
+  buyModes: Record<number, number>; // 产线购买数量模式：1/10/100/0(最大)
 }
 
 /** 格式化数字用的后缀 */
