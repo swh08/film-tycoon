@@ -5,21 +5,18 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import dynamic from 'next/dynamic';
 
-// 不使用SSR的组件
-const TopHUD = dynamic(() => import('@/components/game/TopHUD'), { ssr: false });
-const BottomTabs = dynamic(() => import('@/components/game/BottomTabs'), { ssr: false });
-const PopupProvider = dynamic(() => import('@/components/game/PopupLayer').then(m => ({ default: m.PopupProvider })), { ssr: false });
-const OfflineRewardPopup = dynamic(() => import('@/components/game/OfflineRewardPopup'), { ssr: false });
+import TopHUD from '@/components/game/TopHUD';
+import BottomTabs, { type TabId } from '@/components/game/BottomTabs';
+import { PopupProvider } from '@/components/game/PopupLayer';
+import OfflineRewardPopup from '@/components/game/OfflineRewardPopup';
 
-const BusinessTab = dynamic(() => import('@/components/game/tabs/BusinessTab'), { ssr: false });
-const UpgradeTab = dynamic(() => import('@/components/game/tabs/UpgradeTab'), { ssr: false });
-const ManagerTab = dynamic(() => import('@/components/game/tabs/ManagerTab'), { ssr: false });
-const PrestigeTab = dynamic(() => import('@/components/game/tabs/PrestigeTab'), { ssr: false });
-const ShopTab = dynamic(() => import('@/components/game/tabs/ShopTab'), { ssr: false });
+import BusinessTab from '@/components/game/tabs/BusinessTab';
+import UpgradeTab from '@/components/game/tabs/UpgradeTab';
+import ManagerTab from '@/components/game/tabs/ManagerTab';
+import PrestigeTab from '@/components/game/tabs/PrestigeTab';
+import ShopTab from '@/components/game/tabs/ShopTab';
 
-import type { TabId } from '@/components/game/BottomTabs';
 import { useGameStore } from '@/store/gameStore';
 
 const TAB_INDEX: Record<TabId, number> = {
