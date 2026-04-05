@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
-import { formatCash, formatNumberSmart, calcTotalIncomePerSecond, getMarketTrendText } from '@/game/formulas';
+import { formatCash, formatNumberSmart, getMarketTrendText } from '@/game/formulas';
 import { BUSINESSES } from '@/game/config/businesses';
 import AnimatedNumber from './AnimatedNumber';
 
@@ -23,15 +23,12 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
   const marketMultipliers = useGameStore(s => s.marketMultipliers);
   const activeEvents = useGameStore(s => s.activeEvents);
 
-  const [incomePerSec, setIncomePerSec] = useState(0);
   const [buffTimers, setBuffTimers] = useState<{icon: string; text: string; color: string}[]>([]);
   const [eventTimers, setEventTimers] = useState<{icon: string; text: string; remaining: number}[]>([]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       const state = useGameStore.getState();
-      const ips = calcTotalIncomePerSecond(state, state.adBuffs);
-      setIncomePerSec(ips);
 
       // 构建所有活跃buff的倒计时标签
       const buffs: {icon: string; text: string; color: string}[] = [];
@@ -95,23 +92,15 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
                     border-b-2 border-yellow-500/50 shadow-lg shadow-amber-900/30">
       {/* === 第一行：核心资源 + 按钮 === */}
       <div className="flex items-center justify-between px-3 py-1.5">
-        {/* 现金 + 收入 */}
+        {/* 游戏名 + 现金 */}
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <span className="text-[10px] text-yellow-300/70 font-medium tracking-wider">💰</span>
+          <span className="text-xs font-black text-yellow-200/90 flex-shrink-0">📱贴膜大亨</span>
+          <span className="text-[10px] text-yellow-300/70 font-medium">💰</span>
           <AnimatedNumber
             value={cash}
             formatFn={formatCash}
             className="text-base font-bold gold-shimmer truncate tabular-nums"
           />
-          {incomePerSec > 0 && (
-            <span className="text-[10px] text-green-400 font-medium flex-shrink-0">
-              +<AnimatedNumber
-                value={incomePerSec}
-                formatFn={formatCash}
-                className="text-[10px] text-green-400 font-medium tabular-nums"
-              />/s
-            </span>
-          )}
         </div>
 
         {/* 钻石 & 人脉 & 设置 */}
