@@ -172,8 +172,8 @@
 
 /* 波纹扫描（高速产线进度条） */
 @keyframes wave-sweep {
-  0% { background-position: -100% 0; }
-  100% { background-position: 200% 0; }
+  0% { background-position: 200% 0; }
+  100% { background-position: -100% 0; }
 }
 
 .progress-wave {
