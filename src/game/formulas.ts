@@ -223,6 +223,10 @@ export function calcCycleTime(
   const rushBuff = adBuffs.find(b => b.type === 'rush_order');
   if (rushBuff) cycle *= 0.2;
 
+  // Task 4: speed_boost buff（广告加速，value=3 means ×3 speed）
+  const speedBuff = adBuffs.find(b => b.type === 'speed_boost');
+  if (speedBuff) cycle /= speedBuff.value;
+
   // 店长等级加成（速度）
   cycle *= calcManagerLevelCycleReduce(businessDef.id, (state as any).managerLevels ?? {}, (state as any).hiredManagers ?? []);
 

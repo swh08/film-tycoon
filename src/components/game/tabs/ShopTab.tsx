@@ -3,7 +3,8 @@
 // ============================================================
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { SHOP_OFFERS } from '@/game/config/shop';
 import { GAME_EVENTS } from '@/game/config/events';
@@ -21,20 +22,24 @@ export default function ShopTab() {
     addDiamonds,
     totalEarned,
     totalPrestigeCount,
+    watchAd,
+    getRemainingAds,
+    dailyAdLimit,
   } = useGameStore();
 
   const { showPopup } = usePopup();
-  const [adWatchCount, setAdWatchCount] = useState(0);
+  const [adCooldown, setAdCooldown] = useState<number | null>(null);
+  const [activeCooldownOfferId, setActiveCooldownOfferId] = useState<number | null>(null);
+  const cooldownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const remainingAds = getRemainingAds();
+  const adsAvailable = remainingAds > 0;
 
-  const handleAdReward = (offerId: number, type: string, value: number) => {
-    // 模拟观看广告
-    setAdWatchCount(prev => prev + 1);
-
+  const handleAdReward = useCallback((offerId: number, type: string, value: number) => {
     switch (type) {
       case 'ad_buff_double_revenue':
         addAdBuff('double_revenue', value, 2);
         showPopup({
-          id: `ad_reward_${adWatchCount}`,
+          id: `ad_reward_${Date.now()}`,
           type: 'reward',
           content: (
             <div className="text-center">
@@ -46,12 +51,11 @@ export default function ShopTab() {
         });
         break;
 
-      case 'ad_buff_extra_offline':
-        // 直接给予离线奖励模拟
+      case 'ad_buff_extra_offline': {
         const bonus = Math.floor(cash * 0.5) + 1000;
         addCash(bonus);
         showPopup({
-          id: `ad_reward_${adWatchCount}`,
+          id: `ad_reward_${Date.now()}`,
           type: 'reward',
           content: (
             <div className="text-center">
@@ -62,11 +66,12 @@ export default function ShopTab() {
           ),
         });
         break;
+      }
 
       case 'ad_buff_rush_order':
         addAdBuff('rush_order', value, 3);
         showPopup({
-          id: `ad_reward_${adWatchCount}`,
+          id: `ad_reward_${Date.now()}`,
           type: 'reward',
           content: (
             <div className="text-center">
@@ -77,8 +82,79 @@ export default function ShopTab() {
           ),
         });
         break;
+
+      // Task 4: 新广告奖励类型
+      case 'ad_instant_cash': {
+        const instantCash = Math.max(1000, totalEarned * 0.01);
+        addCash(instantCash);
+        showPopup({
+          id: `ad_reward_${Date.now()}`,
+          type: 'reward',
+          content: (
+            <div className="text-center">
+              <div className="text-4xl mb-2">🎯</div>
+              <h3 className="text-xl font-black mb-1">精准投放成功！</h3>
+              <p className="text-lg text-yellow-200 font-bold">+{formatCash(instantCash)}</p>
+              <p className="text-[10px] text-gray-400 mt-1">总收入1%或¥1,000，取较高值</p>
+            </div>
+          ),
+        });
+        break;
+      }
+
+      case 'diamond':
+        addDiamonds(value);
+        showPopup({
+          id: `ad_reward_${Date.now()}`,
+          type: 'reward',
+          content: (
+            <div className="text-center">
+              <div className="text-4xl mb-2">💎</div>
+              <h3 className="text-xl font-black mb-1">获得钻石！</h3>
+              <p className="text-lg text-cyan-200 font-bold">+{value} 💎</p>
+            </div>
+          ),
+        });
+        break;
+
+      case 'ad_buff_speed':
+        addAdBuff('speed_boost', value, 3);
+        showPopup({
+          id: `ad_reward_${Date.now()}`,
+          type: 'reward',
+          content: (
+            <div className="text-center">
+              <div className="text-4xl mb-2">⚡</div>
+              <h3 className="text-xl font-black mb-1">极速生产激活！</h3>
+              <p className="text-sm text-white/80">60秒内所有产线速度×3！</p>
+            </div>
+          ),
+        });
+        break;
     }
-  };
+  }, [addAdBuff, addCash, addDiamonds, cash, totalEarned, showPopup]);
+
+  const handleAdWatch = useCallback((offerId: number, rewardType: string, rewardValue: number) => {
+    if (adCooldown !== null) return;
+    if (!watchAd()) return; // daily limit check
+
+    setActiveCooldownOfferId(offerId);
+    setAdCooldown(3); // 3 second countdown
+
+    cooldownTimerRef.current = setInterval(() => {
+      setAdCooldown(prev => {
+        if (prev === null) return null;
+        if (prev <= 1) {
+          if (cooldownTimerRef.current) clearInterval(cooldownTimerRef.current);
+          // Grant reward after countdown
+          handleAdReward(offerId, rewardType, rewardValue);
+          setActiveCooldownOfferId(null);
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, [adCooldown, watchAd, handleAdReward]);
 
   const handleFreeOffer = (offerId: number, rewards: any[]) => {
     rewards.forEach(r => {
@@ -104,36 +180,81 @@ export default function ShopTab() {
 
   const isPurchased = (offerId: number) => purchasedOffers.includes(offerId);
 
+  // Ad offers (IDs 1-3 and 10-12)
+  const adOffers = SHOP_OFFERS.filter(o => [1, 2, 3, 10, 11, 12].includes(o.id));
+
   return (
     <div className="flex flex-col gap-4 px-3 py-3 pb-4">
       {/* 广告增益区 */}
       <div>
-        <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1">📺 免费增益（观看广告）</h2>
+        <div className="flex items-center justify-between mb-2 px-1">
+          <h2 className="text-sm font-bold text-yellow-400">📺 免费增益（观看广告）</h2>
+          <span className={`text-[10px] font-bold ${adsAvailable ? 'text-green-400' : 'text-red-400'}`}>
+            今日剩余: {remainingAds}/{dailyAdLimit} 次
+          </span>
+        </div>
+
+        {!adsAvailable && (
+          <div className="rounded-xl p-3 bg-gray-800/50 border border-red-800/30 mb-2 text-center">
+            <span className="text-2xl">😴</span>
+            <p className="text-xs text-red-400 font-bold mt-1">今日次数已用完，明天再来！</p>
+          </div>
+        )}
+
         <div className="flex flex-col gap-2">
-          {SHOP_OFFERS.filter(o => o.id <= 3).map(offer => (
-            <div
-              key={offer.id}
-              className="rounded-xl p-3 bg-gradient-to-r from-gray-800 to-gray-850 border border-green-600/30"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-900/30 flex items-center justify-center text-xl flex-shrink-0">
-                  {offer.icon}
+          {adOffers.map(offer => {
+            const isCountingDown = adCooldown !== null && activeCooldownOfferId === offerId;
+            const isOtherCountingDown = adCooldown !== null && activeCooldownOfferId !== offerId;
+
+            return (
+              <div
+                key={offer.id}
+                className="rounded-xl p-3 bg-gradient-to-r from-gray-800 to-gray-850 border border-green-600/30"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-green-900/30 flex items-center justify-center text-xl flex-shrink-0">
+                    {offer.icon}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-sm font-bold text-white">{offer.name}</h3>
+                    <p className="text-[10px] text-gray-400">{offer.description}</p>
+                    {isCountingDown && (
+                      <div className="mt-1.5">
+                        <div className="h-1.5 rounded-full bg-gray-700 overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full bg-gradient-to-r from-green-400 to-emerald-400"
+                            initial={{ width: '0%' }}
+                            animate={{ width: `${((3 - (adCooldown ?? 0)) / 3) * 100}%` }}
+                            transition={{ duration: 1, ease: 'linear' }}
+                          />
+                        </div>
+                        <p className="text-[9px] text-green-400 mt-0.5">
+                          📺 观看中... {adCooldown}s
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  {isCountingDown ? (
+                    <div className="px-3 py-2 rounded-lg bg-green-800/40 text-green-300 text-xs font-bold animate-pulse flex-shrink-0">
+                      📺 ...
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleAdWatch(offer.id, offer.rewards[0].type, offer.rewards[0].value)}
+                      disabled={!adsAvailable || isOtherCountingDown}
+                      className={`px-3 py-2 rounded-lg text-xs font-bold transition-all active:scale-95
+                        ${!adsAvailable || isOtherCountingDown
+                          ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-500 hover:to-emerald-500'
+                        }`}
+                    >
+                      📺 免费领取
+                    </button>
+                  )}
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-bold text-white">{offer.name}</h3>
-                  <p className="text-[10px] text-gray-400">{offer.description}</p>
-                </div>
-                <button
-                  onClick={() => handleAdReward(offer.id, offer.rewards[0].type, offer.rewards[0].value)}
-                  className="px-3 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 
-                             text-white text-xs font-bold active:scale-95 transition-transform
-                             hover:from-green-500 hover:to-emerald-500"
-                >
-                  📺 免费领取
-                </button>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

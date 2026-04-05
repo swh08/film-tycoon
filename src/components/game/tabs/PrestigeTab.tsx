@@ -5,7 +5,7 @@
 
 import { useGameStore } from '@/store/gameStore';
 import { PRESTIGE_RULE, calcPrestigeGain, calcPrestigeMultiplier } from '@/game/config/prestige';
-import { ANGEL_UPGRADES } from '@/game/config/angel-upgrades';
+import { ANGEL_UPGRADES, ANGEL_UPGRADE_TIERS } from '@/game/config/angel-upgrades';
 import { BUSINESSES } from '@/game/config/businesses';
 import { calcAngelUpgradeEffects, formatCash, formatNumber } from '@/game/formulas';
 import { usePopup } from '../PopupLayer';
@@ -115,6 +115,64 @@ function AngelUpgradePopup({ upgradeId }: { upgradeId: number }) {
 }
 
 // ============================================================
+// 单条人脉升级卡片组件
+// ============================================================
+function AngelUpgradeCard({ upgrade, onBuy }: { upgrade: typeof ANGEL_UPGRADES[0]; onBuy: (id: number) => void }) {
+  const purchasedAngelUpgrades = useGameStore(s => s.purchasedAngelUpgrades);
+  const prestigePoints = useGameStore(s => s.prestigePoints);
+
+  const isPurchased = purchasedAngelUpgrades.includes(upgrade.id);
+  const canAfford = !isPurchased && prestigePoints >= upgrade.cost;
+  const business = upgrade.targetBusinessId
+    ? BUSINESSES.find(b => b.id === upgrade.targetBusinessId)
+    : null;
+
+  return (
+    <div
+      className={`rounded-xl p-2.5 border transition-all duration-200
+        ${isPurchased
+          ? 'bg-green-900/20 border-green-500/30'
+          : 'bg-gray-700/50 border-gray-600/30'
+        }`}
+    >
+      <div className="flex items-center gap-2">
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg flex-shrink-0
+          ${isPurchased ? 'bg-green-500/20' : 'bg-gray-700'}`}>
+          {upgrade.icon}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-white">
+              {business ? `${business.icon} ` : ''}{upgrade.name}
+            </span>
+            {isPurchased ? (
+              <span className="text-green-400 text-[10px] font-bold">✅ 已购买</span>
+            ) : (
+              <span className="text-yellow-400 text-[10px] font-bold">{upgrade.cost} 🤝</span>
+            )}
+          </div>
+          <p className="text-[10px] text-gray-500">{upgrade.description}</p>
+        </div>
+        {!isPurchased && (
+          <button
+            onClick={() => onBuy(upgrade.id)}
+            disabled={!canAfford}
+            className={`px-2 py-1.5 rounded-lg text-[10px] font-bold flex-shrink-0
+              active:scale-95 transition-transform
+              ${canAfford
+                ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white'
+                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+              }`}
+          >
+            购买
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // PrestigeTab 主组件
 // ============================================================
 export default function PrestigeTab() {
@@ -163,9 +221,10 @@ export default function PrestigeTab() {
     });
   };
 
-  // 分类：产线加成 vs 全局加成
-  const businessUpgrades = ANGEL_UPGRADES.filter(u => u.effectType === 'profit_mult_business');
-  const globalUpgrades = ANGEL_UPGRADES.filter(u => u.effectType !== 'profit_mult_business');
+  // 按分层过滤升级
+  const getUpgradesForTier = (minPrestigeCount: number) => {
+    return ANGEL_UPGRADES.filter(u => (u.minPrestigeCount ?? 0) === minPrestigeCount);
+  };
 
   return (
     <div className="flex flex-col gap-4 px-3 py-3 pb-4">
@@ -281,7 +340,7 @@ export default function PrestigeTab() {
         </div>
       </div>
 
-      {/* 人脉升级商店 */}
+      {/* 人脉升级商店 — 按分层显示 */}
       <div className="rounded-2xl p-4 bg-gray-800 border border-purple-600/40">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-bold text-white">🏪 人脉升级商店</h3>
@@ -293,116 +352,94 @@ export default function PrestigeTab() {
           ⚠️ 消耗{PRESTIGE_RULE.currencyName}购买永久升级。购买会降低利润加成，但获得更强大的永久效果！
         </p>
 
-        {/* 产线加成 */}
-        <div className="mb-4">
-          <h4 className="text-xs font-medium text-gray-400 mb-2 px-1">🏭 产线利润加成（×3）</h4>
-          <div className="flex flex-col gap-2">
-            {businessUpgrades.map(upgrade => {
-              const isPurchased = purchasedAngelUpgrades.includes(upgrade.id);
-              const business = BUSINESSES.find(b => b.id === upgrade.targetBusinessId);
-              const canAfford = !isPurchased && prestigePoints >= upgrade.cost;
+        {/* 按分层显示 */}
+        {ANGEL_UPGRADE_TIERS.map(tier => {
+          const tierUpgrades = getUpgradesForTier(tier.minPrestigeCount);
+          const isUnlocked = totalPrestigeCount >= tier.minPrestigeCount;
+          const businessUpgrades = tierUpgrades.filter(u => u.effectType === 'profit_mult_business');
+          const globalUpgrades = tierUpgrades.filter(u => u.effectType !== 'profit_mult_business');
+          const purchasedInTier = tierUpgrades.filter(u => purchasedAngelUpgrades.includes(u.id)).length;
 
-              return (
-                <div
-                  key={upgrade.id}
-                  className={`rounded-xl p-2.5 border transition-all duration-200
-                    ${isPurchased
-                      ? 'bg-green-900/20 border-green-500/30'
-                      : 'bg-gray-700/50 border-gray-600/30'
-                    }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg flex-shrink-0
-                      ${isPurchased ? 'bg-green-500/20' : 'bg-gray-700'}`}>
-                      {upgrade.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white">
-                          {business?.icon} {upgrade.name}
-                        </span>
-                        {isPurchased ? (
-                          <span className="text-green-400 text-[10px] font-bold">✅ 已购买</span>
-                        ) : (
-                          <span className="text-yellow-400 text-[10px] font-bold">{upgrade.cost} 🤝</span>
-                        )}
+          return (
+            <div key={tier.id} className="mb-4 last:mb-0">
+              {/* 分层标题 */}
+              <div className="flex items-center justify-between mb-2 px-1">
+                <h4 className={`text-xs font-medium ${isUnlocked ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {isUnlocked ? (
+                    <>
+                      {tier.id === 1 ? '🏭' : tier.id === 2 ? '⭐' : tier.id === 3 ? '💫' : '🌈'}{' '}
+                      {tier.name}
+                    </>
+                  ) : (
+                    <>🔒 {tier.name}（需要转生{tier.minPrestigeCount}次解锁）</>
+                  )}
+                </h4>
+                {isUnlocked && (
+                  <span className="text-[10px] text-gray-500">
+                    {purchasedInTier}/{tierUpgrades.length}
+                  </span>
+                )}
+              </div>
+
+              {isUnlocked ? (
+                <>
+                  {/* 产线加成（仅Tier 1有） */}
+                  {businessUpgrades.length > 0 && (
+                    <div className="mb-3">
+                      <h4 className="text-[10px] font-medium text-gray-500 mb-1.5 px-1">🏭 产线利润加成（×3）</h4>
+                      <div className="flex flex-col gap-1.5">
+                        {businessUpgrades.map(upgrade => (
+                          <AngelUpgradeCard
+                            key={upgrade.id}
+                            upgrade={upgrade}
+                            onBuy={handleBuyAngelUpgrade}
+                          />
+                        ))}
                       </div>
-                      <p className="text-[10px] text-gray-500">{upgrade.description}</p>
                     </div>
-                    {!isPurchased && (
-                      <button
-                        onClick={() => handleBuyAngelUpgrade(upgrade.id)}
-                        disabled={!canAfford}
-                        className={`px-2 py-1.5 rounded-lg text-[10px] font-bold flex-shrink-0
-                          active:scale-95 transition-transform
-                          ${canAfford
-                            ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white'
-                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                          }`}
-                      >
-                        购买
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                  )}
 
-        {/* 全局加成 */}
-        <div>
-          <h4 className="text-xs font-medium text-gray-400 mb-2 px-1">🌟 全局永久升级</h4>
-          <div className="flex flex-col gap-2">
-            {globalUpgrades.map(upgrade => {
-              const isPurchased = purchasedAngelUpgrades.includes(upgrade.id);
-              const canAfford = !isPurchased && prestigePoints >= upgrade.cost;
-
-              return (
-                <div
-                  key={upgrade.id}
-                  className={`rounded-xl p-2.5 border transition-all duration-200
-                    ${isPurchased
-                      ? 'bg-green-900/20 border-green-500/30'
-                      : 'bg-gray-700/50 border-gray-600/30'
-                    }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg flex-shrink-0
-                      ${isPurchased ? 'bg-green-500/20' : 'bg-gray-700'}`}>
-                      {upgrade.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white">{upgrade.name}</span>
-                        {isPurchased ? (
-                          <span className="text-green-400 text-[10px] font-bold">✅ 已购买</span>
-                        ) : (
-                          <span className="text-yellow-400 text-[10px] font-bold">{upgrade.cost} 🤝</span>
-                        )}
+                  {/* 全局加成 */}
+                  {globalUpgrades.length > 0 && (
+                    <div>
+                      <h4 className="text-[10px] font-medium text-gray-500 mb-1.5 px-1">🌟 全局永久升级</h4>
+                      <div className="flex flex-col gap-1.5">
+                        {globalUpgrades.map(upgrade => (
+                          <AngelUpgradeCard
+                            key={upgrade.id}
+                            upgrade={upgrade}
+                            onBuy={handleBuyAngelUpgrade}
+                          />
+                        ))}
                       </div>
-                      <p className="text-[10px] text-gray-500">{upgrade.description}</p>
                     </div>
-                    {!isPurchased && (
-                      <button
-                        onClick={() => handleBuyAngelUpgrade(upgrade.id)}
-                        disabled={!canAfford}
-                        className={`px-2 py-1.5 rounded-lg text-[10px] font-bold flex-shrink-0
-                          active:scale-95 transition-transform
-                          ${canAfford
-                            ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white'
-                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                          }`}
-                      >
-                        购买
-                      </button>
-                    )}
-                  </div>
+                  )}
+                </>
+              ) : (
+                /* 锁定状态 */
+                <div className="rounded-xl p-4 bg-gray-900/40 border border-gray-700/20 text-center">
+                  <span className="text-2xl">🔒</span>
+                  <p className="text-xs text-gray-600 mt-1">
+                    转生{tier.minPrestigeCount}次后解锁 {tier.upgrades?.length ?? tierUpgrades.length} 个人脉升级
+                  </p>
+                  {totalPrestigeCount < tier.minPrestigeCount && (
+                    <div className="mt-2">
+                      <div className="h-1.5 rounded-full bg-gray-700 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-purple-600 to-pink-500 transition-all"
+                          style={{ width: `${(totalPrestigeCount / tier.minPrestigeCount) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-[9px] text-gray-600 mt-0.5">
+                        {totalPrestigeCount}/{tier.minPrestigeCount}次
+                      </p>
+                    </div>
+                  )}
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* 成就统计 */}

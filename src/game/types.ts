@@ -40,6 +40,7 @@ export interface BusinessDef {
   managerId: number;
   unlockRule: UnlockRule;
   flavorText: string;
+  autoBuyUnlockCost: number; // 钻石费用，解锁自动购买
 }
 
 /** 店长定义 (ManagerDef) */
@@ -128,6 +129,7 @@ export interface AngelUpgradeDef {
   effectType: 'profit_mult_business' | 'profit_mult_all' | 'cost_reduce_all' | 'cycle_reduce_all';
   effectValue: number;
   targetBusinessId?: number; // 产线利润加成的目标产线ID
+  minPrestigeCount?: number; // 解锁此升级需要的最小累计转生次数
 }
 
 /** 商城礼包定义 (OfferDef) */
@@ -156,7 +158,7 @@ export interface EventDef {
 }
 
 /** 广告增益类型 */
-export type AdBuffType = 'double_revenue' | 'extra_offline' | 'rush_order';
+export type AdBuffType = 'double_revenue' | 'extra_offline' | 'rush_order' | 'speed_boost';
 
 /** 广告增益状态 */
 export interface AdBuff {
@@ -303,6 +305,17 @@ export interface GameState {
   numberFormat: 'abbreviation' | 'scientific'; // 数字显示格式
   musicVolume: number;                   // 背景音乐音量 0-1
   sfxVolume: number;                     // 音效音量 0-1
+
+  // 背景音乐开关
+  musicEnabled: boolean;                  // BGM 是否开启
+
+  // 自动购买系统
+  autoBuySettings: Record<number, { enabled: boolean; intervalSec: number; lastAutoBuyTime: number }>; // businessId -> 自动购买配置
+
+  // 广告每日限制
+  adWatchCountToday: number;             // 今日已看广告次数
+  lastAdWatchDate: string;               // YYYY-MM-DD 上次看广告日期
+  dailyAdLimit: number;                  // 每日广告上限（默认20）
 }
 
 /** 格式化数字用的后缀 */

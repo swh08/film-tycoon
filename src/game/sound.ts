@@ -23,6 +23,16 @@ export function isSoundEnabled(): boolean {
   return enabled;
 }
 
+// ============================================================
+// SFX Volume Control
+// ============================================================
+
+let sfxVolumeValue = 0.8;
+
+export function setSfxVolumeValue(v: number) {
+  sfxVolumeValue = v;
+}
+
 function playTone(freq: number, duration: number, type: OscillatorType = 'sine', volume = 0.15) {
   if (!enabled) return;
   try {
@@ -31,7 +41,7 @@ function playTone(freq: number, duration: number, type: OscillatorType = 'sine',
     const gain = ctx.createGain();
     osc.type = type;
     osc.frequency.value = freq;
-    gain.gain.value = volume;
+    gain.gain.value = volume * sfxVolumeValue;
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
     osc.connect(gain);
     gain.connect(ctx.destination);
@@ -50,7 +60,7 @@ function playNoteSequence(notes: { freq: number; dur: number; type?: OscillatorT
       const gain = ctx.createGain();
       osc.type = note.type ?? 'sine';
       osc.frequency.value = note.freq;
-      const vol = note.vol ?? 0.12;
+      const vol = (note.vol ?? 0.12) * sfxVolumeValue;
       gain.gain.setValueAtTime(vol, ctx.currentTime + offset);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + note.dur);
       osc.connect(gain);
@@ -194,4 +204,150 @@ export function playEventEnd() {
     { freq: 659, dur: 0.1, type: 'sine', vol: 0.08 },
     { freq: 523, dur: 0.2, type: 'triangle', vol: 0.1 },
   ]);
+}
+
+// ============================================================
+// 背景音乐系统 (BGM) — Web Audio API 程序化生成
+// ============================================================
+
+let musicGain: GainNode | null = null;
+let musicPlaying = false;
+let musicVolumeValue = 0.5;
+let musicTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+export function setMusicVolume(v: number) {
+  musicVolumeValue = Math.max(0, Math.min(1, v));
+  if (musicGain) {
+    const ctx = getCtx();
+    musicGain.gain.setTargetAtTime(musicVolumeValue * 0.03, ctx.currentTime, 0.1);
+  }
+}
+
+export function startMusic() {
+  if (musicPlaying) return;
+  musicPlaying = true;
+  const ctx = getCtx();
+  musicGain = ctx.createGain();
+  musicGain.gain.value = 0;
+  musicGain.gain.linearRampToValueAtTime(musicVolumeValue * 0.03, ctx.currentTime + 1.0); // 1秒淡入
+  musicGain.connect(ctx.destination);
+
+  playMusicLoop(ctx, musicGain);
+}
+
+export function stopMusic() {
+  if (!musicPlaying) return;
+  musicPlaying = false;
+
+  if (musicTimeoutId) {
+    clearTimeout(musicTimeoutId);
+    musicTimeoutId = null;
+  }
+
+  if (musicGain) {
+    const ctx = getCtx();
+    try {
+      musicGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5);
+      const nodeToDisconnect = musicGain;
+      setTimeout(() => {
+        try { nodeToDisconnect.disconnect(); } catch { /* ignore */ }
+      }, 600);
+    } catch { /* ignore */ }
+    musicGain = null;
+  }
+}
+
+export function isMusicPlaying(): boolean {
+  return musicPlaying;
+}
+
+/** 播放一个音乐循环 — 柔和的五声音阶环境音 */
+function playMusicLoop(ctx: AudioContext, dest: GainNode) {
+  if (!musicPlaying || !dest) return;
+
+  // C大调五声音阶 + Am + F + G 和弦进行
+  // 低八度贝斯 + 和弦垫底 + 简单旋律点缀
+  const chordDuration = 3.0; // 每个和弦3秒
+  const totalDuration = 4 * chordDuration; // 12秒一个循环
+
+  const chords: { bass: number; pad: number[]; melody: number }[] = [
+    { bass: 130.81, pad: [261.63, 329.63, 392.00], melody: 523.25 }, // C major
+    { bass: 110.00, pad: [220.00, 261.63, 329.63], melody: 440.00 }, // A minor
+    { bass: 87.31,  pad: [174.61, 220.00, 261.63], melody: 349.23 }, // F major
+    { bass: 98.00,  pad: [196.00, 246.94, 293.66], melody: 392.00 }, // G major
+  ];
+
+  let time = ctx.currentTime + 0.05;
+
+  for (const chord of chords) {
+    // 贝斯音 — 柔和的正弦波
+    const bassOsc = ctx.createOscillator();
+    const bassGain = ctx.createGain();
+    bassOsc.type = 'sine';
+    bassOsc.frequency.value = chord.bass;
+    bassGain.gain.setValueAtTime(0, time);
+    bassGain.gain.linearRampToValueAtTime(0.5, time + 0.4);
+    bassGain.gain.setValueAtTime(0.5, time + chordDuration - 0.4);
+    bassGain.gain.linearRampToValueAtTime(0, time + chordDuration);
+    bassOsc.connect(bassGain);
+    bassGain.connect(dest);
+    bassOsc.start(time);
+    bassOsc.stop(time + chordDuration + 0.01);
+
+    // 和弦垫底 — 轻柔的三角波
+    for (let i = 0; i < chord.pad.length; i++) {
+      const padOsc = ctx.createOscillator();
+      const padGain = ctx.createGain();
+      padOsc.type = 'triangle';
+      padOsc.frequency.value = chord.pad[i];
+      // 音量从高到低（高音较轻，营造空间感）
+      const vol = 0.25 - i * 0.05;
+      padGain.gain.setValueAtTime(0, time + 0.1 * i);
+      padGain.gain.linearRampToValueAtTime(vol, time + 0.4 + 0.1 * i);
+      padGain.gain.setValueAtTime(vol, time + chordDuration - 0.5);
+      padGain.gain.linearRampToValueAtTime(0, time + chordDuration);
+      padOsc.connect(padGain);
+      padGain.connect(dest);
+      padOsc.start(time + 0.1 * i);
+      padOsc.stop(time + chordDuration + 0.01);
+    }
+
+    // 旋律点缀 — 简单的随机五声音阶音符
+    const pentatonic = [
+      chord.melody,
+      chord.melody * 1.125,  // 大二度
+      chord.melody * 1.25,   // 大三度
+      chord.melody * 1.5,    // 纯五度
+      chord.melody * 1.5 * 1.125, // 八度内五声音阶
+    ];
+
+    // 每个和弦期间弹1-2个音符
+    const noteCount = Math.random() < 0.4 ? 2 : 1;
+    for (let n = 0; n < noteCount; n++) {
+      const noteTime = time + 0.5 + n * (chordDuration / (noteCount + 1));
+      const noteFreq = pentatonic[Math.floor(Math.random() * pentatonic.length)];
+      const noteDur = 0.6 + Math.random() * 0.4;
+
+      const melOsc = ctx.createOscillator();
+      const melGain = ctx.createGain();
+      melOsc.type = 'sine';
+      melOsc.frequency.value = noteFreq;
+      melGain.gain.setValueAtTime(0, noteTime);
+      melGain.gain.linearRampToValueAtTime(0.12, noteTime + 0.08);
+      melGain.gain.exponentialRampToValueAtTime(0.001, noteTime + noteDur);
+      melOsc.connect(melGain);
+      melGain.connect(dest);
+      melOsc.start(noteTime);
+      melOsc.stop(noteTime + noteDur + 0.01);
+    }
+
+    time += chordDuration;
+  }
+
+  // 循环播放
+  musicTimeoutId = setTimeout(() => {
+    if (musicPlaying) {
+      playMusicLoop(ctx, dest);
+    }
+  }, (totalDuration - 0.3) * 1000);
 }

@@ -186,3 +186,22 @@ Stage Summary:
 - `next build` 编译成功，无错误
 - `npm run lint` 仅剩 EventNotification.tsx 预存的 setState-in-effect 警告（非本次修改引入）
 - dev server 运行正常，所有页面 200
+
+---
+Task ID: 6
+Agent: Main Agent
+Task: 实现4个中优先级AC对标功能：扩展人脉升级、自动购买系统、背景音乐、广告奖励完善
+
+Work Log:
+- 阅读所有相关文件（types.ts, gameStore.ts, formulas.ts, sound.ts, angel-upgrades.ts, businesses.ts, shop.ts, ShopTab.tsx, PrestigeTab.tsx, BusinessTab.tsx, SettingsPanel.tsx）
+- 发现4个任务的所有代码已在之前的开发轮次中实现完毕，但存在一个语法错误导致构建失败
+- 修复 `src/components/game/tabs/BusinessTab.tsx` 第565行 JSX 注释缺少闭合大括号：`{/* 操作区：贴膜/购买 + 专属升级 */` → `{/* 操作区：贴膜/购买 + 专属升级 */}`
+- 运行 `npx next build` 验证编译通过
+- 运行 `npm run lint` 确认无新增 lint 错误（仅剩预存的 EventNotification.tsx 警告）
+
+Stage Summary:
+- TASK 1 扩展人脉升级(16→34)：已实现，4个分层(Tier 1-4)共34个升级，含 minPrestigeCount 分层解锁机制，PrestigeTab 按分层显示锁定/解锁状态
+- TASK 2 自动购买系统：已实现，autoBuySettings/autoBuyUnlockCost 配置，unlockAutoBuy/toggleAutoBuy/setAutoBuyInterval actions，updateProgress 中自动购买 tick，转生重置，BusinessTab 🤖按钮UI
+- TASK 3 背景音乐：已实现，Web Audio API BGM系统(C-Am-F-G和弦进行12s循环)，独立GainNode，startMusic/stopMusic/setMusicVolume/isMusicPlaying API，设置面板音乐开关+音量滑块
+- TASK 4 广告奖励完善：已实现，adWatchCountToday/lastAdWatchDate/dailyAdLimit 每日限制，watchAd() action含跨天重置，3种新广告奖励(即时现金/免费钻石/速度加成)，ShopTab 3秒倒计时+剩余次数显示，speed_buff 集成到 calcCycleTime()
+- 构建通过，无错误

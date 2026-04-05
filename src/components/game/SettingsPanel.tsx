@@ -3,9 +3,10 @@
 // ============================================================
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
+import { startMusic, stopMusic, setMusicVolume, setSfxVolumeValue, isMusicPlaying } from '@/game/sound';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -18,15 +19,34 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
   const numberFormat = useGameStore(s => s.numberFormat);
   const setNumberFormat = useGameStore(s => s.setNumberFormat);
   const musicVolume = useGameStore(s => s.musicVolume);
-  const setMusicVolume = useGameStore(s => s.setMusicVolume);
+  const setMusicVolumeStore = useGameStore(s => s.setMusicVolume);
   const sfxVolume = useGameStore(s => s.sfxVolume);
-  const setSfxVolume = useGameStore(s => s.setSfxVolume);
+  const setSfxVolumeStore = useGameStore(s => s.setSfxVolume);
+  const musicEnabled = useGameStore(s => s.musicEnabled);
+  const setMusicEnabled = useGameStore(s => s.setMusicEnabled);
   const resetGame = useGameStore(s => s.resetGame);
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showImportArea, setShowImportArea] = useState(false);
   const [importText, setImportText] = useState('');
   const [toastMsg, setToastMsg] = useState('');
+
+  // Sync BGM with store state
+  useEffect(() => {
+    if (musicEnabled) {
+      startMusic();
+    } else {
+      stopMusic();
+    }
+  }, [musicEnabled]);
+
+  useEffect(() => {
+    setMusicVolume(musicVolume);
+  }, [musicVolume]);
+
+  useEffect(() => {
+    setSfxVolumeValue(sfxVolume);
+  }, [sfxVolume]);
 
   const showToast = useCallback((msg: string) => {
     setToastMsg(msg);
@@ -158,14 +178,28 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                       <div>
                         <p className="text-xs font-medium text-gray-200">🎵 背景音乐</p>
                       </div>
-                      <span className="text-xs text-gray-400 tabular-nums">{Math.round(musicVolume * 100)}%</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setMusicEnabled(!musicEnabled)}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                            musicEnabled ? 'bg-amber-500' : 'bg-gray-600'
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+                              musicEnabled ? 'translate-x-4' : 'translate-x-0.5'
+                            }`}
+                          />
+                        </button>
+                        <span className="text-xs text-gray-400 tabular-nums">{Math.round(musicVolume * 100)}%</span>
+                      </div>
                     </div>
                     <input
                       type="range"
                       min="0"
                       max="100"
                       value={Math.round(musicVolume * 100)}
-                      onChange={(e) => setMusicVolume(Number(e.target.value) / 100)}
+                      onChange={(e) => setMusicVolumeStore(Number(e.target.value) / 100)}
                       className="w-full h-1.5 rounded-full appearance-none bg-gray-700 cursor-pointer
                                  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4
                                  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400
@@ -186,7 +220,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                       min="0"
                       max="100"
                       value={Math.round(sfxVolume * 100)}
-                      onChange={(e) => setSfxVolume(Number(e.target.value) / 100)}
+                      onChange={(e) => setSfxVolumeStore(Number(e.target.value) / 100)}
                       className="w-full h-1.5 rounded-full appearance-none bg-gray-700 cursor-pointer
                                  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4
                                  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400

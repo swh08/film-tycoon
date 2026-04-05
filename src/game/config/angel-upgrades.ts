@@ -2,11 +2,21 @@
 // 人脉升级配置 (AngelUpgradeDef) — 消耗人脉购买永久升级
 // 对标 Adventure Capitalist 天使投资人升级系统
 // 策略抉择：花费人脉→获得强力升级→但倍率降低→需更多轮次补偿
+//
+// 分层系统：
+//   Tier 1 (minPrestigeCount: 0)  — 基础人脉升级，始终可见
+//   Tier 2 (minPrestigeCount: 2)  — 进阶人脉升级
+//   Tier 3 (minPrestigeCount: 5)  — 高级人脉升级
+//   Tier 4 (minPrestigeCount: 10) — 传说人脉升级
 // ============================================================
 import { AngelUpgradeDef } from '../types';
 
 export const ANGEL_UPGRADES: AngelUpgradeDef[] = [
-  // === 产线利润 ×3（10条产线各一个） ===
+  // ================================================================
+  // === Tier 1: 基础人脉升级 (minPrestigeCount: 0, 始终可见) ===
+  // ================================================================
+
+  // --- 产线利润 ×3（10条产线各一个） ---
   {
     id: 1,
     name: '钢化膜秘方',
@@ -108,7 +118,7 @@ export const ANGEL_UPGRADES: AngelUpgradeDef[] = [
     targetBusinessId: 10,
   },
 
-  // === 全局加成升级 ===
+  // --- Tier 1 全局加成升级 ---
   {
     id: 101,
     name: '膜界至尊',
@@ -163,4 +173,211 @@ export const ANGEL_UPGRADES: AngelUpgradeDef[] = [
     effectType: 'cycle_reduce_all',
     effectValue: 0.30,
   },
+
+  // ================================================================
+  // === Tier 2: 进阶人脉升级 (minPrestigeCount: 2) ===
+  // ================================================================
+  {
+    id: 201,
+    name: '批量采购折扣',
+    description: '大宗采购议价权提升，购买成本降低15%',
+    icon: '🏷️',
+    cost: 50,
+    effectType: 'cost_reduce_all',
+    effectValue: 0.15,
+    minPrestigeCount: 2,
+  },
+  {
+    id: 202,
+    name: '极速流水线',
+    description: '流水线工艺优化，生产速度提升20%',
+    icon: '⚡',
+    cost: 75,
+    effectType: 'cycle_reduce_all',
+    effectValue: 0.20,
+    minPrestigeCount: 2,
+  },
+  {
+    id: 203,
+    name: '跨界营销',
+    description: '社交媒体矩阵全面铺开，全产线利润×2',
+    icon: '📢',
+    cost: 100,
+    effectType: 'profit_mult_all',
+    effectValue: 2,
+    minPrestigeCount: 2,
+  },
+  {
+    id: 204,
+    name: '人才储备',
+    description: '建立行业人才库，全产线利润×1.5',
+    icon: '🎓',
+    cost: 30,
+    effectType: 'profit_mult_all',
+    effectValue: 1.5,
+    minPrestigeCount: 2,
+  },
+  {
+    id: 205,
+    name: '供应链优化',
+    description: '优化物流配送体系，购买成本再降10%',
+    icon: '🔗',
+    cost: 60,
+    effectType: 'cost_reduce_all',
+    effectValue: 0.10,
+    minPrestigeCount: 2,
+  },
+  {
+    id: 206,
+    name: '智能调度',
+    description: 'AI调度系统上线，生产速度再提15%',
+    icon: '🧠',
+    cost: 80,
+    effectType: 'cycle_reduce_all',
+    effectValue: 0.15,
+    minPrestigeCount: 2,
+  },
+
+  // ================================================================
+  // === Tier 3: 高级人脉升级 (minPrestigeCount: 5) ===
+  // ================================================================
+  {
+    id: 301,
+    name: '品牌矩阵',
+    description: '多品牌协同效应，全产线利润×5',
+    icon: '🌟',
+    cost: 200,
+    effectType: 'profit_mult_all',
+    effectValue: 5,
+    minPrestigeCount: 5,
+  },
+  {
+    id: 302,
+    name: '工业革命4.0',
+    description: '全面智能制造升级，生产速度提升25%',
+    icon: '🏭',
+    cost: 300,
+    effectType: 'cycle_reduce_all',
+    effectValue: 0.25,
+    minPrestigeCount: 5,
+  },
+  {
+    id: 303,
+    name: '垄断经营',
+    description: '行业寡头地位确立，全产线利润×3',
+    icon: '🏛️',
+    cost: 500,
+    effectType: 'profit_mult_all',
+    effectValue: 3,
+    minPrestigeCount: 5,
+  },
+  {
+    id: 304,
+    name: '直营模式',
+    description: '砍掉所有中间环节，购买成本降低20%',
+    icon: '🏪',
+    cost: 150,
+    effectType: 'cost_reduce_all',
+    effectValue: 0.20,
+    minPrestigeCount: 5,
+  },
+  {
+    id: 305,
+    name: '全自动化',
+    description: '无人车间全面铺开，生产速度提升30%',
+    icon: '🤖',
+    cost: 400,
+    effectType: 'cycle_reduce_all',
+    effectValue: 0.30,
+    minPrestigeCount: 5,
+  },
+  {
+    id: 306,
+    name: '上市公司',
+    description: '资本运作加持，全产线利润×5',
+    icon: '📈',
+    cost: 1000,
+    effectType: 'profit_mult_all',
+    effectValue: 5,
+    minPrestigeCount: 5,
+  },
+
+  // ================================================================
+  // === Tier 4: 传说人脉升级 (minPrestigeCount: 10) ===
+  // ================================================================
+  {
+    id: 401,
+    name: '全球定价权',
+    description: '成为行业定价标杆，全产线利润×5',
+    icon: '🌍',
+    cost: 2000,
+    effectType: 'profit_mult_all',
+    effectValue: 5,
+    minPrestigeCount: 10,
+  },
+  {
+    id: 402,
+    name: '量子加速',
+    description: '量子计算优化生产流程，生产速度提升20%',
+    icon: '⚛️',
+    cost: 1500,
+    effectType: 'cycle_reduce_all',
+    effectValue: 0.20,
+    minPrestigeCount: 10,
+  },
+  {
+    id: 403,
+    name: '黑洞供应链',
+    description: '跨维度供应链网络，购买成本降低25%',
+    icon: '🕳️',
+    cost: 3000,
+    effectType: 'cost_reduce_all',
+    effectValue: 0.25,
+    minPrestigeCount: 10,
+  },
+  {
+    id: 404,
+    name: '维度折叠',
+    description: '折叠时空降低运输成本，全产线利润×7',
+    icon: '🌀',
+    cost: 2500,
+    effectType: 'profit_mult_all',
+    effectValue: 7,
+    minPrestigeCount: 10,
+  },
+  {
+    id: 405,
+    name: '时间加速器',
+    description: '操控时间流速，生产速度提升30%',
+    icon: '⏰',
+    cost: 5000,
+    effectType: 'cycle_reduce_all',
+    effectValue: 0.30,
+    minPrestigeCount: 10,
+  },
+  {
+    id: 406,
+    name: '膜帝之眼',
+    description: '洞察一切商业机会，全产线利润×10',
+    icon: '👁️',
+    cost: 10000,
+    effectType: 'profit_mult_all',
+    effectValue: 10,
+    minPrestigeCount: 10,
+  },
+];
+
+/** 获取分层信息 */
+export interface AngelUpgradeTier {
+  id: number;
+  name: string;
+  minPrestigeCount: number;
+  description: string;
+}
+
+export const ANGEL_UPGRADE_TIERS: AngelUpgradeTier[] = [
+  { id: 1, name: '基础人脉升级', minPrestigeCount: 0, description: '转生即可解锁' },
+  { id: 2, name: '进阶人脉升级', minPrestigeCount: 2, description: '转生2次+' },
+  { id: 3, name: '高级人脉升级', minPrestigeCount: 5, description: '转生5次+' },
+  { id: 4, name: '传说人脉升级', minPrestigeCount: 10, description: '转生10次+' },
 ];

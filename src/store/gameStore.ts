@@ -7,7 +7,7 @@ import { BUSINESSES } from '../game/config/businesses';
 import { MANAGERS } from '../game/config/managers';
 import { GLOBAL_UPGRADES } from '../game/config/upgrades';
 import { ANGEL_UPGRADES } from '../game/config/angel-upgrades';
-import { calcBuyCost, calcBuyCostWithDiscount, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects, calcAngelUpgradeEffects, calcAngelBusinessProfitMult, checkAchievementConditions, calcBusinessUpgradeProfitMult, calcBusinessUpgradeCycleReduce, calcManagerUpgradeCost, generateMarketMultipliers, calcManagerLevelCycleReduce, calcManagerLevelProfitMult, getTodayStr, isConsecutiveDay, tryTriggerEvent, calcEventCostReduce, syncNumberFormat } from '../game/formulas';
+import { calcBuyCost, calcBuyCostWithDiscount, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects, calcAngelUpgradeEffects, calcAngelBusinessProfitMult, checkAchievementConditions, calcBusinessUpgradeProfitMult, calcBusinessUpgradeCycleReduce, calcManagerUpgradeCost, calcMaxBuyable, generateMarketMultipliers, calcManagerLevelCycleReduce, calcManagerLevelProfitMult, getTodayStr, isConsecutiveDay, tryTriggerEvent, calcEventCostReduce, syncNumberFormat } from '../game/formulas';
 import { BUSINESS_UPGRADES } from '../game/config/business-upgrades';
 import { ACHIEVEMENTS } from '../game/config/achievements';
 import { DAILY_REWARDS } from '../game/config/daily-rewards';
@@ -65,6 +65,11 @@ function createInitialState(): GameState {
     numberFormat: 'abbreviation' as const,
     musicVolume: 0.5,
     sfxVolume: 0.8,
+    musicEnabled: false,
+    autoBuySettings: {} as Record<number, { enabled: boolean; intervalSec: number; lastAutoBuyTime: number }>,
+    adWatchCountToday: 0,
+    lastAdWatchDate: '',
+    dailyAdLimit: 20,
   };
 }
 
@@ -183,6 +188,18 @@ interface GameActions {
 
   // 强制保存
   save: () => void;
+
+  // === Task 3: 背景音乐 ===
+  setMusicEnabled: (enabled: boolean) => void;
+
+  // === Task 2: 自动购买系统 ===
+  unlockAutoBuy: (businessId: number) => boolean;
+  setAutoBuyInterval: (businessId: number, interval: number) => void;
+  toggleAutoBuy: (businessId: number, enabled: boolean) => void;
+
+  // === Task 4: 广告每日限制 ===
+  watchAd: () => boolean;
+  getRemainingAds: () => number;
 }
 
 type GameStore = GameState & GameActions;
@@ -229,6 +246,11 @@ export const useGameStore = create<GameStore>((set, get) => {
     numberFormat: (initial as any).numberFormat ?? 'abbreviation',
     musicVolume: (initial as any).musicVolume ?? 0.5,
     sfxVolume: (initial as any).sfxVolume ?? 0.8,
+    musicEnabled: (initial as any).musicEnabled ?? false,
+    autoBuySettings: (initial as any).autoBuySettings ?? {},
+    adWatchCountToday: (initial as any).adWatchCountToday ?? 0,
+    lastAdWatchDate: (initial as any).lastAdWatchDate ?? '',
+    dailyAdLimit: (initial as any).dailyAdLimit ?? 20,
   };
 
   // 同步音效设置
@@ -266,6 +288,86 @@ export const useGameStore = create<GameStore>((set, get) => {
     setSfxVolume: (v: number) => {
       set({ sfxVolume: Math.max(0, Math.min(1, v)) });
       get().save();
+    },
+
+    // === Task 3: 背景音乐开关 ===
+    setMusicEnabled: (enabled: boolean) => {
+      set({ musicEnabled: enabled });
+      get().save();
+    },
+
+    // === Task 2: 自动购买系统 ===
+    unlockAutoBuy: (businessId: number): boolean => {
+      const state = get();
+      const def = BUSINESSES.find(b => b.id === businessId);
+      if (!def) return false;
+      if (state.autoBuySettings[businessId]) return false; // 已解锁
+      if (state.diamonds < def.autoBuyUnlockCost) return false;
+
+      set(s => ({
+        diamonds: s.diamonds - def.autoBuyUnlockCost,
+        autoBuySettings: {
+          ...s.autoBuySettings,
+          [businessId]: { enabled: true, intervalSec: 5, lastAutoBuyTime: Date.now() },
+        },
+      }));
+      get().save();
+      return true;
+    },
+
+    setAutoBuyInterval: (businessId: number, interval: number) => {
+      set(s => {
+        const existing = s.autoBuySettings[businessId];
+        if (!existing) return s;
+        return {
+          autoBuySettings: {
+            ...s.autoBuySettings,
+            [businessId]: { ...existing, intervalSec: interval },
+          },
+        };
+      });
+      get().save();
+    },
+
+    toggleAutoBuy: (businessId: number, enabled: boolean) => {
+      set(s => {
+        const existing = s.autoBuySettings[businessId];
+        if (!existing) return s;
+        return {
+          autoBuySettings: {
+            ...s.autoBuySettings,
+            [businessId]: { ...existing, enabled },
+          },
+        };
+      });
+      get().save();
+    },
+
+    // === Task 4: 广告每日限制 ===
+    watchAd: (): boolean => {
+      const state = get();
+      const today = getTodayStr();
+
+      // 如果是新的一天，重置计数
+      if (state.lastAdWatchDate !== today) {
+        set({ adWatchCountToday: 0, lastAdWatchDate: today });
+      }
+
+      const currentState = get();
+      if (currentState.adWatchCountToday >= currentState.dailyAdLimit) return false;
+
+      set(s => ({
+        adWatchCountToday: s.adWatchCountToday + 1,
+      }));
+      get().save();
+      return true;
+    },
+
+    getRemainingAds: (): number => {
+      const state = get();
+      const today = getTodayStr();
+      if (state.lastAdWatchDate !== today) return state.dailyAdLimit;
+      return Math.max(0, state.dailyAdLimit - state.adWatchCountToday);
     },
 
     // === 市场波动 ===
@@ -652,6 +754,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         activeEvents: [],  // 事件清除
         lastEventCheck: Date.now(),
         eventCooldownUntil: 0,
+        autoBuySettings: {}, // 自动购买重置
       }));
       get().save();
     },
@@ -724,7 +827,47 @@ export const useGameStore = create<GameStore>((set, get) => {
       const marketMultipliers = state.marketMultipliers || {};
       const managerLevels = state.managerLevels || {};
 
-      const newBusinesses = state.businesses.map(bs => {
+      // === 自动购买系统 tick ===
+      const now = Date.now();
+      const autoBuySettings = state.autoBuySettings || {};
+      let autoBuyTriggered = false;
+      for (const [busIdStr, settings] of Object.entries(autoBuySettings)) {
+        if (!settings.enabled) continue;
+        const busId = parseInt(busIdStr);
+        if (now - settings.lastAutoBuyTime >= settings.intervalSec * 1000) {
+          // 尝试购买
+          const def = BUSINESSES.find(b => b.id === busId);
+          if (!def) continue;
+          const bs = state.businesses.find(b => b.businessId === busId);
+          if (!bs || bs.quantity <= 0) continue;
+
+          // 根据当前 buyMode 决定购买数量
+          let buyCount = state.buyMode;
+          if (buyCount === 0) {
+            buyCount = calcMaxBuyable(def, bs.quantity, state.cash, state.purchasedAngelUpgrades);
+          }
+          if (buyCount > 0) {
+            const cost = calcBuyCostWithDiscount(def, bs.quantity, buyCount, state.purchasedAngelUpgrades);
+            if (state.cash >= cost) {
+              // 执行购买
+              const success = get().buyBusiness(busId, buyCount);
+              if (success) autoBuyTriggered = true;
+            }
+          }
+          // 更新 lastAutoBuyTime
+          set(s => ({
+            autoBuySettings: {
+              ...s.autoBuySettings,
+              [busId]: { ...s.autoBuySettings[busId], lastAutoBuyTime: now },
+            },
+          }));
+        }
+      }
+
+      // 如果自动购买触发了，重新获取 state
+      const currentState = autoBuyTriggered ? get() : state;
+
+      const newBusinesses = currentState.businesses.map(bs => {
         if (bs.quantity <= 0) return { ...bs };
         if (!bs.hasManager && bs.progress <= 0) return { ...bs };
 
@@ -732,23 +875,26 @@ export const useGameStore = create<GameStore>((set, get) => {
         if (!def) return { ...bs };
 
         // 计算实际周期
-        const globalEffects = calcGlobalEffects(state.upgrades);
+        const globalEffects = calcGlobalEffects(currentState.upgrades);
         let cycle = def.baseCycleSec * globalEffects.cycleMultiplier;
-        cycle *= calcBusinessUpgradeCycleReduce(bs.businessId, state.purchasedBusinessUpgrades || []);
+        cycle *= calcBusinessUpgradeCycleReduce(bs.businessId, currentState.purchasedBusinessUpgrades || []);
         cycle *= angelEffects.globalCycleReduce;
-        cycle *= calcManagerLevelCycleReduce(bs.businessId, managerLevels, state.hiredManagers);
-        const rushBuff = state.adBuffs.find(b => b.type === 'rush_order');
+        cycle *= calcManagerLevelCycleReduce(bs.businessId, managerLevels, currentState.hiredManagers);
+        const rushBuff = currentState.adBuffs.find(b => b.type === 'rush_order');
         if (rushBuff) cycle *= 0.2;
         // 利润/速度模式
-        const bizMode = state.businessModes?.[bs.businessId];
+        const bizMode = currentState.businessModes?.[bs.businessId];
         if (bizMode === 'speed') cycle *= 0.5;
         if (bizMode === 'profit') cycle *= 1.5;
         // 事件增益（速度类/全能类）
-        if (state.activeEvents) {
-          for (const evt of state.activeEvents) {
+        if (currentState.activeEvents) {
+          for (const evt of currentState.activeEvents) {
             if (evt.boostType === 'speed_mult' || evt.boostType === 'all_mult') cycle /= evt.boostValue;
           }
         }
+        // Task 4: speed_boost buff
+        const speedBuff = currentState.adBuffs.find(b => b.type === 'speed_boost');
+        if (speedBuff) cycle /= speedBuff.value;
         cycle = Math.max(0.05, cycle);
 
         const newProgress = bs.progress + deltaSec / cycle;
@@ -760,12 +906,12 @@ export const useGameStore = create<GameStore>((set, get) => {
             if (bs.quantity >= ms.at) revenue *= ms.multiplier;
           }
           revenue *= globalEffects.profitMultiplier;
-          revenue *= calcBusinessUpgradeProfitMult(bs.businessId, state.purchasedBusinessUpgrades || []);
-          revenue *= calcAngelBusinessProfitMult(bs.businessId, state.purchasedAngelUpgrades || []);
+          revenue *= calcBusinessUpgradeProfitMult(bs.businessId, currentState.purchasedBusinessUpgrades || []);
+          revenue *= calcAngelBusinessProfitMult(bs.businessId, currentState.purchasedAngelUpgrades || []);
           revenue *= angelEffects.globalProfitMult;
-          revenue *= calcPrestigeMultiplier(state.prestigePoints);
-          revenue *= calcManagerLevelProfitMult(bs.businessId, managerLevels, state.hiredManagers);
-          if (state.adBuffs.some(b => b.type === 'double_revenue')) revenue *= 2;
+          revenue *= calcPrestigeMultiplier(currentState.prestigePoints);
+          revenue *= calcManagerLevelProfitMult(bs.businessId, managerLevels, currentState.hiredManagers);
+          if (currentState.adBuffs.some(b => b.type === 'double_revenue')) revenue *= 2;
           if (rushBuff) revenue *= 3;
           // 市场波动
           revenue *= marketMultipliers[bs.businessId] ?? 1;
@@ -773,8 +919,8 @@ export const useGameStore = create<GameStore>((set, get) => {
           if (bizMode === 'profit') revenue *= 1.5;
           if (bizMode === 'speed') revenue *= 0.8;
           // 事件增益（利润类/全能类）
-          if (state.activeEvents) {
-            for (const evt of state.activeEvents) {
+          if (currentState.activeEvents) {
+            for (const evt of currentState.activeEvents) {
               if (evt.boostType === 'profit_mult' || evt.boostType === 'all_mult') revenue *= evt.boostValue;
             }
           }
@@ -797,12 +943,12 @@ export const useGameStore = create<GameStore>((set, get) => {
       }
 
       // 定期检查成就（每3秒）
-      const now = Date.now();
-      if (now - state.lastAchievementCheck >= 3000) {
+      const checkNow = Date.now();
+      if (checkNow - currentState.lastAchievementCheck >= 3000) {
         get().checkAchievements();
       }
 
-      if (state.adBuffs.length > 0) {
+      if (currentState.adBuffs.length > 0) {
         get().tickAdBuffs(deltaSec);
       }
 

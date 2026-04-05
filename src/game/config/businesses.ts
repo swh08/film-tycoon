@@ -27,6 +27,7 @@ export const BUSINESSES: BusinessDef[] = [
     managerId: 1,
     unlockRule: { type: 'tutorial_complete', value: 0 },
     flavorText: '手艺活起家，一刀下去满屏好评',
+    autoBuyUnlockCost: 5,
   },
   {
     id: 2,
@@ -50,6 +51,7 @@ export const BUSINESSES: BusinessDef[] = [
     managerId: 2,
     unlockRule: { type: 'total_earned', value: 50 },
     flavorText: '走街串巷，课间10分钟能贴30台',
+    autoBuyUnlockCost: 10,
   },
   {
     id: 3,
@@ -73,6 +75,7 @@ export const BUSINESSES: BusinessDef[] = [
     managerId: 3,
     unlockRule: { type: 'total_earned', value: 5000 },
     flavorText: '黄金位置日均进账，比卖手机还赚',
+    autoBuyUnlockCost: 20,
   },
   {
     id: 4,
@@ -96,6 +99,7 @@ export const BUSINESSES: BusinessDef[] = [
     managerId: 4,
     unlockRule: { type: 'total_earned', value: 50000 },
     flavorText: '从单店到百店，加盟费比利润还高',
+    autoBuyUnlockCost: 40,
   },
   {
     id: 5,
@@ -119,6 +123,7 @@ export const BUSINESSES: BusinessDef[] = [
     managerId: 5,
     unlockRule: { type: 'total_earned', value: 500000 },
     flavorText: '321上链接！1秒抢光10万张膜',
+    autoBuyUnlockCost: 80,
   },
   {
     id: 6,
@@ -142,6 +147,7 @@ export const BUSINESSES: BusinessDef[] = [
     managerId: 6,
     unlockRule: { type: 'total_earned', value: 5000000 },
     flavorText: '给大牌代工，一张膜成本2毛卖20',
+    autoBuyUnlockCost: 160,
   },
   {
     id: 7,
@@ -165,6 +171,7 @@ export const BUSINESSES: BusinessDef[] = [
     managerId: 7,
     unlockRule: { type: 'total_earned', value: 50000000 },
     flavorText: '自研纳米涂层技术，一张膜售价500起步',
+    autoBuyUnlockCost: 320,
   },
   {
     id: 8,
@@ -188,6 +195,7 @@ export const BUSINESSES: BusinessDef[] = [
     managerId: 8,
     unlockRule: { type: 'total_earned', value: 500000000 },
     flavorText: '联名款贴膜比奢侈品还难抢',
+    autoBuyUnlockCost: 500,
   },
   {
     id: 9,
@@ -211,6 +219,7 @@ export const BUSINESSES: BusinessDef[] = [
     managerId: 9,
     unlockRule: { type: 'total_earned', value: 5000000000 },
     flavorText: '纽约时代广场大屏都是你的广告',
+    autoBuyUnlockCost: 750,
   },
   {
     id: 10,
@@ -234,5 +243,6 @@ export const BUSINESSES: BusinessDef[] = [
     managerId: 10,
     unlockRule: { type: 'prestige_count', value: 1 },
     flavorText: '全宇宙的手机屏幕都被你承包了',
+    autoBuyUnlockCost: 1000,
   },
 ];
