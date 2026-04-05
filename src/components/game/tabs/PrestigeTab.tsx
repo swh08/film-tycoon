@@ -300,7 +300,7 @@ export default function PrestigeTab() {
             <div className="bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-xl p-3 mb-3 border border-orange-500/30">
               <p className="text-xs text-gray-400 mb-1">本次转生预计获得</p>
               <div className="text-2xl font-black text-orange-400">
-                +{gain} 🤝
+                +{formatNumberSmart(gain)} 🤝
               </div>
               <p className="text-[10px] text-gray-500 mt-1">
                 转生后加成: ×{formatNumber(currentMultiplier)} → ×{formatNumber(nextMultiplier)}
