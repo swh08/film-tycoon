@@ -13,7 +13,6 @@ import OfflineRewardPopup from '@/components/game/OfflineRewardPopup';
 import SettingsPanel from '@/components/game/SettingsPanel';
 import DailyRewardPopup from '@/components/game/DailyRewardPopup';
 import EventNotification from '@/components/game/EventNotification';
-import RevenueFloatLayer from '@/components/game/RevenueFloatLayer';
 
 import BusinessTab from '@/components/game/tabs/BusinessTab';
 import UpgradeTab from '@/components/game/tabs/UpgradeTab';
@@ -144,9 +143,6 @@ export default function GamePage() {
 
         {/* 事件通知 */}
         <EventNotification />
-
-        {/* 收益飘字 */}
-        <RevenueFloatLayer />
       </div>
     </PopupProvider>
   );
