@@ -519,23 +519,23 @@ export default function BusinessTab() {
               {/* 利润/速度模式切换 */}
               {quantity > 0 && (
                 <div className="mb-2">
-                  <div className="flex rounded-lg overflow-hidden border border-gray-600 w-fit">
+                  <div className="flex rounded-lg overflow-hidden w-fit">
                     <button
                       onClick={() => setBusinessMode(def.id, 'profit')}
-                      className={`px-2 py-0.5 text-[10px] font-bold transition-all active:scale-95
+                      className={`px-2 py-1.5 text-[10px] font-bold transition-all duration-150
                         ${(businessModes?.[def.id] === 'profit')
-                          ? 'bg-yellow-600 text-white'
-                          : 'bg-gray-700 text-gray-400'
+                          ? 'bg-gradient-to-b from-yellow-400 to-amber-600 text-white shadow-[0_3px_0_0_#92400e]'
+                          : 'bg-gradient-to-b from-gray-400 to-gray-600 text-gray-200 shadow-[0_3px_0_0_#374151] active:shadow-[0_1px_0_0_#374151] active:translate-y-[2px]'
                         }`}
                     >
                       💰 利润
                     </button>
                     <button
                       onClick={() => setBusinessMode(def.id, 'speed')}
-                      className={`px-2 py-0.5 text-[10px] font-bold transition-all active:scale-95
+                      className={`px-2 py-1.5 text-[10px] font-bold transition-all duration-150
                         ${(businessModes?.[def.id] === 'speed')
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-700 text-gray-400'
+                          ? 'bg-gradient-to-b from-blue-400 to-indigo-600 text-white shadow-[0_3px_0_0_#312e81]'
+                          : 'bg-gradient-to-b from-gray-400 to-gray-600 text-gray-200 shadow-[0_3px_0_0_#374151] active:shadow-[0_1px_0_0_#374151] active:translate-y-[2px]'
                         }`}
                     >
                       ⚡ 速度
@@ -549,10 +549,10 @@ export default function BusinessTab() {
                         }));
                         useGameStore.getState().save();
                       }}
-                      className={`px-2 py-0.5 text-[10px] font-bold transition-all active:scale-95
+                      className={`px-2 py-1.5 text-[10px] font-bold transition-all duration-150
                         ${(!businessModes?.[def.id])
-                          ? 'bg-green-600 text-white'
-                          : 'bg-gray-700 text-gray-400'
+                          ? 'bg-gradient-to-b from-green-400 to-green-600 text-white shadow-[0_3px_0_0_#166534]'
+                          : 'bg-gradient-to-b from-gray-400 to-gray-600 text-gray-200 shadow-[0_3px_0_0_#374151] active:shadow-[0_1px_0_0_#374151] active:translate-y-[2px]'
                         }`}
                     >
                       ⚖️ 默认
