@@ -90,24 +90,23 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
   return (
     <div className="sticky top-0 z-40 bg-gradient-to-r from-amber-900 via-yellow-800 to-amber-900 
                     border-b-2 border-yellow-500/50 shadow-lg shadow-amber-900/30">
-      {/* === 第一行：核心资源 + 按钮 === */}
+      {/* === 第一行：资源（左） + 设置（右） === */}
       <div className="flex items-center justify-between px-3 py-1.5">
-        {/* 现金 */}
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <AnimatedNumber
-            value={cash}
-            formatFn={formatCash}
-            className="text-base font-bold text-yellow-200 truncate tabular-nums"
-          />
-        </div>
-
-        {/* 钻石 & 人脉 & 设置 */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        {/* 金币 + 钻石 + 人脉 */}
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          <div className="flex items-center gap-1 min-w-0">
+            <span className="text-sm">🪙</span>
+            <AnimatedNumber
+              value={cash}
+              formatFn={formatCash}
+              className="text-sm font-bold text-yellow-200 truncate tabular-nums"
+            />
+          </div>
           <div className="flex items-center gap-0.5">
-            <span className="text-sm">💎</span>
+            <span className="text-xs">💎</span>
             <AnimatedNumber
               value={diamonds}
-              className="text-sm font-bold text-cyan-300 tabular-nums"
+              className="text-xs font-bold text-cyan-300 tabular-nums"
               formatFn={(n) => Math.floor(n).toString()}
             />
           </div>
@@ -121,10 +120,14 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
               />
             </div>
           )}
+        </div>
+
+        {/* 设置 */}
+        <div className="flex items-center flex-shrink-0">
           {onSettingsOpen && (
             <button
               onClick={onSettingsOpen}
-              className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-600/30 hover:bg-gray-600/50 transition-colors ml-0.5"
+              className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-600/30 hover:bg-gray-600/50 transition-colors"
             >
               <span className="text-xs">⚙️</span>
             </button>
