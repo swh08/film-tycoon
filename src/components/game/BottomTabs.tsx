@@ -5,7 +5,7 @@
 
 import { useGameStore } from '@/store/gameStore';
 
-export type TabId = 'business' | 'upgrade' | 'manager' | 'prestige' | 'shop';
+export type TabId = 'business' | 'upgrade' | 'manager' | 'prestige' | 'shop' | 'achievement';
 
 interface Tab {
   id: TabId;
@@ -19,6 +19,7 @@ const TABS: Tab[] = [
   { id: 'manager', label: '店长', icon: '👥' },
   { id: 'prestige', label: '人脉', icon: '🤝' },
   { id: 'shop', label: '商城', icon: '🛒' },
+  { id: 'achievement', label: '成就', icon: '🏅' },
 ];
 
 interface BottomTabsProps {
@@ -62,13 +63,13 @@ export default function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) 
             )}
             
             {/* 图标 */}
-            <span className={`text-xl mb-0.5 transition-transform duration-200
+            <span className={`text-lg mb-0.5 transition-transform duration-200
                             ${isActive ? 'scale-110' : ''}`}>
               {tab.icon}
             </span>
 
             {/* 标签文字 */}
-            <span className={`text-[11px] font-medium ${isActive ? 'text-yellow-400' : ''}`}>
+            <span className={`text-[10px] font-medium ${isActive ? 'text-yellow-400' : ''}`}>
               {tab.label}
             </span>
 

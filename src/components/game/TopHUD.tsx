@@ -7,23 +7,20 @@ import { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { formatCash, formatNumberSmart, calcTotalIncomePerSecond, getMarketTrendText } from '@/game/formulas';
 import { calcPrestigeMultiplier } from '@/game/config/prestige';
-import { ACHIEVEMENTS } from '@/game/config/achievements';
 import { BUSINESSES } from '@/game/config/businesses';
 import AnimatedNumber from './AnimatedNumber';
 
 export interface TopHUDProps {
-  onAchievementOpen?: () => void;
   onSettingsOpen?: () => void;
 }
 
-export default function TopHUD({ onAchievementOpen, onSettingsOpen }: TopHUDProps) {
+export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
   const cash = useGameStore(s => s.cash);
   const diamonds = useGameStore(s => s.diamonds);
   const adBuffs = useGameStore(s => s.adBuffs);
   const businesses = useGameStore(s => s.businesses);
   const upgrades = useGameStore(s => s.upgrades);
   const prestigePoints = useGameStore(s => s.prestigePoints);
-  const unlockedAchievements = useGameStore(s => s.unlockedAchievements);
   const marketMultipliers = useGameStore(s => s.marketMultipliers);
   const activeEvents = useGameStore(s => s.activeEvents);
 
@@ -118,21 +115,8 @@ export default function TopHUD({ onAchievementOpen, onSettingsOpen }: TopHUDProp
           )}
         </div>
 
-        {/* 按钮组 */}
+        {/* 设置按钮 */}
         <div className="flex items-center gap-1 mx-2">
-          {onAchievementOpen && (
-            <button
-              onClick={onAchievementOpen}
-              className="relative flex items-center justify-center w-7 h-7 rounded-full bg-yellow-600/30 hover:bg-yellow-600/50 transition-colors"
-            >
-              <span className="text-xs">🏅</span>
-              {unlockedAchievements.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 text-[7px] font-black text-white flex items-center justify-center">
-                  {unlockedAchievements.length}
-                </span>
-              )}
-            </button>
-          )}
           {onSettingsOpen && (
             <button
               onClick={onSettingsOpen}

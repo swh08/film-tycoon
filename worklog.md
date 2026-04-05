@@ -248,3 +248,24 @@ Stage Summary:
 - 商城展示当前活跃事件+完整事件目录（全部11个）
 - 事件通知支持多事件排队，显示队列计数
 - tickEvents性能优化：从最多4次set降到1次
+
+---
+Task ID: 3
+Agent: Main
+Task: 把成就从HUD按钮+模态改为底部tab
+
+Work Log:
+- 新建 AchievementTab.tsx：从 AchievementPanel 提取内容为内联tab，保留头部进度条+分类列表
+- BottomTabs.tsx：TabId 新增 'achievement'，TABS 数组新增 { id: 'achievement', label: '成就', icon: '🏅' }
+- BottomTabs.tsx：图标从 text-xl 缩小到 text-lg，标签从 text-[11px] 缩小到 text-[10px]，适配6个tab
+- page.tsx：导入 AchievementTab，添加到 TAB_INDEX 和 TAB_COMPONENTS
+- page.tsx：移除 AchievementPanel 导入和模态渲染，移除 showAchievements state
+- page.tsx：TopHUD 移除 onAchievementOpen prop
+- TopHUD.tsx：移除 onAchievementOpen prop、unlockedAchievements 订阅、成就按钮渲染、ACHIEVEMENTS import
+- 构建验证通过
+
+Stage Summary:
+- 成就从 HUD 按钮 → 底部 tab 第6个位置（🏅 成就）
+- HUD 现在只有 ⚙️ 设置按钮，更简洁
+- AchievementPanel.tsx 文件保留但不再使用，可后续清理
+- 6个tab布局已调整大小适配

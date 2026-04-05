@@ -10,7 +10,6 @@ import TopHUD from '@/components/game/TopHUD';
 import BottomTabs, { type TabId } from '@/components/game/BottomTabs';
 import { PopupProvider } from '@/components/game/PopupLayer';
 import OfflineRewardPopup from '@/components/game/OfflineRewardPopup';
-import AchievementPanel from '@/components/game/AchievementPanel';
 import SettingsPanel from '@/components/game/SettingsPanel';
 import DailyRewardPopup from '@/components/game/DailyRewardPopup';
 import EventNotification from '@/components/game/EventNotification';
@@ -20,18 +19,18 @@ import UpgradeTab from '@/components/game/tabs/UpgradeTab';
 import ManagerTab from '@/components/game/tabs/ManagerTab';
 import PrestigeTab from '@/components/game/tabs/PrestigeTab';
 import ShopTab from '@/components/game/tabs/ShopTab';
+import AchievementTab from '@/components/game/tabs/AchievementTab';
 
 import { useGameStore } from '@/store/gameStore';
 
 const TAB_INDEX: Record<TabId, number> = {
-  business: 0, upgrade: 1, manager: 2, prestige: 3, shop: 4,
+  business: 0, upgrade: 1, manager: 2, prestige: 3, shop: 4, achievement: 5,
 };
 
 export default function GamePage() {
   const activeTab = useGameStore(s => s.activeTab) as TabId;
   const setActiveTab = useGameStore(s => s.setActiveTab);
   const [isReady, setIsReady] = useState(false);
-  const [showAchievements, setShowAchievements] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showDailyReward, setShowDailyReward] = useState(false);
   const updateProgress = useGameStore(s => s.updateProgress);
@@ -108,6 +107,7 @@ export default function GamePage() {
     manager: <ManagerTab />,
     prestige: <PrestigeTab />,
     shop: <ShopTab />,
+    achievement: <AchievementTab />,
   };
 
   return (
@@ -115,7 +115,6 @@ export default function GamePage() {
       <div className="fixed inset-0 flex flex-col bg-gray-950 overflow-hidden select-none">
         {/* 顶部HUD */}
         <TopHUD
-          onAchievementOpen={() => setShowAchievements(true)}
           onSettingsOpen={() => setShowSettings(true)}
         />
 
@@ -129,12 +128,6 @@ export default function GamePage() {
 
         {/* 离线收益弹窗 */}
         <OfflineRewardPopup />
-
-        {/* 成就面板 */}
-        <AchievementPanel
-          isOpen={showAchievements}
-          onClose={() => setShowAchievements(false)}
-        />
 
         {/* 设置面板（内含统计入口） */}
         <SettingsPanel
