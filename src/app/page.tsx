@@ -11,6 +11,7 @@ import BottomTabs, { type TabId } from '@/components/game/BottomTabs';
 import { PopupProvider } from '@/components/game/PopupLayer';
 import OfflineRewardPopup from '@/components/game/OfflineRewardPopup';
 import AchievementPanel from '@/components/game/AchievementPanel';
+import DailyRewardPopup from '@/components/game/DailyRewardPopup';
 
 import BusinessTab from '@/components/game/tabs/BusinessTab';
 import UpgradeTab from '@/components/game/tabs/UpgradeTab';
@@ -29,8 +30,10 @@ export default function GamePage() {
   const setActiveTab = useGameStore(s => s.setActiveTab);
   const [isReady, setIsReady] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showDailyReward, setShowDailyReward] = useState(false);
   const updateProgress = useGameStore(s => s.updateProgress);
   const save = useGameStore(s => s.save);
+  const checkDailyLogin = useGameStore(s => s.checkDailyLogin);
   const lastTick = useRef<number>(Date.now());
 
   // 游戏主循环
@@ -71,6 +74,11 @@ export default function GamePage() {
 
   useEffect(() => {
     setIsReady(true);
+    // 检查每日登录
+    setTimeout(() => {
+      const { isRewardAvailable } = checkDailyLogin();
+      if (isRewardAvailable) setShowDailyReward(true);
+    }, 500);
   }, []);
 
   if (!isReady) {
@@ -120,6 +128,12 @@ export default function GamePage() {
         <AchievementPanel
           isOpen={showAchievements}
           onClose={() => setShowAchievements(false)}
+        />
+
+        {/* 每日登录奖励 */}
+        <DailyRewardPopup
+          isOpen={showDailyReward}
+          onClose={() => setShowDailyReward(false)}
         />
       </div>
     </PopupProvider>

@@ -7,6 +7,7 @@ import { GLOBAL_UPGRADES } from './config/upgrades';
 import { ANGEL_UPGRADES } from './config/angel-upgrades';
 import { BUSINESS_UPGRADES } from './config/business-upgrades';
 import { ACHIEVEMENTS } from './config/achievements';
+import { MANAGERS } from './config/managers';
 import { calcPrestigeMultiplier } from './config/prestige';
 import type { BusinessState, UpgradeState, GameState } from './types';
 
@@ -173,6 +174,13 @@ export function calcRevenuePerCycle(
   const rushBuff = adBuffs.find(b => b.type === 'rush_order');
   if (rushBuff) revenue *= 3;
 
+  // 市场波动
+  const marketMult = (state as any).marketMultipliers?.[businessDef.id] ?? 1;
+  revenue *= marketMult;
+
+  // 店长等级加成（利润）
+  revenue *= calcManagerLevelProfitMult(businessDef.id, (state as any).managerLevels ?? {}, (state as any).hiredManagers ?? []);
+
   return revenue;
 }
 
@@ -198,6 +206,9 @@ export function calcCycleTime(
   // 爆单潮（30秒极速，周期缩短80%）
   const rushBuff = adBuffs.find(b => b.type === 'rush_order');
   if (rushBuff) cycle *= 0.2;
+
+  // 店长等级加成（速度）
+  cycle *= calcManagerLevelCycleReduce(businessDef.id, (state as any).managerLevels ?? {}, (state as any).hiredManagers ?? []);
 
   return Math.max(0.05, cycle); // 最低50ms
 }
@@ -418,6 +429,117 @@ export function checkAchievementConditions(state: any): string[] {
   }
 
   return newlyUnlocked;
+}
+
+// === 店长等级效果 ===
+
+/** 计算店长等级对指定产线的利润加成 */
+export function calcManagerLevelProfitMult(
+  businessId: number,
+  managerLevels: Record<number, number>,
+  hiredManagers: number[],
+): number {
+  let mult = 1;
+  for (const mgrId of hiredManagers) {
+    const def = MANAGERS.find(m => m.id === mgrId);
+    if (!def) continue;
+    const level = managerLevels[mgrId] ?? 0;
+    if (level <= 0) continue;
+
+    if (def.effectType === 'profit_mult' && def.businessId === 0) {
+      // 全局利润店长：每级额外利润
+      mult += def.upgradeEffectPerLevel * level;
+    }
+  }
+  return mult;
+}
+
+/** 计算店长等级对指定产线的速度缩减 */
+export function calcManagerLevelCycleReduce(
+  businessId: number,
+  managerLevels: Record<number, number>,
+  hiredManagers: number[],
+): number {
+  let reduction = 1;
+  for (const mgrId of hiredManagers) {
+    const def = MANAGERS.find(m => m.id === mgrId);
+    if (!def) continue;
+    const level = managerLevels[mgrId] ?? 0;
+    if (level <= 0) continue;
+
+    if (def.effectType === 'auto_run' && def.businessId === businessId) {
+      // 产线店长：每级额外速度
+      reduction *= (1 - def.upgradeEffectPerLevel * level);
+    }
+    if (def.effectType === 'cycle_reduce' && def.businessId === 0) {
+      // 全局速度店长：每级额外速度
+      reduction *= (1 - def.upgradeEffectPerLevel * level);
+    }
+  }
+  return reduction;
+}
+
+/** 计算店长升级费用 */
+export function calcManagerUpgradeCost(managerId: number, currentLevel: number): number {
+  const def = MANAGERS.find(m => m.id === managerId);
+  if (!def) return Infinity;
+  return Math.ceil(def.upgradeCostBase * Math.pow(def.upgradeCostMultiplier, currentLevel));
+}
+
+// === 市场波动 ===
+
+/** 生成市场波动倍率 */
+export function generateMarketMultipliers(): Record<number, number> {
+  const multipliers: Record<number, number> = {};
+  for (const biz of BUSINESSES) {
+    const rand = Math.random();
+    let mult: number;
+    if (rand < 0.10) {
+      // 10% 暴跌：×0.3 ~ ×0.7
+      mult = 0.3 + Math.random() * 0.4;
+    } else if (rand < 0.30) {
+      // 20% 繁荣：×1.5 ~ ×3.0
+      mult = 1.5 + Math.random() * 1.5;
+    } else if (rand < 0.50) {
+      // 20% 上涨：×1.1 ~ ×1.5
+      mult = 1.1 + Math.random() * 0.4;
+    } else if (rand < 0.70) {
+      // 20% 下跌：×0.7 ~ ×0.9
+      mult = 0.7 + Math.random() * 0.2;
+    } else {
+      // 30% 平稳：×0.9 ~ ×1.1
+      mult = 0.9 + Math.random() * 0.2;
+    }
+    multipliers[biz.id] = Math.round(mult * 100) / 100;
+  }
+  return multipliers;
+}
+
+/** 获取市场趋势文字 */
+export function getMarketTrendText(multiplier: number): { text: string; color: string; icon: string } {
+  if (multiplier >= 2.0) return { text: '🔥 爆发', color: 'text-yellow-300', icon: '🔥' };
+  if (multiplier >= 1.5) return { text: '📈 繁荣', color: 'text-green-400', icon: '📈' };
+  if (multiplier >= 1.1) return { text: '↗ 上涨', color: 'text-green-300', icon: '↗' };
+  if (multiplier >= 0.9) return { text: '→ 平稳', color: 'text-gray-400', icon: '→' };
+  if (multiplier >= 0.7) return { text: '↘ 下跌', color: 'text-orange-400', icon: '↘' };
+  return { text: '📉 暴跌', color: 'text-red-400', icon: '📉' };
+}
+
+// === 每日登录 ===
+
+/** 获取今天日期字符串 YYYY-MM-DD */
+export function getTodayStr(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** 检查是否为连续登录 */
+export function isConsecutiveDay(lastDate: string, today: string): boolean {
+  if (!lastDate) return false;
+  const last = new Date(lastDate + 'T00:00:00');
+  const now = new Date(today + 'T00:00:00');
+  const diffDays = Math.round((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+  return diffDays === 1;
 }
 
 // === 数字格式化 ===

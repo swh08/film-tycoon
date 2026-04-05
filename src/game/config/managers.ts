@@ -1,5 +1,5 @@
 // ============================================================
-// 店长配置 (ManagerDef) — 每档产线1名自动化店长
+// 店长配置 (ManagerDef) — 每档产线1名自动化店长 + 升级系统
 // ============================================================
 import { ManagerDef } from '../types';
 
@@ -15,6 +15,11 @@ export const MANAGERS: ManagerDef[] = [
     rarity: 'common',
     icon: '👨‍🔧',
     description: '干了20年贴膜的老手，闭着眼都能贴出完美无气泡的膜',
+    maxLevel: 10,
+    upgradeCostBase: 500,
+    upgradeCostMultiplier: 2.5,
+    upgradeEffectPerLevel: 0.05, // 每级-5%周期
+    upgradeCurrency: 'cash',
   },
   {
     id: 2,
@@ -27,6 +32,11 @@ export const MANAGERS: ManagerDef[] = [
     rarity: 'common',
     icon: '🎓',
     description: '学生会主席，把贴膜车开到了每个校区，生意好到炸',
+    maxLevel: 10,
+    upgradeCostBase: 8000,
+    upgradeCostMultiplier: 2.5,
+    upgradeEffectPerLevel: 0.05,
+    upgradeCurrency: 'cash',
   },
   {
     id: 3,
@@ -39,6 +49,11 @@ export const MANAGERS: ManagerDef[] = [
     rarity: 'common',
     icon: '👩‍💼',
     description: '前商场楼层经理，熟知每个档口的流量密码',
+    maxLevel: 10,
+    upgradeCostBase: 50000,
+    upgradeCostMultiplier: 2.5,
+    upgradeEffectPerLevel: 0.05,
+    upgradeCurrency: 'cash',
   },
   {
     id: 4,
@@ -51,6 +66,11 @@ export const MANAGERS: ManagerDef[] = [
     rarity: 'rare',
     icon: '👔',
     description: '连锁加盟领域20年老兵，标准化手册写了300页',
+    maxLevel: 10,
+    upgradeCostBase: 250000,
+    upgradeCostMultiplier: 2.5,
+    upgradeEffectPerLevel: 0.06,
+    upgradeCurrency: 'cash',
   },
   {
     id: 5,
@@ -63,6 +83,11 @@ export const MANAGERS: ManagerDef[] = [
     rarity: 'rare',
     icon: '🎬',
     description: '粉丝3000万的膜界顶流，一句"买它"能卖光一个仓库',
+    maxLevel: 10,
+    upgradeCostBase: 1000000,
+    upgradeCostMultiplier: 2.5,
+    upgradeEffectPerLevel: 0.06,
+    upgradeCurrency: 'cash',
   },
   {
     id: 6,
@@ -75,6 +100,11 @@ export const MANAGERS: ManagerDef[] = [
     rarity: 'rare',
     icon: '🏭',
     description: '代工行业老炮，产能调度精准到秒，废品率不到0.01%',
+    maxLevel: 10,
+    upgradeCostBase: 5000000,
+    upgradeCostMultiplier: 2.5,
+    upgradeEffectPerLevel: 0.06,
+    upgradeCurrency: 'cash',
   },
   {
     id: 7,
@@ -87,6 +117,11 @@ export const MANAGERS: ManagerDef[] = [
     rarity: 'epic',
     icon: '🧪',
     description: '材料学博士，纳米涂层的专利持有人，学术圈膜界权威',
+    maxLevel: 10,
+    upgradeCostBase: 25000000,
+    upgradeCostMultiplier: 2.5,
+    upgradeEffectPerLevel: 0.07,
+    upgradeCurrency: 'cash',
   },
   {
     id: 8,
@@ -99,6 +134,11 @@ export const MANAGERS: ManagerDef[] = [
     rarity: 'epic',
     icon: '💎',
     description: '前LVMH大中华区VP，奢侈品牌联名就是她的朋友圈',
+    maxLevel: 10,
+    upgradeCostBase: 250000000,
+    upgradeCostMultiplier: 2.5,
+    upgradeEffectPerLevel: 0.07,
+    upgradeCurrency: 'cash',
   },
   {
     id: 9,
@@ -111,6 +151,11 @@ export const MANAGERS: ManagerDef[] = [
     rarity: 'legendary',
     icon: '✈️',
     description: '精通12国语言，全球供应链操盘手，一年飞30万公里',
+    maxLevel: 10,
+    upgradeCostBase: 2500000000,
+    upgradeCostMultiplier: 2.5,
+    upgradeEffectPerLevel: 0.08,
+    upgradeCurrency: 'cash',
   },
   {
     id: 10,
@@ -123,6 +168,11 @@ export const MANAGERS: ManagerDef[] = [
     rarity: 'legendary',
     icon: '👑',
     description: '传说中的贴膜之神，据说他的膜能让手机自动升值',
+    maxLevel: 10,
+    upgradeCostBase: 25000000000,
+    upgradeCostMultiplier: 2.5,
+    upgradeEffectPerLevel: 0.08,
+    upgradeCurrency: 'cash',
   },
   // === 专家顾问（缩时/倍率） ===
   {
@@ -136,6 +186,11 @@ export const MANAGERS: ManagerDef[] = [
     rarity: 'rare',
     icon: '⚡',
     description: '六西格玛黑带，专治各种生产效率低下',
+    maxLevel: 10,
+    upgradeCostBase: 3,
+    upgradeCostMultiplier: 2,
+    upgradeEffectPerLevel: 0.02, // 每级额外-2%周期
+    upgradeCurrency: 'diamond',
   },
   {
     id: 12,
@@ -148,5 +203,10 @@ export const MANAGERS: ManagerDef[] = [
     rarity: 'epic',
     icon: '💰',
     description: '商学院教授转行，定价策略能让利润翻三倍',
+    maxLevel: 10,
+    upgradeCostBase: 5,
+    upgradeCostMultiplier: 2,
+    upgradeEffectPerLevel: 0.03, // 每级额外+3%利润
+    upgradeCurrency: 'diamond',
   },
 ];

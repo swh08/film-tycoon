@@ -42,3 +42,29 @@ Stage Summary:
 - 人脉升级购买后弹窗自动关闭
 - 两个弹窗都已改为响应式组件，不再有静态JSX问题
 - activeTab 状态从 page 局部状态迁移到全局 store，任何组件都可以控制 tab 切换
+
+---
+Task ID: 3
+Agent: Main Agent
+Task: 实现4大AC对标功能：音效系统、每日登录奖励、市场波动、店长升级
+
+Work Log:
+- 创建 `src/game/sound.ts`：Web Audio API 合成音效系统（10种音效：tap/buy/upgrade/hire/milestone/achievement/prestige/dailyReward/error/marketUp/marketDown/uiClick），无需音频文件
+- 创建 `src/game/config/daily-rewards.ts`：7天循环登录奖励配置（现金/钻石/双倍buff），奖励逐日递增
+- 更新 `src/game/types.ts`：ManagerDef 增加 maxLevel/upgradeCostBase/upgradeCostMultiplier/upgradeEffectPerLevel/upgradeCurrency；GameState 增加 marketMultipliers/lastMarketUpdate/soundEnabled/lastLoginDate/loginStreak/managerLevels
+- 更新 `src/game/config/managers.ts`：12个店长全部增加升级字段（maxLevel=10，升级费用指数增长）
+- 更新 `src/game/formulas.ts`：新增 calcManagerLevelProfitMult/calcManagerLevelCycleReduce/calcManagerUpgradeCost（店长等级效果）；generateMarketMultipliers/getMarketTrendText（市场波动）；getTodayStr/isConsecutiveDay（每日登录）；收益和周期计算集成市场波动+店长等级
+- 创建 `src/components/game/DailyRewardPopup.tsx`：全屏弹窗UI，7天奖励预览网格、今日奖励详情、领取按钮、粒子动画
+- 更新 `src/store/gameStore.ts`：新增 upgradeManager/tickMarket/checkDailyLogin/claimDailyReward/setSoundEnabled actions；prestige 重置市场+店长等级；updateProgress 集成市场波动+店长等级效果+市场 tick
+- 更新 `src/components/game/tabs/BusinessTab.tsx`：市场波动指示器（每条产线卡片显示趋势+倍率），购买/贴膜按钮加音效
+- 更新 `src/components/game/tabs/ManagerTab.tsx`：店长卡片增加等级进度条、升级按钮、满级提示、效果描述
+- 更新 `src/components/game/TopHUD.tsx`：市场趋势汇总指示器、音效开关按钮（🔊/🔇）
+- 更新 `src/app/page.tsx`：集成 DailyRewardPopup，启动时检查每日登录
+- 编译通过，无报错
+
+Stage Summary:
+- 音效系统：10种Web Audio API合成音效，全局音效开关，设置持久化
+- 每日登录奖励：7天循环，连续登录检测+断签重置，奖励含现金/钻石/buff，精美弹窗UI
+- 市场波动：每90-150秒随机波动，5种趋势（暴跌/下跌/平稳/上涨/繁荣），顶栏+产线卡片双重指示
+- 店长升级：12个店长均可升至Lv.10，指数费用增长，产线店长加速+全局店长增益/加速
+- 收益公式完整链路：基础×数量×里程碑×全局升级×产线升级×人脉升级×转生×店长等级×广告buff×市场波动

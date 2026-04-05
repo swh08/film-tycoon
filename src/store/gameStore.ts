@@ -7,15 +7,20 @@ import { BUSINESSES } from '../game/config/businesses';
 import { MANAGERS } from '../game/config/managers';
 import { GLOBAL_UPGRADES } from '../game/config/upgrades';
 import { ANGEL_UPGRADES } from '../game/config/angel-upgrades';
-import { calcBuyCost, calcBuyCostWithDiscount, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects, calcAngelUpgradeEffects, calcAngelBusinessProfitMult, checkAchievementConditions, calcBusinessUpgradeProfitMult, calcBusinessUpgradeCycleReduce } from '../game/formulas';
+import { calcBuyCost, calcBuyCostWithDiscount, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects, calcAngelUpgradeEffects, calcAngelBusinessProfitMult, checkAchievementConditions, calcBusinessUpgradeProfitMult, calcBusinessUpgradeCycleReduce, calcManagerUpgradeCost, generateMarketMultipliers, calcManagerLevelCycleReduce, calcManagerLevelProfitMult, getTodayStr, isConsecutiveDay } from '../game/formulas';
 import { BUSINESS_UPGRADES } from '../game/config/business-upgrades';
 import { ACHIEVEMENTS } from '../game/config/achievements';
+import { DAILY_REWARDS } from '../game/config/daily-rewards';
 import { calcPrestigeGain, calcPrestigeMultiplier } from '../game/config/prestige';
+import { setSoundEnabled } from '../game/sound';
 
 const SAVE_KEY = 'screen_tycoon_save_v1';
 
 /** 创建初始游戏状态 */
 function createInitialState(): GameState {
+  const initialMarket: Record<number, number> = {};
+  for (const b of BUSINESSES) initialMarket[b.id] = 1;
+
   return {
     cash: 0,
     diamonds: 0,
@@ -46,6 +51,12 @@ function createInitialState(): GameState {
     startTime: Date.now(),
     buyMode: 1,
     activeTab: 'business' as string,
+    marketMultipliers: initialMarket,
+    lastMarketUpdate: Date.now(),
+    soundEnabled: true,
+    lastLoginDate: '',
+    loginStreak: 0,
+    managerLevels: {},
   };
 }
 
@@ -69,7 +80,6 @@ function saveToDisk(state: GameState) {
   if (typeof window === 'undefined') return;
   try {
     const toSave: GameState = { ...state };
-    // 不保存运行时临时数据（progress会在tick中恢复）
     localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
   } catch (e) {
     console.warn('存档保存失败:', e);
@@ -93,6 +103,9 @@ interface GameActions {
   // 雇佣店长
   hireManager: (managerId: number) => boolean;
 
+  // 升级店长
+  upgradeManager: (managerId: number) => boolean;
+
   // 升级全局升级
   buyUpgrade: (upgradeId: number, count?: number) => boolean;
 
@@ -104,7 +117,6 @@ interface GameActions {
 
   // 检查并解锁成就（返回新解锁的成就ID列表）
   checkAchievements: () => string[];
-
 
   // 转生
   prestige: () => void;
@@ -132,6 +144,16 @@ interface GameActions {
   // 购买模式切换
   setBuyMode: (mode: number) => void;
 
+  // 音效开关
+  setSoundEnabled: (enabled: boolean) => void;
+
+  // 市场波动
+  tickMarket: () => void;
+
+  // 每日登录
+  checkDailyLogin: () => { isRewardAvailable: boolean; streak: number };
+  claimDailyReward: () => void;
+
   // 生产进度更新（每帧调用）
   updateProgress: (deltaSec: number) => { completedBusinesses: number[]; totalEarned: number };
 
@@ -149,15 +171,17 @@ export const useGameStore = create<GameStore>((set, get) => {
   const initial = saved ?? createInitialState();
 
   // 确保数据结构完整（版本兼容）
+  const initialMarket: Record<number, number> = {};
+  for (const b of BUSINESSES) initialMarket[b.id] = 1;
+
   const safeState: GameState = {
     ...createInitialState(),
     ...initial,
-    // 确保数组长度正确
     businesses: initial.businesses?.length
       ? BUSINESSES.map((b, i) => ({
           businessId: b.id,
           quantity: initial.businesses[i]?.quantity ?? 0,
-          progress: 0, // 重置进度（从存档恢复不保留进度）
+          progress: 0,
           hasManager: initial.businesses[i]?.hasManager ?? false,
           managerId: initial.businesses[i]?.managerId,
         }))
@@ -168,7 +192,18 @@ export const useGameStore = create<GameStore>((set, get) => {
           level: initial.upgrades[i]?.level ?? 0,
         }))
       : createInitialState().upgrades,
+    marketMultipliers: initial.marketMultipliers ?? initialMarket,
+    lastMarketUpdate: initial.lastMarketUpdate ?? Date.now(),
+    soundEnabled: initial.soundEnabled ?? true,
+    lastLoginDate: initial.lastLoginDate ?? '',
+    loginStreak: initial.loginStreak ?? 0,
+    managerLevels: initial.managerLevels ?? {},
   };
+
+  // 同步音效设置
+  if (typeof window !== 'undefined') {
+    setSoundEnabled(safeState.soundEnabled);
+  }
 
   return {
     ...safeState,
@@ -179,16 +214,109 @@ export const useGameStore = create<GameStore>((set, get) => {
       set({ activeTab: tab });
     },
 
+    setSoundEnabled: (enabled: boolean) => {
+      set({ soundEnabled: enabled });
+      setSoundEnabled(enabled);
+      get().save();
+    },
+
+    // === 市场波动 ===
+    tickMarket: () => {
+      const state = get();
+      const now = Date.now();
+      // 每90~150秒波动一次
+      const interval = 90000 + Math.random() * 60000;
+      if (now - state.lastMarketUpdate < interval) return;
+
+      const newMultipliers = generateMarketMultipliers();
+      set({
+        marketMultipliers: newMultipliers,
+        lastMarketUpdate: now,
+      });
+      get().save();
+    },
+
+    // === 每日登录 ===
+    checkDailyLogin: () => {
+      const state = get();
+      const today = getTodayStr();
+
+      if (state.lastLoginDate === today) {
+        return { isRewardAvailable: false, streak: state.loginStreak };
+      }
+
+      if (isConsecutiveDay(state.lastLoginDate, today)) {
+        // 连续登录，streak+1
+        const newStreak = state.loginStreak + 1;
+        set({ loginStreak: newStreak, lastLoginDate: today });
+        get().save();
+        return { isRewardAvailable: true, streak: newStreak };
+      } else {
+        // 断签，重置为第1天
+        set({ loginStreak: 1, lastLoginDate: today });
+        get().save();
+        return { isRewardAvailable: true, streak: 1 };
+      }
+    },
+
+    claimDailyReward: () => {
+      const state = get();
+      const currentDay = ((state.loginStreak - 1) % 7) + 1;
+      const reward = DAILY_REWARDS.find(r => r.day === currentDay);
+
+      if (!reward) return;
+
+      let cashReward = 0;
+      let diamondReward = 0;
+
+      for (const r of reward.rewards) {
+        if (r.type === 'cash') cashReward += r.value;
+        if (r.type === 'diamond') diamondReward += r.value;
+        if (r.type === 'buff' && r.buffType && r.buffDuration) {
+          get().addAdBuff(r.buffType as any, r.buffDuration, 1);
+        }
+      }
+
+      set(s => ({
+        cash: s.cash + cashReward,
+        totalEarned: s.totalEarned + cashReward,
+        diamonds: s.diamonds + diamondReward,
+      }));
+      get().save();
+    },
+
+    // === 店长升级 ===
+    upgradeManager: (managerId: number) => {
+      const state = get();
+      if (!state.hiredManagers.includes(managerId)) return false;
+
+      const def = MANAGERS.find(m => m.id === managerId);
+      if (!def) return false;
+
+      const currentLevel = state.managerLevels[managerId] ?? 0;
+      if (currentLevel >= def.maxLevel) return false;
+
+      const cost = calcManagerUpgradeCost(managerId, currentLevel);
+      if (def.upgradeCurrency === 'cash' && state.cash < cost) return false;
+      if (def.upgradeCurrency === 'diamond' && state.diamonds < cost) return false;
+
+      set(s => ({
+        managerLevels: { ...s.managerLevels, [managerId]: currentLevel + 1 },
+        cash: def.upgradeCurrency === 'cash' ? s.cash - cost : s.cash,
+        diamonds: def.upgradeCurrency === 'diamond' ? s.diamonds - cost : s.diamonds,
+      }));
+      get().save();
+      return true;
+    },
+
     manualProduce: (businessId: number) => {
       set(state => {
         const bsIdx = state.businesses.findIndex(b => b.businessId === businessId);
         if (bsIdx === -1) return state;
         const bs = state.businesses[bsIdx];
         if (bs.quantity <= 0) return state;
-        // 已经在生产中，不允许重复点击
         if (bs.progress > 0) return state;
 
-        // 手动生产：启动进度条（不是直接给收益）
         const newBusinesses = [...state.businesses];
         newBusinesses[bsIdx] = { ...bs, progress: 0.001 };
 
@@ -243,7 +371,6 @@ export const useGameStore = create<GameStore>((set, get) => {
         const newBusinesses = [...s.businesses];
 
         if (def.businessId > 0) {
-          // 绑定到具体产线
           const bsIdx = newBusinesses.findIndex(b => b.businessId === def.businessId);
           if (bsIdx !== -1) {
             newBusinesses[bsIdx] = {
@@ -274,7 +401,6 @@ export const useGameStore = create<GameStore>((set, get) => {
       if (uIdx === -1) return false;
 
       const currentLevel = state.upgrades[uIdx].level;
-      // 限制不超过最大等级
       const actualCount = Math.min(count, def.maxLevel - currentLevel);
       if (actualCount <= 0) return false;
 
@@ -309,7 +435,6 @@ export const useGameStore = create<GameStore>((set, get) => {
         purchasedAngelUpgrades: [...s.purchasedAngelUpgrades, upgradeId],
       }));
       get().save();
-      // 检查成就
       setTimeout(() => get().checkAchievements(), 100);
       return true;
     },
@@ -321,7 +446,6 @@ export const useGameStore = create<GameStore>((set, get) => {
       const def = BUSINESS_UPGRADES.find(u => u.id === upgradeId);
       if (!def) return false;
 
-      // 检查拥有数量是否满足解锁要求
       const bs = state.businesses.find(b => b.businessId === def.businessId);
       if (!bs || bs.quantity < def.unlockQuantity) return false;
 
@@ -340,7 +464,6 @@ export const useGameStore = create<GameStore>((set, get) => {
       const state = get();
       const now = Date.now();
 
-      // 节流：最多每3秒检查一次
       if (now - state.lastAchievementCheck < 3000) return [];
 
       const newlyUnlocked = checkAchievementConditions(state);
@@ -349,7 +472,6 @@ export const useGameStore = create<GameStore>((set, get) => {
         return [];
       }
 
-      // 计算奖励
       let totalCashReward = 0;
       let totalDiamondReward = 0;
       for (const id of newlyUnlocked) {
@@ -377,15 +499,18 @@ export const useGameStore = create<GameStore>((set, get) => {
       const gain = calcPrestigeGain(state.totalEarned);
       if (gain <= 0) return;
 
+      const freshMarket: Record<number, number> = {};
+      for (const b of BUSINESSES) freshMarket[b.id] = 1;
+
       set(s => ({
         cash: 0,
-        diamonds: s.diamonds, // 钻石保留
+        diamonds: s.diamonds,
         totalEarned: 0,
         prestigePoints: s.prestigePoints + gain,
         totalPrestigeCount: s.totalPrestigeCount + 1,
         businesses: BUSINESSES.map(b => ({
           businessId: b.id,
-          quantity: b.id === 1 ? 1 : 0, // 转生后送1个第一档
+          quantity: b.id === 1 ? 1 : 0,
           progress: 0,
           hasManager: false,
         })),
@@ -394,15 +519,18 @@ export const useGameStore = create<GameStore>((set, get) => {
           level: 0,
         })),
         hiredManagers: [],
+        managerLevels: {}, // 店长等级重置
         adBuffs: [],
         lastOnlineTimestamp: Date.now(),
         tutorialStep: 'none' as TutorialStep,
         totalManualTaps: 0,
         totalPurchases: 0,
-        buyMode: s.buyMode, // UI偏好保留
-        purchasedAngelUpgrades: s.purchasedAngelUpgrades, // 人脉升级永久保留
-        purchasedBusinessUpgrades: [], // 产线专属升级重置
-        unlockedAchievements: s.unlockedAchievements, // 成就永久保留
+        buyMode: s.buyMode,
+        purchasedAngelUpgrades: s.purchasedAngelUpgrades,
+        purchasedBusinessUpgrades: [],
+        unlockedAchievements: s.unlockedAchievements,
+        marketMultipliers: freshMarket, // 市场重置
+        lastMarketUpdate: Date.now(),
       }));
       get().save();
     },
@@ -471,12 +599,12 @@ export const useGameStore = create<GameStore>((set, get) => {
       const completedBusinesses: number[] = [];
       let totalEarned = 0;
 
-      // 预计算人脉升级效果
       const angelEffects = calcAngelUpgradeEffects(state.purchasedAngelUpgrades || []);
+      const marketMultipliers = state.marketMultipliers || {};
+      const managerLevels = state.managerLevels || {};
 
       const newBusinesses = state.businesses.map(bs => {
         if (bs.quantity <= 0) return { ...bs };
-        // 有店长的自动运行；没店长但progress>0说明手动启动过，也要走进度
         if (!bs.hasManager && bs.progress <= 0) return { ...bs };
 
         const def = BUSINESSES.find(b => b.id === bs.businessId);
@@ -487,6 +615,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         let cycle = def.baseCycleSec * globalEffects.cycleMultiplier;
         cycle *= calcBusinessUpgradeCycleReduce(bs.businessId, state.purchasedBusinessUpgrades || []);
         cycle *= angelEffects.globalCycleReduce;
+        cycle *= calcManagerLevelCycleReduce(bs.businessId, managerLevels, state.hiredManagers);
         const rushBuff = state.adBuffs.find(b => b.type === 'rush_order');
         if (rushBuff) cycle *= 0.2;
         cycle = Math.max(0.05, cycle);
@@ -494,7 +623,6 @@ export const useGameStore = create<GameStore>((set, get) => {
         const newProgress = bs.progress + deltaSec / cycle;
 
         if (newProgress >= 1) {
-          // 完成生产
           completedBusinesses.push(bs.businessId);
           let revenue = def.baseRevenue * bs.quantity;
           for (const ms of def.milestones) {
@@ -505,11 +633,13 @@ export const useGameStore = create<GameStore>((set, get) => {
           revenue *= calcAngelBusinessProfitMult(bs.businessId, state.purchasedAngelUpgrades || []);
           revenue *= angelEffects.globalProfitMult;
           revenue *= calcPrestigeMultiplier(state.prestigePoints);
+          revenue *= calcManagerLevelProfitMult(bs.businessId, managerLevels, state.hiredManagers);
           if (state.adBuffs.some(b => b.type === 'double_revenue')) revenue *= 2;
           if (rushBuff) revenue *= 3;
+          // 市场波动
+          revenue *= marketMultipliers[bs.businessId] ?? 1;
 
           totalEarned += revenue;
-          // 有店长：自动重启（progress=0.001）；没店长：停止（progress=0）
           return { ...bs, progress: bs.hasManager ? 0.001 : 0 };
         }
 
@@ -526,7 +656,6 @@ export const useGameStore = create<GameStore>((set, get) => {
         set({ businesses: newBusinesses });
       }
 
-      // 更新广告buff计时
       // 定期检查成就（每3秒）
       const now = Date.now();
       if (now - state.lastAchievementCheck >= 3000) {
@@ -536,6 +665,9 @@ export const useGameStore = create<GameStore>((set, get) => {
       if (state.adBuffs.length > 0) {
         get().tickAdBuffs(deltaSec);
       }
+
+      // 市场波动 tick
+      get().tickMarket();
 
       return { completedBusinesses, totalEarned };
     },

@@ -54,6 +54,11 @@ export interface ManagerDef {
   rarity: Rarity;
   icon: string;
   description: string;
+  maxLevel: number;             // 店长最大可升级等级
+  upgradeCostBase: number;       // 升级基础费用
+  upgradeCostMultiplier: number; // 升级费用增长倍率
+  upgradeEffectPerLevel: number; // 每级额外效果值
+  upgradeCurrency: 'cash' | 'diamond'; // 升级消耗货币
 }
 
 /** 全局升级分组 */
@@ -234,6 +239,18 @@ export interface GameState {
   // 成就系统
   unlockedAchievements: string[];
   lastAchievementCheck: number; // 上次成就检查时间戳
+
+  // 市场波动
+  marketMultipliers: Record<number, number>; // businessId -> 利润倍率
+  lastMarketUpdate: number;       // 上次市场更新时间戳
+  soundEnabled: boolean;          // 音效开关
+
+  // 每日登录
+  lastLoginDate: string;          // YYYY-MM-DD
+  loginStreak: number;            // 连续登录天数
+
+  // 店长等级
+  managerLevels: Record<number, number>; // managerId -> level
 }
 
 /** 格式化数字用的后缀 */

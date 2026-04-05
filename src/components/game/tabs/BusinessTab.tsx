@@ -16,11 +16,13 @@ import {
   calcRevenuePerCycle,
   calcCycleTime,
   calcAngelUpgradeEffects,
+  getMarketTrendText,
   formatCash,
   formatNumber,
   formatTime,
 } from '@/game/formulas';
 import { usePopup } from '@/components/game/PopupLayer';
+import { playTap, playBuy, playUIClick } from '@/game/sound';
 
 // ============================================================
 // 产线专属升级弹窗内容 — 独立组件，实时订阅 store
@@ -115,6 +117,7 @@ export default function BusinessTab() {
     prestigePoints,
     purchasedAngelUpgrades,
     purchasedBusinessUpgrades,
+    marketMultipliers,
     buyBusiness,
     manualProduce,
     advanceTutorial,
@@ -342,6 +345,20 @@ export default function BusinessTab() {
                 </div>
               )}
 
+              {/* 市场波动指示器 */}
+              {quantity > 0 && marketMultipliers && marketMultipliers[def.id] !== undefined && (
+                (() => {
+                  const mMult = marketMultipliers[def.id] ?? 1;
+                  const trend = getMarketTrendText(mMult);
+                  const isAbnormal = mMult < 0.9 || mMult > 1.1;
+                  return isAbnormal ? (
+                    <div className={`text-[10px] font-bold mb-1 ${trend.color}`}>
+                      📊 市场: {trend.text} (×{mMult.toFixed(2)})
+                    </div>
+                  ) : null;
+                })()
+              )}
+
               {/* 下一个里程碑提示 */}
               {nextMs && quantity > 0 && (
                 <div className="text-[10px] text-gray-500 mb-1">
@@ -373,6 +390,7 @@ export default function BusinessTab() {
                       <button
                         onClick={() => {
                           manualProduce(def.id);
+                          playTap();
                           if (tutorialStep === 'none') {
                             advanceTutorial('first_tap');
                           }
@@ -388,7 +406,10 @@ export default function BusinessTab() {
 
                   {/* 购买按钮 */}
                   <button
-                    onClick={() => handleBuy(def.id)}
+                    onClick={() => {
+                      if (canAfford) playBuy(); else playUIClick();
+                      handleBuy(def.id);
+                    }}
                     disabled={!canAfford}
                     className={`
                       flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-150
