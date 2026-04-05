@@ -2,15 +2,16 @@
 // 游戏状态管理 — Zustand Store + localStorage 持久化
 // ============================================================
 import { create } from 'zustand';
-import { BusinessState, UpgradeState, AdBuff, TutorialStep, GameState } from '../game/types';
+import { BusinessState, UpgradeState, AdBuff, TutorialStep, GameState, BusinessMode, ActiveGameEvent } from '../game/types';
 import { BUSINESSES } from '../game/config/businesses';
 import { MANAGERS } from '../game/config/managers';
 import { GLOBAL_UPGRADES } from '../game/config/upgrades';
 import { ANGEL_UPGRADES } from '../game/config/angel-upgrades';
-import { calcBuyCost, calcBuyCostWithDiscount, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects, calcAngelUpgradeEffects, calcAngelBusinessProfitMult, checkAchievementConditions, calcBusinessUpgradeProfitMult, calcBusinessUpgradeCycleReduce, calcManagerUpgradeCost, generateMarketMultipliers, calcManagerLevelCycleReduce, calcManagerLevelProfitMult, getTodayStr, isConsecutiveDay } from '../game/formulas';
+import { calcBuyCost, calcBuyCostWithDiscount, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects, calcAngelUpgradeEffects, calcAngelBusinessProfitMult, checkAchievementConditions, calcBusinessUpgradeProfitMult, calcBusinessUpgradeCycleReduce, calcManagerUpgradeCost, generateMarketMultipliers, calcManagerLevelCycleReduce, calcManagerLevelProfitMult, getTodayStr, isConsecutiveDay, tryTriggerEvent, calcEventCostReduce } from '../game/formulas';
 import { BUSINESS_UPGRADES } from '../game/config/business-upgrades';
 import { ACHIEVEMENTS } from '../game/config/achievements';
 import { DAILY_REWARDS } from '../game/config/daily-rewards';
+import { GAME_EVENTS } from '../game/config/events';
 import { calcPrestigeGain, calcPrestigeMultiplier } from '../game/config/prestige';
 import { setSoundEnabled } from '../game/sound';
 
@@ -57,6 +58,10 @@ function createInitialState(): GameState {
     lastLoginDate: '',
     loginStreak: 0,
     managerLevels: {},
+    businessModes: {} as Record<number, BusinessMode>,
+    activeEvents: [] as ActiveGameEvent[],
+    lastEventCheck: Date.now(),
+    eventCooldownUntil: 0,
   };
 }
 
@@ -154,6 +159,12 @@ interface GameActions {
   checkDailyLogin: () => { isRewardAvailable: boolean; streak: number };
   claimDailyReward: () => void;
 
+  // 产线模式切换
+  setBusinessMode: (businessId: number, mode: BusinessMode) => void;
+
+  // 事件系统
+  tickEvents: (deltaSec: number) => ActiveGameEvent | null;
+
   // 生产进度更新（每帧调用）
   updateProgress: (deltaSec: number) => { completedBusinesses: number[]; totalEarned: number };
 
@@ -198,6 +209,13 @@ export const useGameStore = create<GameStore>((set, get) => {
     lastLoginDate: initial.lastLoginDate ?? '',
     loginStreak: initial.loginStreak ?? 0,
     managerLevels: initial.managerLevels ?? {},
+    businessModes: initial.businessModes ?? {},
+    activeEvents: (initial.activeEvents ?? []).filter((e: any) => e.remainingSec > 0).map((e: any) => ({
+      ...e,
+      remainingSec: Math.max(0, (e.remainingSec ?? 0)),
+    })),
+    lastEventCheck: initial.lastEventCheck ?? Date.now(),
+    eventCooldownUntil: initial.eventCooldownUntil ?? 0,
   };
 
   // 同步音效设置
@@ -307,6 +325,75 @@ export const useGameStore = create<GameStore>((set, get) => {
       }));
       get().save();
       return true;
+    },
+
+    // === 产线模式切换 ===
+    setBusinessMode: (businessId: number, mode: BusinessMode) => {
+      set(s => ({
+        businessModes: { ...s.businessModes, [businessId]: mode },
+      }));
+      get().save();
+    },
+
+    // === 事件系统 ===
+    tickEvents: (deltaSec: number): ActiveGameEvent | null => {
+      const state = get();
+      const now = Date.now();
+
+      // 更新现有事件的剩余时间
+      let updatedEvents = state.activeEvents
+        .map(e => ({ ...e, remainingSec: e.remainingSec - deltaSec }))
+        .filter(e => e.remainingSec > 0);
+
+      // 发放已完成事件的奖励
+      const expiredEvents = state.activeEvents.filter(e => e.remainingSec - deltaSec <= 0);
+      for (const expired of expiredEvents) {
+        const def = GAME_EVENTS.find(ev => ev.id === expired.eventDefId);
+        if (def?.reward) {
+          set(s => {
+            if (def.reward!.type === 'cash') {
+              return { cash: s.cash + def.reward!.value, totalEarned: s.totalEarned + def.reward!.value };
+            } else if (def.reward!.type === 'diamond') {
+              return { diamonds: s.diamonds + def.reward!.value };
+            }
+            return s;
+          });
+        }
+      }
+
+      let newlyTriggered: ActiveGameEvent | null = null;
+
+      // 尝试触发新事件（每30秒检查一次，概率触发）
+      const checkInterval = 30000;
+      if (now - state.lastEventCheck >= checkInterval) {
+        // 10% 概率触发新事件（每次检查）
+        if (Math.random() < 0.10) {
+          const newState = { ...state, activeEvents: updatedEvents, lastEventCheck: now };
+          const newEvent = tryTriggerEvent(newState);
+          if (newEvent) {
+            updatedEvents = [...updatedEvents, newEvent];
+            newlyTriggered = newEvent;
+            // 设置冷却
+            const def = GAME_EVENTS.find(e => e.id === newEvent.eventDefId);
+            const cooldownMs = (def?.cooldownSec ?? 120) * 1000;
+            set(s => ({
+              eventCooldownUntil: now + cooldownMs,
+              lastEventCheck: now,
+            }));
+          } else {
+            set({ lastEventCheck: now });
+          }
+        } else {
+          set({ lastEventCheck: now });
+        }
+      }
+
+      if (expiredEvents.length > 0 || updatedEvents.length !== state.activeEvents.length) {
+        set({ activeEvents: updatedEvents });
+        get().save();
+      }
+
+      return newlyTriggered;
     },
 
     manualProduce: (businessId: number) => {
@@ -531,6 +618,10 @@ export const useGameStore = create<GameStore>((set, get) => {
         unlockedAchievements: s.unlockedAchievements,
         marketMultipliers: freshMarket, // 市场重置
         lastMarketUpdate: Date.now(),
+        businessModes: {}, // 模式重置
+        activeEvents: [],  // 事件清除
+        lastEventCheck: Date.now(),
+        eventCooldownUntil: 0,
       }));
       get().save();
     },
@@ -618,6 +709,16 @@ export const useGameStore = create<GameStore>((set, get) => {
         cycle *= calcManagerLevelCycleReduce(bs.businessId, managerLevels, state.hiredManagers);
         const rushBuff = state.adBuffs.find(b => b.type === 'rush_order');
         if (rushBuff) cycle *= 0.2;
+        // 利润/速度模式
+        const bizMode = state.businessModes?.[bs.businessId];
+        if (bizMode === 'speed') cycle *= 0.5;
+        if (bizMode === 'profit') cycle *= 1.5;
+        // 事件增益（速度类/全能类）
+        if (state.activeEvents) {
+          for (const evt of state.activeEvents) {
+            if (evt.boostType === 'speed_mult' || evt.boostType === 'all_mult') cycle /= evt.boostValue;
+          }
+        }
         cycle = Math.max(0.05, cycle);
 
         const newProgress = bs.progress + deltaSec / cycle;
@@ -638,6 +739,15 @@ export const useGameStore = create<GameStore>((set, get) => {
           if (rushBuff) revenue *= 3;
           // 市场波动
           revenue *= marketMultipliers[bs.businessId] ?? 1;
+          // 利润/速度模式
+          if (bizMode === 'profit') revenue *= 1.5;
+          if (bizMode === 'speed') revenue *= 0.8;
+          // 事件增益（利润类/全能类）
+          if (state.activeEvents) {
+            for (const evt of state.activeEvents) {
+              if (evt.boostType === 'profit_mult' || evt.boostType === 'all_mult') revenue *= evt.boostValue;
+            }
+          }
 
           totalEarned += revenue;
           return { ...bs, progress: bs.hasManager ? 0.001 : 0 };
@@ -668,6 +778,9 @@ export const useGameStore = create<GameStore>((set, get) => {
 
       // 市场波动 tick
       get().tickMarket();
+
+      // 事件系统 tick
+      get().tickEvents(deltaSec);
 
       return { completedBusinesses, totalEarned };
     },

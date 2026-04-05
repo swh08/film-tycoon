@@ -25,9 +25,11 @@ export default function TopHUD({ onAchievementOpen }: TopHUDProps) {
   const marketMultipliers = useGameStore(s => s.marketMultipliers);
   const soundEnabled = useGameStore(s => s.soundEnabled);
   const setSoundEnabledStore = useGameStore(s => s.setSoundEnabled);
+  const activeEvents = useGameStore(s => s.activeEvents);
 
   const [incomePerSec, setIncomePerSec] = useState(0);
   const [buffTimer, setBuffTimer] = useState('');
+  const [eventTimers, setEventTimers] = useState<{icon: string; text: string; remaining: number}[]>([]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -45,6 +47,18 @@ export default function TopHUD({ onAchievementOpen }: TopHUDProps) {
         setBuffTimer(`🚀爆单 ${Math.ceil(rush.remainingSec)}s`);
       } else {
         setBuffTimer('');
+      }
+
+      // 事件计时器
+      const events = state.activeEvents || [];
+      if (events.length > 0) {
+        setEventTimers(events.map(e => ({
+          icon: e.icon,
+          text: e.name,
+          remaining: Math.ceil(e.remainingSec),
+        })));
+      } else {
+        setEventTimers([]);
       }
     }, 200);
     return () => clearInterval(timer);
@@ -80,8 +94,18 @@ export default function TopHUD({ onAchievementOpen }: TopHUDProps) {
         )}
       </div>
 
-      {/* 中间区域：Buff + 市场 */}
-      <div className="flex items-center gap-1.5 mx-1">
+      {/* 中间区域：Buff + 事件 + 市场 */}
+      <div className="flex items-center gap-1.5 mx-1 flex-wrap justify-center">
+        {/* 活跃事件 */}
+        {eventTimers.map((evt, idx) => (
+          <div
+            key={idx}
+            className="px-2 py-1 rounded-full bg-gradient-to-r from-purple-600/80 to-pink-600/80
+                           text-white text-[10px] font-bold animate-pulse shadow-md shadow-purple-500/40"
+          >
+            {evt.icon} {evt.remaining}s
+          </div>
+        ))}
         {/* 广告Buff计时 */}
         {buffTimer && (
           <div className="px-2 py-1 rounded-full bg-red-500/80 text-white text-[10px] font-bold 

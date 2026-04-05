@@ -68,3 +68,43 @@ Stage Summary:
 - 市场波动：每90-150秒随机波动，5种趋势（暴跌/下跌/平稳/上涨/繁荣），顶栏+产线卡片双重指示
 - 店长升级：12个店长均可升至Lv.10，指数费用增长，产线店长加速+全局店长增益/加速
 - 收益公式完整链路：基础×数量×里程碑×全局升级×产线升级×人脉升级×转生×店长等级×广告buff×市场波动
+
+---
+Task ID: 4
+Agent: Main Agent
+Task: 实现3大AC对标功能：利润/速度切换、详细收益分解Tooltip、事件激活系统
+
+Work Log:
+- 更新 `src/game/types.ts`：
+  - 新增 BusinessMode 类型（profit/speed）
+  - 新增 EventBoostType、GameEventDef、ActiveGameEvent 类型
+  - GameState 增加 activeTab、businessModes、activeEvents、lastEventCheck、eventCooldownUntil
+- 创建 `src/game/config/events.ts`：11个随机事件配置（4利润类/3速度类/2全能类/2成本类），含权重、冷却、最低收入要求、完成奖励
+- 更新 `src/game/formulas.ts`：
+  - calcRevenuePerCycle/calcCycleTime 集成利润/速度模式倍率和事件增益
+  - 新增 calcDetailedBreakdown：完整收益分解（12项乘数），用于Tooltip显示
+  - 新增 tryTriggerEvent：加权随机事件触发逻辑
+  - 新增 calcEventCostReduce：事件成本缩减计算
+- 更新 `src/store/gameStore.ts`：
+  - 新增 setBusinessMode action（切换产线利润/速度/默认模式）
+  - 新增 tickEvents action（事件tick：更新剩余时间、发放完成奖励、概率触发新事件）
+  - updateProgress 集成利润/速度模式和事件效果到收益和周期计算
+  - updateProgress 集成事件 tick
+  - prestige 重置 businessModes、activeEvents、lastEventCheck、eventCooldownUntil
+  - createInitialState/safeState 初始化新字段
+- 更新 `src/game/sound.ts`：新增 playEventStart/playEventEnd 事件音效
+- 更新 `src/components/game/tabs/BusinessTab.tsx`：
+  - 新增 BusinessDetailPopupContent 组件：响应式弹窗显示完整收益分解（基础×12项乘数→最终收益/周期/秒收入）
+  - 每条产线卡片右上角添加 ℹ️ 详情按钮
+  - 每条产线卡片添加三态模式切换（💰利润/⚡速度/⚖️默认），带效果提示
+- 创建 `src/components/game/EventNotification.tsx`：事件触发通知弹窗（从顶部滑入，3秒自动消失，显示事件名+增益+倒计时）
+- 更新 `src/components/game/TopHUD.tsx`：顶栏中间区域显示激活事件倒计时（紫粉渐变徽章）
+- 更新 `src/components/game/tabs/ShopTab.tsx`：旧 EVENTS 引用迁移为 GAME_EVENTS，显示随机事件预览列表
+- 更新 `src/app/page.tsx`：集成 EventNotification 组件
+- 编译通过，build成功
+
+Stage Summary:
+- 利润/速度切换：每条产线独立三态切换（利润×1.5速度×0.67 / 速度×2利润×0.8 / 默认），持久化到store，转生重置
+- 详细收益分解Tooltip：点击ℹ️按钮查看完整乘数分解（基础→里程碑→全局升级→产线升级→人脉→转生→广告→市场→店长→模式→事件），含最终收益/周期/秒收入
+- 事件激活系统：11种随机事件（利润/速度/全能/成本），每30秒10%概率触发，最多2个同时激活，自动倒计时+奖励发放，顶栏+通知弹窗+商城Tab三处显示
+- 收益公式完整链路更新：基础×数量×里程碑×全局升级×产线升级×人脉升级×转生×店长等级×广告buff×市场波动×经营模式×事件增益

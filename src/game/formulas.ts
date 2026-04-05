@@ -1,7 +1,7 @@
 // ============================================================
 // 公式引擎 — 成本/收益/生产 计算
 // ============================================================
-import { BusinessDef, CostCurve, Milestone, AdBuff } from './types';
+import { BusinessDef, CostCurve, Milestone, AdBuff, BusinessMode, ActiveGameEvent, GameEventDef } from './types';
 import { BUSINESSES } from './config/businesses';
 import { GLOBAL_UPGRADES } from './config/upgrades';
 import { ANGEL_UPGRADES } from './config/angel-upgrades';
@@ -9,6 +9,7 @@ import { BUSINESS_UPGRADES } from './config/business-upgrades';
 import { ACHIEVEMENTS } from './config/achievements';
 import { MANAGERS } from './config/managers';
 import { calcPrestigeMultiplier } from './config/prestige';
+import { GAME_EVENTS } from './config/events';
 import type { BusinessState, UpgradeState, GameState } from './types';
 
 // === 成本计算 ===
@@ -181,6 +182,21 @@ export function calcRevenuePerCycle(
   // 店长等级加成（利润）
   revenue *= calcManagerLevelProfitMult(businessDef.id, (state as any).managerLevels ?? {}, (state as any).hiredManagers ?? []);
 
+  // 利润/速度模式
+  const businessMode = (state as any).businessModes?.[businessDef.id] as BusinessMode | undefined;
+  if (businessMode === 'profit') revenue *= 1.5;
+  if (businessMode === 'speed') revenue *= 0.8;
+
+  // 事件增益（利润类/全能类）
+  const activeEvents = (state as any).activeEvents as ActiveGameEvent[] | undefined;
+  if (activeEvents) {
+    for (const evt of activeEvents) {
+      if (evt.boostType === 'profit_mult' || evt.boostType === 'all_mult') {
+        revenue *= evt.boostValue;
+      }
+    }
+  }
+
   return revenue;
 }
 
@@ -209,6 +225,21 @@ export function calcCycleTime(
 
   // 店长等级加成（速度）
   cycle *= calcManagerLevelCycleReduce(businessDef.id, (state as any).managerLevels ?? {}, (state as any).hiredManagers ?? []);
+
+  // 利润/速度模式
+  const businessMode = (state as any).businessModes?.[businessDef.id] as BusinessMode | undefined;
+  if (businessMode === 'speed') cycle *= 0.5;
+  if (businessMode === 'profit') cycle *= 1.5;
+
+  // 事件增益（速度类/全能类）
+  const activeEvents = (state as any).activeEvents as ActiveGameEvent[] | undefined;
+  if (activeEvents) {
+    for (const evt of activeEvents) {
+      if (evt.boostType === 'speed_mult' || evt.boostType === 'all_mult') {
+        cycle /= evt.boostValue;
+      }
+    }
+  }
 
   return Math.max(0.05, cycle); // 最低50ms
 }
@@ -576,4 +607,198 @@ export function formatTime(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
   return mins > 0 ? `${hours}小时${mins}分` : `${hours}小时`;
+}
+
+// ============================================================
+// 详细收益分解（Tooltip用）
+// ============================================================
+
+/** 单项乘数信息 */
+export interface MultiplierBreakdownItem {
+  label: string;         // 乘数名称
+  value: number;         // 当前值
+  displayValue: string;  // 显示文字
+  color: string;         // 显示颜色
+}
+
+/** 收益分解结果 */
+export interface RevenueBreakdown {
+  baseRevenue: number;
+  quantity: number;
+  baseTotal: number;
+  items: MultiplierBreakdownItem[];
+  finalRevenue: number;
+  finalCycle: number;
+  revenuePerSec: number;
+}
+
+/** 计算详细收益分解 — 用于Tooltip显示 */
+export function calcDetailedBreakdown(
+  businessDef: BusinessDef,
+  quantity: number,
+  state: GameState,
+  adBuffs: AdBuff[],
+): RevenueBreakdown {
+  const items: MultiplierBreakdownItem[] = [];
+
+  // 1. 基础收益
+  const baseTotal = businessDef.baseRevenue * quantity;
+
+  // 2. 里程碑倍率
+  const milestoneMult = calcMilestoneMultiplier(businessDef, quantity);
+  if (milestoneMult > 1) {
+    items.push({ label: '里程碑倍率', value: milestoneMult, displayValue: `×${formatNumber(milestoneMult)}`, color: 'text-pink-400' });
+  }
+
+  // 3. 全局升级利润
+  const globalEffects = calcGlobalEffects(state.upgrades);
+  if (globalEffects.profitMultiplier > 1) {
+    items.push({ label: '全局升级', value: globalEffects.profitMultiplier, displayValue: `×${formatNumber(globalEffects.profitMultiplier)}`, color: 'text-blue-400' });
+  }
+
+  // 4. 产线专属升级利润
+  const bizUpgradeMult = calcBusinessUpgradeProfitMult(businessDef.id, state.purchasedBusinessUpgrades || []);
+  if (bizUpgradeMult > 1) {
+    items.push({ label: '产线升级', value: bizUpgradeMult, displayValue: `×${formatNumber(bizUpgradeMult)}`, color: 'text-indigo-400' });
+  }
+
+  // 5. 人脉升级（单产线）
+  const angelBizMult = calcAngelBusinessProfitMult(businessDef.id, state.purchasedAngelUpgrades || []);
+  if (angelBizMult > 1) {
+    items.push({ label: '人脉·产线', value: angelBizMult, displayValue: `×${formatNumber(angelBizMult)}`, color: 'text-orange-400' });
+  }
+
+  // 6. 人脉升级（全局）
+  const angelEffects = calcAngelUpgradeEffects(state.purchasedAngelUpgrades || []);
+  if (angelEffects.globalProfitMult > 1) {
+    items.push({ label: '人脉·全局', value: angelEffects.globalProfitMult, displayValue: `×${formatNumber(angelEffects.globalProfitMult)}`, color: 'text-orange-400' });
+  }
+
+  // 7. 转生永久加成
+  const prestigeMult = calcPrestigeMultiplier(state.prestigePoints);
+  if (prestigeMult > 1) {
+    items.push({ label: '转生加成', value: prestigeMult, displayValue: `×${formatNumber(prestigeMult)}`, color: 'text-yellow-400' });
+  }
+
+  // 8. 广告增益
+  const hasDoubleRevenue = adBuffs.some(b => b.type === 'double_revenue');
+  if (hasDoubleRevenue) {
+    items.push({ label: '广告·双倍', value: 2, displayValue: '×2', color: 'text-red-400' });
+  }
+  const rushBuff = adBuffs.find(b => b.type === 'rush_order');
+  if (rushBuff) {
+    items.push({ label: '爆单潮', value: 3, displayValue: '×3', color: 'text-red-300' });
+  }
+
+  // 9. 市场波动
+  const marketMult = (state as any).marketMultipliers?.[businessDef.id] ?? 1;
+  if (Math.abs(marketMult - 1) > 0.01) {
+    const trendColor = marketMult >= 1 ? 'text-green-400' : 'text-red-400';
+    items.push({ label: '市场波动', value: marketMult, displayValue: `×${marketMult.toFixed(2)}`, color: trendColor });
+  }
+
+  // 10. 店长等级利润
+  const mgrProfitMult = calcManagerLevelProfitMult(businessDef.id, (state as any).managerLevels ?? {}, (state as any).hiredManagers ?? []);
+  if (mgrProfitMult > 1) {
+    items.push({ label: '店长等级', value: mgrProfitMult, displayValue: `×${formatNumber(mgrProfitMult)}`, color: 'text-cyan-400' });
+  }
+
+  // 11. 利润/速度模式
+  const businessMode = (state as any).businessModes?.[businessDef.id] as BusinessMode | undefined;
+  if (businessMode === 'profit') {
+    items.push({ label: '💰 利润模式', value: 1.5, displayValue: '×1.5', color: 'text-yellow-300' });
+  } else if (businessMode === 'speed') {
+    items.push({ label: '⚡ 速度模式', value: 0.8, displayValue: '×0.8', color: 'text-blue-300' });
+  }
+
+  // 12. 事件增益
+  const activeEvents = (state as any).activeEvents as ActiveGameEvent[] | undefined;
+  if (activeEvents && activeEvents.length > 0) {
+    for (const evt of activeEvents) {
+      if (evt.boostType === 'profit_mult' || evt.boostType === 'all_mult') {
+        items.push({ label: `🎊 ${evt.name}`, value: evt.boostValue, displayValue: `×${evt.boostValue}`, color: 'text-yellow-200' });
+      }
+    }
+  }
+
+  // 计算最终收益
+  let finalRevenue = baseTotal;
+  for (const item of items) finalRevenue *= item.value;
+
+  // 计算最终周期
+  const finalCycle = calcCycleTime(businessDef, state, adBuffs);
+  const revenuePerSec = finalRevenue / finalCycle;
+
+  return {
+    baseRevenue: businessDef.baseRevenue,
+    quantity,
+    baseTotal,
+    items,
+    finalRevenue,
+    finalCycle,
+    revenuePerSec,
+  };
+}
+
+// ============================================================
+// 事件系统公式
+// ============================================================
+
+/** 触发随机事件（根据权重和冷却时间） */
+export function tryTriggerEvent(state: GameState): ActiveGameEvent | null {
+  const now = Date.now();
+
+  // 检查冷却
+  if (state.eventCooldownUntil && now < state.eventCooldownUntil) return null;
+
+  // 检查是否已有事件在运行
+  if (state.activeEvents && state.activeEvents.length >= 2) return null;
+
+  // 筛选可用事件（满足收入要求和冷却）
+  const available = GAME_EVENTS.filter(evt => {
+    if (state.totalEarned < evt.minTotalEarned) return false;
+    // 检查同类型事件是否已在运行
+    if (state.activeEvents?.some(a => a.eventDefId === evt.id)) return false;
+    return true;
+  });
+
+  if (available.length === 0) return null;
+
+  // 加权随机选择
+  const totalWeight = available.reduce((sum, e) => sum + e.weight, 0);
+  let roll = Math.random() * totalWeight;
+  let selected: GameEventDef | null = null;
+  for (const evt of available) {
+    roll -= evt.weight;
+    if (roll <= 0) { selected = evt; break; }
+  }
+  if (!selected) selected = available[available.length - 1];
+
+  // 创建激活事件
+  const activeEvent: ActiveGameEvent = {
+    id: `evt_${selected.id}_${now}`,
+    eventDefId: selected.id,
+    name: selected.name,
+    icon: selected.icon,
+    description: selected.description,
+    startTime: now,
+    durationSec: selected.durationSec,
+    remainingSec: selected.durationSec,
+    boostType: selected.boostType,
+    boostValue: selected.boostValue,
+  };
+
+  return activeEvent;
+}
+
+/** 计算事件成本缩减 */
+export function calcEventCostReduce(activeEvents: ActiveGameEvent[] | undefined): number {
+  if (!activeEvents || activeEvents.length === 0) return 1;
+  let reduce = 1;
+  for (const evt of activeEvents) {
+    if (evt.boostType === 'cost_reduce') {
+      reduce *= evt.boostValue;
+    }
+  }
+  return reduce;
 }

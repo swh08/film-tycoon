@@ -165,6 +165,44 @@ export interface AdBuff {
   value: number;
 }
 
+/** 产线经营模式 */
+export type BusinessMode = 'profit' | 'speed';
+
+/** 事件增益类型 */
+export type EventBoostType = 'profit_mult' | 'speed_mult' | 'all_mult' | 'cost_reduce';
+
+/** 游戏事件模板定义 */
+export interface GameEventDef {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  durationSec: number;          // 事件持续秒数
+  boostType: EventBoostType;
+  boostValue: number;            // 增益值（倍率或缩减比例）
+  weight: number;                // 触发权重（越高越常见）
+  cooldownSec: number;           // 事件触发最小间隔
+  minTotalEarned: number;        // 最低累计收入要求
+  reward?: {                     // 事件结束时的奖励
+    type: 'cash' | 'diamond';
+    value: number;
+  };
+}
+
+/** 运行时激活的事件 */
+export interface ActiveGameEvent {
+  id: string;                    // 唯一实例ID
+  eventDefId: number;            // 引用 GameEventDef.id
+  name: string;
+  icon: string;
+  description: string;
+  startTime: number;             // 开始时间戳
+  durationSec: number;           // 持续秒数
+  remainingSec: number;          // 剩余秒数
+  boostType: EventBoostType;
+  boostValue: number;
+}
+
 // ============================================================
 // 运行时状态类型
 // ============================================================
@@ -229,6 +267,7 @@ export interface GameState {
 
   // UI偏好（跨tab/刷新持久化）
   buyMode: number; // 全局购买数量模式：1/10/100/0(最大)
+  activeTab: string; // 当前活跃的Tab页面
 
   // 人脉升级（永久，消耗人脉购买）
   purchasedAngelUpgrades: number[];
@@ -251,6 +290,14 @@ export interface GameState {
 
   // 店长等级
   managerLevels: Record<number, number>; // managerId -> level
+
+  // 产线模式（利润/速度切换）
+  businessModes: Record<number, BusinessMode>; // businessId -> mode
+
+  // 事件系统
+  activeEvents: ActiveGameEvent[];      // 当前激活的事件列表
+  lastEventCheck: number;                // 上次事件检查时间戳
+  eventCooldownUntil: number;            // 事件冷却截止时间戳
 }
 
 /** 格式化数字用的后缀 */

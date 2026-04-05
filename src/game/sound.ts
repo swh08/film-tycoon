@@ -175,3 +175,23 @@ export function playMarketDown() {
 export function playUIClick() {
   playTone(600, 0.04, 'sine', 0.06);
 }
+
+/** 事件触发 — 神秘上升音效 */
+export function playEventStart() {
+  playNoteSequence([
+    { freq: 440, dur: 0.1, type: 'sine', vol: 0.08 },
+    { freq: 554, dur: 0.1, type: 'sine', vol: 0.08 },
+    { freq: 659, dur: 0.1, type: 'sine', vol: 0.1 },
+    { freq: 880, dur: 0.2, type: 'triangle', vol: 0.12 },
+    { freq: 1100, dur: 0.3, type: 'triangle', vol: 0.14 },
+  ]);
+}
+
+/** 事件结束 — 温和下降音效 */
+export function playEventEnd() {
+  playNoteSequence([
+    { freq: 880, dur: 0.1, type: 'sine', vol: 0.1 },
+    { freq: 659, dur: 0.1, type: 'sine', vol: 0.08 },
+    { freq: 523, dur: 0.2, type: 'triangle', vol: 0.1 },
+  ]);
+}

@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { SHOP_OFFERS } from '@/game/config/shop';
-import { EVENTS } from '@/game/config/events';
+import { GAME_EVENTS } from '@/game/config/events';
 import { formatCash } from '@/game/formulas';
 import { usePopup } from '../PopupLayer';
 
@@ -244,16 +244,13 @@ export default function ShopTab() {
         </div>
       </div>
 
-      {/* 限时活动 */}
+      {/* 限时活动 — 当前激活事件 + 未来事件预览 */}
       <div>
-        <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1">🎉 限时活动</h2>
+        <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1">🎊 随机事件系统</h2>
+        <p className="text-[10px] text-gray-500 mb-2 px-1">随机事件会自动触发，为你带来临时增益！</p>
         <div className="flex flex-col gap-2">
-          {EVENTS.map(event => {
-            const unlocked = event.unlockCondition
-              ? (event.unlockCondition.type === 'total_earned'
-                  ? totalEarned >= event.unlockCondition.value
-                  : totalPrestigeCount >= (event.unlockCondition.value || 0))
-              : true;
+          {GAME_EVENTS.slice(0, 5).map(event => {
+            const unlocked = totalEarned >= event.minTotalEarned;
 
             return (
               <div
@@ -266,44 +263,30 @@ export default function ShopTab() {
               >
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-purple-900/30 flex items-center justify-center text-xl flex-shrink-0">
-                    🎪
+                    {event.icon}
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-bold text-white">{event.name}</h3>
-                    <p className="text-[10px] text-gray-400 mb-1">{event.description}</p>
-                    {unlocked ? (
-                      <button
-                        onClick={() => {
-                          showPopup({
-                            id: `event_${event.id}`,
-                            type: 'info',
-                            content: (
-                              <div className="text-center">
-                                <div className="text-4xl mb-2">🎪</div>
-                                <h3 className="text-xl font-black mb-2">{event.name}</h3>
-                                <p className="text-sm text-white/80 mb-3">{event.description}</p>
-                                <div className="bg-white/10 rounded-xl p-3 text-left space-y-1">
-                                  <p className="text-xs text-white/70">活动奖励:</p>
-                                  {event.rewards.map((r, i) => (
-                                    <p key={i} className="text-sm text-yellow-300 font-bold">• {r.label}</p>
-                                  ))}
-                                  {event.boostType && (
-                                    <p className="text-sm text-pink-300 mt-2">
-                                      🚀 活动加成: {event.boostType === 'profit_mult' ? '利润' : '速度'}×{event.boostValue}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                            ),
-                          });
-                        }}
-                        className="mt-1 px-3 py-1.5 rounded-lg bg-purple-600 text-white text-xs font-bold"
-                      >
-                        查看详情
-                      </button>
-                    ) : (
-                      <p className="text-[10px] text-gray-500">🔒 达成条件后解锁</p>
-                    )}
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-white">{event.name}</h3>
+                      <span className={`text-[10px] font-bold ${
+                        event.boostType === 'profit_mult' || event.boostType === 'all_mult'
+                          ? 'text-yellow-400' : event.boostType === 'speed_mult' ? 'text-cyan-400' : 'text-green-400'
+                      }`}>{
+                        event.boostType === 'profit_mult' ? `利润×${event.boostValue}` :
+                        event.boostType === 'speed_mult' ? `速度×${event.boostValue}` :
+                        event.boostType === 'all_mult' ? `全属性×${event.boostValue}` :
+                        `成本${Math.round(event.boostValue*100)}%`
+                      }</span>
+                    </div>
+                    <p className="text-[10px] text-gray-400 mt-0.5">{event.description}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[9px] text-gray-500">⏱ {event.durationSec}秒</span>
+                      {event.reward && (
+                        <span className="text-[9px] text-green-400">
+                          🎁 {event.reward.type === 'cash' ? formatCash(event.reward.value) : `${event.reward.value}💎`}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

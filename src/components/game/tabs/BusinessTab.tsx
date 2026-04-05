@@ -17,12 +17,14 @@ import {
   calcCycleTime,
   calcAngelUpgradeEffects,
   getMarketTrendText,
+  calcDetailedBreakdown,
   formatCash,
   formatNumber,
   formatTime,
 } from '@/game/formulas';
 import { usePopup } from '@/components/game/PopupLayer';
 import { playTap, playBuy, playUIClick } from '@/game/sound';
+import type { BusinessMode } from '@/game/types';
 
 // ============================================================
 // 产线专属升级弹窗内容 — 独立组件，实时订阅 store
@@ -108,6 +110,119 @@ function BusinessUpgradePopupContent({ businessId }: { businessId: number }) {
   );
 }
 
+// ============================================================
+// 收益分解详情弹窗 — 独立组件，实时订阅 store
+// ============================================================
+function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
+  const businesses = useGameStore(s => s.businesses);
+  const upgrades = useGameStore(s => s.upgrades);
+  const prestigePoints = useGameStore(s => s.prestigePoints);
+  const adBuffs = useGameStore(s => s.adBuffs);
+  const purchasedAngelUpgrades = useGameStore(s => s.purchasedAngelUpgrades);
+  const purchasedBusinessUpgrades = useGameStore(s => s.purchasedBusinessUpgrades);
+  const marketMultipliers = useGameStore(s => s.marketMultipliers);
+  const managerLevels = useGameStore(s => s.managerLevels);
+  const hiredManagers = useGameStore(s => s.hiredManagers);
+  const businessModes = useGameStore(s => s.businessModes);
+  const activeEvents = useGameStore(s => s.activeEvents);
+
+  const businessDef = BUSINESSES.find(b => b.id === businessId);
+  if (!businessDef) return null;
+
+  const bs = businesses.find(b => b.businessId === businessId);
+  const quantity = bs?.quantity ?? 0;
+
+  // 构建临时 state 用于计算
+  const tempState = {
+    businesses,
+    upgrades,
+    prestigePoints,
+    adBuffs,
+    purchasedAngelUpgrades,
+    purchasedBusinessUpgrades,
+    marketMultipliers,
+    managerLevels,
+    hiredManagers,
+    businessModes,
+    activeEvents,
+  } as any;
+
+  const breakdown = quantity > 0
+    ? calcDetailedBreakdown(businessDef, quantity, tempState, adBuffs)
+    : null;
+
+  return (
+    <div className="max-h-[70vh] overflow-y-auto">
+      <div className="text-center mb-3">
+        <span className="text-3xl">{businessDef.icon}</span>
+        <h3 className="text-base font-black text-white mt-1">{businessDef.name}</h3>
+        <p className="text-[10px] text-gray-400">收益分解详情</p>
+      </div>
+
+      {breakdown ? (
+        <div className="space-y-3">
+          {/* 基础信息 */}
+          <div className="bg-gray-700/50 rounded-xl p-3 border border-gray-600/30">
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-gray-400">基础单价</span>
+              <span className="text-white font-bold">{formatCash(breakdown.baseRevenue)}</span>
+            </div>
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-gray-400">数量</span>
+              <span className="text-white font-bold">×{breakdown.quantity}</span>
+            </div>
+            <div className="border-t border-gray-600/50 my-1.5" />
+            <div className="flex justify-between text-xs">
+              <span className="text-gray-400">基础总价</span>
+              <span className="text-white font-bold">{formatCash(breakdown.baseTotal)}</span>
+            </div>
+          </div>
+
+          {/* 乘数列表 */}
+          {breakdown.items.length > 0 ? (
+            <div className="bg-gray-700/50 rounded-xl p-3 border border-gray-600/30">
+              <h4 className="text-[10px] text-gray-500 font-bold mb-2">📊 加成倍率</h4>
+              <div className="space-y-1.5">
+                {breakdown.items.map((item, idx) => (
+                  <div key={idx} className="flex justify-between text-xs">
+                    <span className="text-gray-300">{item.label}</span>
+                    <span className={`font-bold ${item.color}`}>{item.displayValue}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-3 text-xs text-gray-500">
+              暂无加成效果
+            </div>
+          )}
+
+          {/* 最终结果 */}
+          <div className="bg-gradient-to-r from-yellow-900/30 to-amber-900/20 rounded-xl p-3 border border-yellow-500/30">
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-gray-400">最终收益/次</span>
+              <span className="text-yellow-400 font-black">{formatCash(breakdown.finalRevenue)}</span>
+            </div>
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-gray-400">最终周期</span>
+              <span className="text-cyan-400 font-bold">{formatTime(breakdown.finalCycle)}</span>
+            </div>
+            <div className="border-t border-yellow-500/20 my-1.5" />
+            <div className="flex justify-between text-sm">
+              <span className="text-yellow-300 font-bold">收益/秒</span>
+              <span className="text-yellow-200 font-black">{formatCash(breakdown.revenuePerSec)}/s</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-6 text-gray-500 text-xs">
+          购买该产线后查看收益分解
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function BusinessTab() {
   const {
     cash,
@@ -118,12 +233,14 @@ export default function BusinessTab() {
     purchasedAngelUpgrades,
     purchasedBusinessUpgrades,
     marketMultipliers,
+    businessModes,
     buyBusiness,
     manualProduce,
     advanceTutorial,
     tutorialStep,
     buyMode,
     setBuyMode,
+    setBusinessMode,
   } = useGameStore();
 
   const { showPopup } = usePopup();
@@ -135,6 +252,15 @@ export default function BusinessTab() {
       id: `biz_upgrades_${businessId}`,
       type: 'info',
       content: <BusinessUpgradePopupContent businessId={businessId} />,
+    });
+  };
+
+  // 显示收益分解详情弹窗
+  const showDetailPopup = (businessId: number) => {
+    showPopup({
+      id: `biz_detail_${businessId}`,
+      type: 'info',
+      content: <BusinessDetailPopupContent businessId={businessId} />,
     });
   };
 
@@ -314,13 +440,25 @@ export default function BusinessTab() {
                     <p className="text-[10px] text-gray-400">{def.flavorText}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-lg font-black text-yellow-400 tabular-nums">×{quantity}</span>
-                  {milestoneMult > 1 && (
-                    <div className="text-[10px] font-bold text-pink-400">
-                      ×{formatNumber(milestoneMult)} 倍率
-                    </div>
+                <div className="flex items-center gap-1.5">
+                  {/* 详情按钮 */}
+                  {quantity > 0 && (
+                    <button
+                      onClick={() => showDetailPopup(def.id)}
+                      className="w-6 h-6 rounded-full bg-gray-700/80 hover:bg-gray-600/80 flex items-center justify-center text-[10px] text-gray-300 transition-colors active:scale-90"
+                      title="收益分解详情"
+                    >
+                      ℹ️
+                    </button>
                   )}
+                  <div className="text-right">
+                    <span className="text-lg font-black text-yellow-400 tabular-nums">×{quantity}</span>
+                    {milestoneMult > 1 && (
+                      <div className="text-[10px] font-bold text-pink-400">
+                        ×{formatNumber(milestoneMult)} 倍率
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -364,6 +502,58 @@ export default function BusinessTab() {
                 <div className="text-[10px] text-gray-500 mb-1">
                   🎯 下一里程碑: {nextMs.at}级 (还差{nextMs.at - quantity})
                   <span className="text-pink-400 ml-1">→ ×{nextMs.multiplier}</span>
+                </div>
+              )}
+
+              {/* 利润/速度模式切换 */}
+              {quantity > 0 && (
+                <div className="mb-2">
+                  <div className="flex rounded-lg overflow-hidden border border-gray-600 w-fit">
+                    <button
+                      onClick={() => setBusinessMode(def.id, 'profit')}
+                      className={`px-2 py-0.5 text-[10px] font-bold transition-all active:scale-95
+                        ${(businessModes?.[def.id] === 'profit')
+                          ? 'bg-yellow-600 text-white'
+                          : 'bg-gray-700 text-gray-400'
+                        }`}
+                    >
+                      💰 利润
+                    </button>
+                    <button
+                      onClick={() => setBusinessMode(def.id, 'speed')}
+                      className={`px-2 py-0.5 text-[10px] font-bold transition-all active:scale-95
+                        ${(businessModes?.[def.id] === 'speed')
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-700 text-gray-400'
+                        }`}
+                    >
+                      ⚡ 速度
+                    </button>
+                    <button
+                      onClick={() => {
+                        useGameStore.setState(s => ({
+                          businessModes: Object.fromEntries(
+                            Object.entries(s.businessModes).filter(([k]) => parseInt(k) !== def.id)
+                          ),
+                        }));
+                        useGameStore.getState().save();
+                      }}
+                      className={`px-2 py-0.5 text-[10px] font-bold transition-all active:scale-95
+                        ${(!businessModes?.[def.id])
+                          ? 'bg-green-600 text-white'
+                          : 'bg-gray-700 text-gray-400'
+                        }`}
+                    >
+                      ⚖️ 默认
+                    </button>
+                  </div>
+                  {businessModes?.[def.id] && (
+                    <div className={`text-[9px] mt-0.5 ${
+                      businessModes[def.id] === 'profit' ? 'text-yellow-500/70' : 'text-blue-400/70'
+                    }`}>
+                      {businessModes[def.id] === 'profit' ? '利润×1.5 速度×0.67' : '速度×2 利润×0.8'}
+                    </div>
+                  )}
                 </div>
               )}
 

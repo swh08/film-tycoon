@@ -12,6 +12,7 @@ import { PopupProvider } from '@/components/game/PopupLayer';
 import OfflineRewardPopup from '@/components/game/OfflineRewardPopup';
 import AchievementPanel from '@/components/game/AchievementPanel';
 import DailyRewardPopup from '@/components/game/DailyRewardPopup';
+import EventNotification from '@/components/game/EventNotification';
 
 import BusinessTab from '@/components/game/tabs/BusinessTab';
 import UpgradeTab from '@/components/game/tabs/UpgradeTab';
@@ -135,6 +136,9 @@ export default function GamePage() {
           isOpen={showDailyReward}
           onClose={() => setShowDailyReward(false)}
         />
+
+        {/* 事件通知 */}
+        <EventNotification />
       </div>
     </PopupProvider>
   );
