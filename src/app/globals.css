@@ -170,6 +170,25 @@
   animation: progress-glow 1.5s ease-in-out infinite;
 }
 
+/* 波纹扫描（高速产线进度条） */
+@keyframes wave-sweep {
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.progress-wave {
+  background: linear-gradient(
+    90deg,
+    rgba(234, 179, 8, 0.4) 0%,
+    rgba(245, 158, 11, 0.9) 25%,
+    rgba(252, 211, 77, 1) 50%,
+    rgba(245, 158, 11, 0.9) 75%,
+    rgba(234, 179, 8, 0.4) 100%
+  );
+  background-size: 200% 100%;
+  animation: wave-sweep 1s ease-in-out infinite;
+}
+
 /* 粒子飘落（金币雨） */
 @keyframes coin-fall {
   0% {

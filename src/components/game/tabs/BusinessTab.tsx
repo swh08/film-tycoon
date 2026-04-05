@@ -480,7 +480,7 @@ export default function BusinessTab() {
                   </div>
                   {cycleTime < 0.5 ? (
                     <div className="h-3 rounded-full bg-gray-700 overflow-hidden relative">
-                      <div className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400 animate-pulse" />
+                      <div className="h-full rounded-full progress-wave" />
                     </div>
                   ) : (
                     <div className="h-3 rounded-full bg-gray-700 overflow-hidden relative">
