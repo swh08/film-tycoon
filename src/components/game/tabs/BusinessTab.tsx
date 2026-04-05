@@ -613,11 +613,11 @@ export default function BusinessTab() {
                     }}
                     disabled={!canAfford}
                     className={`
-                      flex-1 py-3 rounded-lg text-xs font-bold transition-all duration-150
-                      active:scale-[0.97] border
+                      flex-1 py-3 rounded-xl text-xs font-bold transition-all duration-150
+                      active:scale-[0.97]
                       ${canAfford
-                        ? 'bg-gradient-to-r from-yellow-600 to-amber-500 text-white hover:from-yellow-500 hover:to-amber-400 shadow-lg shadow-amber-900/40 border-yellow-400/30'
-                        : 'bg-gray-700 text-gray-500 cursor-not-allowed border-gray-600/20 shadow-md shadow-black/20'
+                        ? 'bg-gradient-to-b from-yellow-400 to-amber-600 text-white hover:from-yellow-300 hover:to-amber-500 shadow-[0_4px_0_0_#92400e,0_6px_12px_rgba(120,53,15,0.4)] active:shadow-[0_2px_0_0_#92400e,0_3px_6px_rgba(120,53,15,0.3)] active:translate-y-[2px]'
+                        : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 cursor-not-allowed shadow-[0_4px_0_0_#374151,0_6px_8px_rgba(0,0,0,0.3)]'
                       }
                     `}
                   >
