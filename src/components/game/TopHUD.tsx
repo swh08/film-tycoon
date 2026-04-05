@@ -92,10 +92,9 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
                     border-b-2 border-yellow-500/50 shadow-lg shadow-amber-900/30">
       {/* === 第一行：核心资源 + 按钮 === */}
       <div className="flex items-center justify-between px-3 py-1.5">
-        {/* 游戏名 + 现金 */}
+        {/* 现金 */}
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <span className="text-xs font-black text-yellow-200/90 flex-shrink-0">📱贴膜大亨</span>
-          <span className="text-[10px] text-yellow-300/70 font-medium">💰</span>
+          <span className="text-[10px] text-yellow-300/70 font-medium tracking-wider">💰</span>
           <AnimatedNumber
             value={cash}
             formatFn={formatCash}
