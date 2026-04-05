@@ -115,19 +115,7 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
           )}
         </div>
 
-        {/* 设置按钮 */}
-        <div className="flex items-center gap-1 mx-2">
-          {onSettingsOpen && (
-            <button
-              onClick={onSettingsOpen}
-              className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-600/30 hover:bg-gray-600/50 transition-colors"
-            >
-              <span className="text-xs">⚙️</span>
-            </button>
-          )}
-        </div>
-
-        {/* 钻石 & 人脉（单行紧凑） */}
+        {/* 钻石 & 人脉 & 设置 */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <div className="flex items-center gap-0.5">
             <span className="text-sm">💎</span>
@@ -147,6 +135,14 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
               />
               <span className="text-[10px] text-orange-400/80">×{formatNumberSmart(calcPrestigeMultiplier(prestigePoints))}</span>
             </div>
+          )}
+          {onSettingsOpen && (
+            <button
+              onClick={onSettingsOpen}
+              className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-600/30 hover:bg-gray-600/50 transition-colors ml-0.5"
+            >
+              <span className="text-xs">⚙️</span>
+            </button>
           )}
         </div>
       </div>
