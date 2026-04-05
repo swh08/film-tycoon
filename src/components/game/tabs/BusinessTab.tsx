@@ -479,11 +479,8 @@ export default function BusinessTab() {
                     <span>{formatTime(cycleTime)}/次</span>
                   </div>
                   {cycleTime < 0.5 ? (
-                    <div className="h-3 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
-                      <svg className="w-4 h-4 animate-spin text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 2v6h-6" /><path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
-                        <path d="M3 22v-6h6" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
-                      </svg>
+                    <div className="h-3 rounded-full bg-gray-700 overflow-hidden relative">
+                      <div className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400 animate-pulse" />
                     </div>
                   ) : (
                     <div className="h-3 rounded-full bg-gray-700 overflow-hidden relative">
