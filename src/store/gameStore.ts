@@ -511,12 +511,13 @@ export const useGameStore = create<GameStore>((set, get) => {
       }
 
       // 单次set合并所有状态变更
-      const hasChanges = expiredEvents.length > 0
-        || updatedEvents.length !== state.activeEvents.length
-        || lastEventCheck !== state.lastEventCheck
+      // 只要有活跃事件就每帧更新（确保倒计时显示实时），否则检查其他变化
+      const hasActiveEvents = updatedEvents.length > 0;
+      const listChanged = updatedEvents.length !== state.activeEvents.length;
+      const metaChanged = lastEventCheck !== state.lastEventCheck
         || eventCooldownUntil !== state.eventCooldownUntil;
 
-      if (hasChanges) {
+      if (hasActiveEvents || listChanged || metaChanged || cashReward > 0 || diamondReward > 0) {
         set(s => ({
           ...(
             cashReward > 0 ? { cash: s.cash + cashReward, totalEarned: s.totalEarned + cashReward } : {}
@@ -528,7 +529,10 @@ export const useGameStore = create<GameStore>((set, get) => {
           eventCooldownUntil,
           lastEventCheck,
         }));
-        get().save();
+        // 仅在事件列表结构性变化（新增/过期）或有奖励时存档，纯倒计时跳过
+        if (listChanged || cashReward > 0 || diamondReward > 0) {
+          get().save();
+        }
       }
 
       return newlyTriggered;
