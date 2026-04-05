@@ -58,8 +58,8 @@ function PrestigeConfirmPopup({ onConfirm }: { onConfirm: () => void }) {
       <div className="flex gap-2 mt-4">
         <button
           onClick={handleConfirm}
-          className="flex-1 py-2.5 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-red-500 
-                     text-white active:scale-95 transition-transform"
+          className="flex-1 py-3 rounded-xl font-bold bg-gradient-to-b from-orange-400 to-red-600 
+                     text-white transition-all duration-150 shadow-[0_4px_0_0_#991b1b,0_6px_12px_rgba(127,29,29,0.3)] active:shadow-[0_2px_0_0_#991b1b,0_3px_6px_rgba(127,29,29,0.2)] active:translate-y-[2px]"
         >
           确认转生
         </button>
@@ -157,11 +157,11 @@ function AngelUpgradeCard({ upgrade, onBuy }: { upgrade: typeof ANGEL_UPGRADES[0
           <button
             onClick={() => onBuy(upgrade.id)}
             disabled={!canAfford}
-            className={`px-2 py-1.5 rounded-lg text-[10px] font-bold flex-shrink-0
-              active:scale-95 transition-transform
+            className={`px-3 py-2.5 rounded-xl text-[10px] font-bold flex-shrink-0
+              transition-all duration-150
               ${canAfford
-                ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white'
-                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                ? 'bg-gradient-to-b from-orange-400 to-red-600 text-white shadow-[0_3px_0_0_#991b1b,0_4px_8px_rgba(127,29,29,0.3)] active:shadow-[0_1px_0_0_#991b1b,0_2px_4px_rgba(127,29,29,0.2)] active:translate-y-[2px]'
+                : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.3)]'
               }`}
           >
             购买
@@ -311,11 +311,10 @@ export default function PrestigeTab() {
               onClick={handlePrestige}
               disabled={!canDoPrestige}
               className={`
-                w-full py-3 rounded-xl font-bold text-base transition-all duration-200
-                active:scale-[0.97]
+                w-full py-3 rounded-xl font-bold text-base transition-all duration-150
                 ${canDoPrestige
-                  ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-400 hover:to-red-400 shadow-lg shadow-red-900/40 animate-pulse'
-                  : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                  ? 'bg-gradient-to-b from-orange-400 to-red-600 text-white shadow-[0_4px_0_0_#991b1b,0_6px_12px_rgba(127,29,29,0.3)] active:shadow-[0_2px_0_0_#991b1b,0_3px_6px_rgba(127,29,29,0.2)] active:translate-y-[2px]'
+                  : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_4px_0_0_#374151,0_6px_8px_rgba(0,0,0,0.3)]'
                 }
               `}
             >

@@ -141,11 +141,10 @@ export default function ManagerTab() {
                         }}
                         disabled={!canHire}
                         className={`
-                          w-full py-2 rounded-lg text-xs font-bold transition-all duration-150
-                          active:scale-[0.97]
+                          w-full py-3 rounded-xl text-xs font-bold transition-all duration-150
                           ${canHire
-                            ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-500 hover:to-emerald-500'
-                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                            ? 'bg-gradient-to-b from-green-400 to-green-600 text-white shadow-[0_4px_0_0_#166534,0_6px_12px_rgba(21,128,61,0.3)] active:shadow-[0_2px_0_0_#166534,0_3px_6px_rgba(21,128,61,0.2)] active:translate-y-[2px]'
+                            : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_4px_0_0_#374151,0_6px_8px_rgba(0,0,0,0.3)]'
                           }
                         `}
                       >
@@ -162,11 +161,10 @@ export default function ManagerTab() {
                         }}
                         disabled={!canAffordUpgrade}
                         className={`
-                          w-full py-1.5 rounded-lg text-[10px] font-bold transition-all duration-150
-                          active:scale-[0.97]
+                          w-full py-2.5 rounded-xl text-[10px] font-bold transition-all duration-150
                           ${canAffordUpgrade
-                            ? 'bg-gradient-to-r from-blue-600 to-indigo-500 text-white hover:from-blue-500 hover:to-indigo-400'
-                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                            ? 'bg-gradient-to-b from-blue-400 to-indigo-600 text-white shadow-[0_4px_0_0_#312e81,0_6px_12px_rgba(49,46,129,0.3)] active:shadow-[0_2px_0_0_#312e81,0_3px_6px_rgba(49,46,129,0.2)] active:translate-y-[2px]'
+                            : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.3)]'
                           }
                         `}
                       >
@@ -286,11 +284,10 @@ export default function ManagerTab() {
                         }}
                         disabled={!canAfford}
                         className={`
-                          w-full py-2 rounded-lg text-xs font-bold transition-all duration-150
-                          active:scale-[0.97]
+                          w-full py-3 rounded-xl text-xs font-bold transition-all duration-150
                           ${canAfford
-                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                            ? 'bg-gradient-to-b from-purple-400 to-pink-600 text-white shadow-[0_4px_0_0_#701a75,0_6px_12px_rgba(112,26,117,0.3)] active:shadow-[0_2px_0_0_#701a75,0_3px_6px_rgba(112,26,117,0.2)] active:translate-y-[2px]'
+                            : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_4px_0_0_#374151,0_6px_8px_rgba(0,0,0,0.3)]'
                           }
                         `}
                       >
@@ -306,11 +303,10 @@ export default function ManagerTab() {
                         }}
                         disabled={!canAffordUpgrade}
                         className={`
-                          w-full py-1.5 rounded-lg text-[10px] font-bold transition-all duration-150
-                          active:scale-[0.97]
+                          w-full py-2.5 rounded-xl text-[10px] font-bold transition-all duration-150
                           ${canAffordUpgrade
-                            ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white'
-                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                            ? 'bg-gradient-to-b from-purple-400 to-pink-600 text-white shadow-[0_4px_0_0_#701a75,0_6px_12px_rgba(112,26,117,0.3)] active:shadow-[0_2px_0_0_#701a75,0_3px_6px_rgba(112,26,117,0.2)] active:translate-y-[2px]'
+                            : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.3)]'
                           }
                         `}
                       >

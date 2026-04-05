@@ -322,7 +322,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                         <button
                           onClick={handleImport}
                           disabled={!importText.trim()}
-                          className="mt-2 w-full py-2 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:bg-gray-600 disabled:text-gray-500 text-white text-xs font-bold transition-colors"
+                          className="mt-2 w-full py-3 rounded-xl bg-gradient-to-b from-amber-400 to-amber-600 disabled:from-gray-500 disabled:to-gray-700 disabled:text-gray-400 disabled:shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.3)] text-white text-xs font-bold transition-all duration-150 shadow-[0_4px_0_0_#92400e,0_6px_12px_rgba(120,53,15,0.3)] active:shadow-[0_2px_0_0_#92400e,0_3px_6px_rgba(120,53,15,0.2)] active:translate-y-[2px]"
                         >
                           确认导入
                         </button>
@@ -355,13 +355,13 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                         <div className="flex gap-2">
                           <button
                             onClick={() => setShowResetConfirm(false)}
-                            className="flex-1 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs font-bold transition-colors"
+                            className="flex-1 py-3 rounded-xl bg-gradient-to-b from-gray-400 to-gray-600 hover:from-gray-300 hover:to-gray-500 text-gray-200 text-xs font-bold transition-all duration-150 shadow-[0_3px_0_0_#374151] active:shadow-[0_1px_0_0_#374151] active:translate-y-[2px]"
                           >
                             取消
                           </button>
                           <button
                             onClick={handleReset}
-                            className="flex-1 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition-colors"
+                            className="flex-1 py-3 rounded-xl bg-gradient-to-b from-red-400 to-red-600 hover:from-red-300 hover:to-red-500 text-white text-xs font-bold transition-all duration-150 shadow-[0_3px_0_0_#991b1b,0_4px_8px_rgba(127,29,29,0.3)] active:shadow-[0_1px_0_0_#991b1b,0_2px_4px_rgba(127,29,29,0.2)] active:translate-y-[2px]"
                           >
                             确认重置
                           </button>

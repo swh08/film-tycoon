@@ -256,10 +256,10 @@ export default function ShopTab() {
                     <button
                       onClick={() => handleAdWatch(offer.id, offer.rewards[0].type, offer.rewards[0].value)}
                       disabled={!adsAvailable || isOtherCountingDown}
-                      className={`px-3 py-2 rounded-lg text-xs font-bold transition-all active:scale-95
+                      className={`px-3 py-3 rounded-xl text-xs font-bold transition-all duration-150
                         ${!adsAvailable || isOtherCountingDown
-                          ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-500 hover:to-emerald-500'
+                          ? 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.3)]'
+                          : 'bg-gradient-to-b from-green-400 to-green-600 text-white shadow-[0_3px_0_0_#166534,0_4px_8px_rgba(21,128,61,0.3)] active:shadow-[0_1px_0_0_#166534,0_2px_4px_rgba(21,128,61,0.2)] active:translate-y-[2px]'
                         }`}
                     >
                       📺 免费领取
@@ -305,8 +305,8 @@ export default function ShopTab() {
                   {!purchased && (
                     <button
                       onClick={() => handleFreeOffer(offer.id, offer.rewards)}
-                      className="px-3 py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-amber-500 
-                                 text-white text-xs font-bold active:scale-95 transition-transform"
+                      className="px-3 py-3 rounded-xl bg-gradient-to-b from-yellow-300 to-amber-600 
+                                 text-white text-xs font-bold transition-all duration-150 shadow-[0_3px_0_0_#92400e,0_4px_8px_rgba(120,53,15,0.3)] active:shadow-[0_1px_0_0_#92400e,0_2px_4px_rgba(120,53,15,0.2)] active:translate-y-[2px]"
                     >
                       免费领取
                     </button>
@@ -364,8 +364,8 @@ export default function ShopTab() {
                         // 模拟内购成功
                         handleFreeOffer(offer.id, offer.rewards);
                       }}
-                      className="px-3 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 
-                                 text-white text-xs font-bold active:scale-95 transition-transform"
+                      className="px-3 py-3 rounded-xl bg-gradient-to-b from-cyan-300 to-blue-600 
+                                 text-white text-xs font-bold transition-all duration-150 shadow-[0_3px_0_0_#1e3a5f,0_4px_8px_rgba(30,58,95,0.3)] active:shadow-[0_1px_0_0_#1e3a5f,0_2px_4px_rgba(30,58,95,0.2)] active:translate-y-[2px]"
                     >
                       🪙{offer.cost}
                     </button>

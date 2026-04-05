@@ -27,15 +27,15 @@ export default function UpgradeTab() {
         <h2 className="text-sm font-bold text-yellow-400">⚡ 全局升级</h2>
         <div className="flex items-center gap-2">
           {/* 全局购买模式切换 */}
-          <div className="flex rounded-lg overflow-hidden border border-gray-600">
+          <div className="flex rounded-lg overflow-hidden">
             {BUY_MODES.map(m => (
               <button
                 key={m.value}
                 onClick={() => setBuyMode(m.value)}
-                className={`px-2 py-1 text-[10px] font-bold transition-colors
+                className={`px-2 py-1.5 text-[10px] font-bold transition-all duration-150
                   ${buyMode === m.value
-                    ? 'bg-yellow-600 text-white'
-                    : 'bg-gray-700 text-gray-400'
+                    ? 'bg-gradient-to-b from-yellow-400 to-amber-600 text-white shadow-[0_3px_0_0_#92400e]'
+                    : 'bg-gradient-to-b from-gray-400 to-gray-600 text-gray-200 shadow-[0_3px_0_0_#374151] active:shadow-[0_1px_0_0_#374151] active:translate-y-[2px]'
                   }`}
               >
                 {m.label}
@@ -132,11 +132,10 @@ export default function UpgradeTab() {
                             onClick={() => buyUpgrade(def.id, actualCount)}
                             disabled={!canAfford}
                             className={`
-                              w-full py-2 rounded-lg text-xs font-bold transition-all duration-150
-                              active:scale-[0.97]
+                              w-full py-3 rounded-xl text-xs font-bold transition-all duration-150
                               ${canAfford
-                                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-500 hover:to-cyan-500 shadow-md shadow-blue-900/30'
-                                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                                ? 'bg-gradient-to-b from-blue-400 to-indigo-600 text-white shadow-[0_4px_0_0_#312e81,0_6px_12px_rgba(49,46,129,0.3)] active:shadow-[0_2px_0_0_#312e81,0_3px_6px_rgba(49,46,129,0.2)] active:translate-y-[2px]'
+                                : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_4px_0_0_#374151,0_6px_8px_rgba(0,0,0,0.3)]'
                               }
                             `}
                           >
