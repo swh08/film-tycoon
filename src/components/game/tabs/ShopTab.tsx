@@ -31,6 +31,7 @@ export default function ShopTab() {
   const [adCooldown, setAdCooldown] = useState<number | null>(null);
   const [activeCooldownOfferId, setActiveCooldownOfferId] = useState<number | null>(null);
   const cooldownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pendingRewardRef = useRef<{ offerId: number; type: string; value: number } | null>(null);
   const remainingAds = getRemainingAds();
   const adsAvailable = remainingAds > 0;
 
@@ -135,26 +136,35 @@ export default function ShopTab() {
   }, [addAdBuff, addCash, addDiamonds, cash, totalEarned, showPopup]);
 
   const handleAdWatch = useCallback((offerId: number, rewardType: string, rewardValue: number) => {
-    if (adCooldown !== null) return;
-    if (!watchAd()) return; // daily limit check
+    if (cooldownTimerRef.current) return;
+    if (!watchAd()) return;
 
     setActiveCooldownOfferId(offerId);
-    setAdCooldown(3); // 3 second countdown
+    pendingRewardRef.current = { offerId, type: rewardType, value: rewardValue };
+    setAdCooldown(3);
 
     cooldownTimerRef.current = setInterval(() => {
       setAdCooldown(prev => {
         if (prev === null) return null;
         if (prev <= 1) {
           if (cooldownTimerRef.current) clearInterval(cooldownTimerRef.current);
-          // Grant reward after countdown
-          handleAdReward(offerId, rewardType, rewardValue);
-          setActiveCooldownOfferId(null);
+          cooldownTimerRef.current = null;
           return null;
         }
         return prev - 1;
       });
     }, 1000);
-  }, [adCooldown, watchAd, handleAdReward]);
+  }, [watchAd]);
+
+  // 当倒计时结束（adCooldown 从有值变为 null）时发放奖励
+  useEffect(() => {
+    if (adCooldown === null && pendingRewardRef.current) {
+      const { offerId, type, value } = pendingRewardRef.current;
+      pendingRewardRef.current = null;
+      setActiveCooldownOfferId(null);
+      handleAdReward(offerId, type, value);
+    }
+  }, [adCooldown, handleAdReward]);
 
   const handleFreeOffer = (offerId: number, rewards: any[]) => {
     rewards.forEach(r => {
