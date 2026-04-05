@@ -94,7 +94,6 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
       <div className="flex items-center justify-between px-3 py-1.5">
         {/* 现金 */}
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <span className="text-[10px] text-yellow-300/70 font-medium tracking-wider">💰</span>
           <AnimatedNumber
             value={cash}
             formatFn={formatCash}
