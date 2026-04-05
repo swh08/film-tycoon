@@ -13,11 +13,10 @@ import AnimatedNumber from './AnimatedNumber';
 
 export interface TopHUDProps {
   onAchievementOpen?: () => void;
-  onStatsOpen?: () => void;
   onSettingsOpen?: () => void;
 }
 
-export default function TopHUD({ onAchievementOpen, onStatsOpen, onSettingsOpen }: TopHUDProps) {
+export default function TopHUD({ onAchievementOpen, onSettingsOpen }: TopHUDProps) {
   const cash = useGameStore(s => s.cash);
   const diamonds = useGameStore(s => s.diamonds);
   const adBuffs = useGameStore(s => s.adBuffs);
@@ -78,98 +77,61 @@ export default function TopHUD({ onAchievementOpen, onStatsOpen, onSettingsOpen 
   const marketTrend = getMarketTrendText(avgMarket);
   const hasMarketEvent = avgMarket < 0.85 || avgMarket > 1.15;
 
+  // 第二行是否有内容
+  const hasSecondRow = eventTimers.length > 0 || buffTimer || hasMarketEvent;
+
   return (
-    <div className="sticky top-0 z-40 flex items-center justify-between px-3 py-2 
-                    bg-gradient-to-r from-amber-900 via-yellow-800 to-amber-900 
+    <div className="sticky top-0 z-40 bg-gradient-to-r from-amber-900 via-yellow-800 to-amber-900 
                     border-b-2 border-yellow-500/50 shadow-lg shadow-amber-900/30">
-      {/* 现金 */}
-      <div className="flex flex-col items-start min-w-0 flex-1">
-        <span className="text-[10px] text-yellow-300/70 font-medium tracking-wider">💰 现金</span>
-        <AnimatedNumber
-          value={cash}
-          formatFn={formatCash}
-          className="text-base font-bold text-yellow-100 truncate tabular-nums"
-        />
-        {incomePerSec > 0 && (
-          <span className="text-[10px] text-green-400 font-medium">
-            +<AnimatedNumber
-              value={incomePerSec}
-              formatFn={formatCash}
-              className="text-[10px] text-green-400 font-medium tabular-nums"
-            />/秒
-          </span>
-        )}
-      </div>
+      {/* === 第一行：核心资源 + 按钮 === */}
+      <div className="flex items-center justify-between px-3 py-1.5">
+        {/* 现金 + 收入 */}
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <span className="text-[10px] text-yellow-300/70 font-medium tracking-wider">💰</span>
+          <AnimatedNumber
+            value={cash}
+            formatFn={formatCash}
+            className="text-base font-bold text-yellow-100 truncate tabular-nums"
+          />
+          {incomePerSec > 0 && (
+            <span className="text-[10px] text-green-400 font-medium flex-shrink-0">
+              +<AnimatedNumber
+                value={incomePerSec}
+                formatFn={formatCash}
+                className="text-[10px] text-green-400 font-medium tabular-nums"
+              />/s
+            </span>
+          )}
+        </div>
 
-      {/* 中间区域：Buff + 事件 + 市场 */}
-      <div className="flex items-center gap-1.5 mx-1 flex-wrap justify-center">
-        {/* 活跃事件 */}
-        {eventTimers.map((evt, idx) => (
-          <div
-            key={idx}
-            className="px-2 py-1 rounded-full bg-gradient-to-r from-purple-600/80 to-pink-600/80
-                           text-white text-[10px] font-bold animate-pulse shadow-md shadow-purple-500/40"
-          >
-            {evt.icon} {evt.remaining}s
-          </div>
-        ))}
-        {/* 广告Buff计时 */}
-        {buffTimer && (
-          <div className="px-2 py-1 rounded-full bg-red-500/80 text-white text-[10px] font-bold 
-                          animate-pulse shadow-md shadow-red-500/40">
-            {buffTimer}
-          </div>
-        )}
-        {/* 市场趋势指示 */}
-        {hasMarketEvent && (
-          <div className={`px-2 py-1 rounded-full text-[10px] font-bold ${
-            avgMarket > 1.15 ? 'bg-green-600/80 text-green-100' : 'bg-red-600/80 text-red-100'
-          }`}>
-            📊 {marketTrend.text}
-          </div>
-        )}
-      </div>
+        {/* 按钮组 */}
+        <div className="flex items-center gap-1 mx-2">
+          {onAchievementOpen && (
+            <button
+              onClick={onAchievementOpen}
+              className="relative flex items-center justify-center w-7 h-7 rounded-full bg-yellow-600/30 hover:bg-yellow-600/50 transition-colors"
+            >
+              <span className="text-xs">🏅</span>
+              {unlockedAchievements.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 text-[7px] font-black text-white flex items-center justify-center">
+                  {unlockedAchievements.length}
+                </span>
+              )}
+            </button>
+          )}
+          {onSettingsOpen && (
+            <button
+              onClick={onSettingsOpen}
+              className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-600/30 hover:bg-gray-600/50 transition-colors"
+            >
+              <span className="text-xs">⚙️</span>
+            </button>
+          )}
+        </div>
 
-      {/* 右侧区域 */}
-      <div className="flex items-center gap-1.5">
-        {/* 统计入口 */}
-        {onStatsOpen && (
-          <button
-            onClick={onStatsOpen}
-            className="flex items-center justify-center w-7 h-7 rounded-full bg-blue-600/30 hover:bg-blue-600/50 transition-colors"
-          >
-            <span className="text-xs">📊</span>
-          </button>
-        )}
-
-        {/* 成就入口 */}
-        {onAchievementOpen && (
-          <button
-            onClick={onAchievementOpen}
-            className="relative flex items-center justify-center w-7 h-7 rounded-full bg-yellow-600/30 hover:bg-yellow-600/50 transition-colors"
-          >
-            <span className="text-xs">🏅</span>
-            {unlockedAchievements.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 text-[7px] font-black text-white flex items-center justify-center">
-                {unlockedAchievements.length}
-              </span>
-            )}
-          </button>
-        )}
-
-        {/* 设置入口 */}
-        {onSettingsOpen && (
-          <button
-            onClick={onSettingsOpen}
-            className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-600/30 hover:bg-gray-600/50 transition-colors"
-          >
-            <span className="text-xs">⚙️</span>
-          </button>
-        )}
-
-        {/* 钻石 & 人脉 */}
-        <div className="flex flex-col items-end gap-0.5">
-          <div className="flex items-center gap-1">
+        {/* 钻石 & 人脉（单行紧凑） */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-0.5">
             <span className="text-sm">💎</span>
             <AnimatedNumber
               value={diamonds}
@@ -178,7 +140,7 @@ export default function TopHUD({ onAchievementOpen, onStatsOpen, onSettingsOpen 
             />
           </div>
           {prestigePoints > 0 && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5">
               <span className="text-xs">🤝</span>
               <AnimatedNumber
                 value={prestigePoints}
@@ -190,6 +152,34 @@ export default function TopHUD({ onAchievementOpen, onStatsOpen, onSettingsOpen 
           )}
         </div>
       </div>
+
+      {/* === 第二行：动态buff/事件/市场（无内容时自动隐藏） === */}
+      {hasSecondRow && (
+        <div className="flex items-center gap-1.5 px-3 pb-1.5 overflow-x-auto">
+          {eventTimers.map((evt, idx) => (
+            <div
+              key={idx}
+              className="flex-shrink-0 px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-600/80 to-pink-600/80
+                             text-white text-[10px] font-bold animate-pulse shadow-md shadow-purple-500/40"
+            >
+              {evt.icon} {evt.remaining}s
+            </div>
+          ))}
+          {buffTimer && (
+            <div className="flex-shrink-0 px-2 py-0.5 rounded-full bg-red-500/80 text-white text-[10px] font-bold 
+                            animate-pulse shadow-md shadow-red-500/40">
+              {buffTimer}
+            </div>
+          )}
+          {hasMarketEvent && (
+            <div className={`flex-shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+              avgMarket > 1.15 ? 'bg-green-600/80 text-green-100' : 'bg-red-600/80 text-red-100'
+            }`}>
+              {marketTrend.text}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

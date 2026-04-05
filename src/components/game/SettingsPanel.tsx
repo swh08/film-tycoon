@@ -7,6 +7,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { startMusic, stopMusic, setMusicVolume, setSfxVolumeValue, isMusicPlaying } from '@/game/sound';
+import StatsPanel from './StatsPanel';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showImportArea, setShowImportArea] = useState(false);
+  const [showStatsView, setShowStatsView] = useState(false);
   const [importText, setImportText] = useState('');
   const [toastMsg, setToastMsg] = useState('');
 
@@ -230,6 +232,21 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 </div>
               </section>
 
+              {/* 📊 游戏统计 */}
+              <section>
+                <button
+                  onClick={() => setShowStatsView(true)}
+                  className="w-full bg-blue-900/30 hover:bg-blue-900/50 rounded-xl p-3 border border-blue-600/30 transition-colors flex items-center gap-3"
+                >
+                  <span className="text-lg">📊</span>
+                  <div className="text-left flex-1">
+                    <p className="text-xs font-medium text-blue-300">游戏统计</p>
+                    <p className="text-[10px] text-gray-500">查看收入、产线、转生等详细数据</p>
+                  </div>
+                  <span className="text-xs text-gray-500">›</span>
+                </button>
+              </section>
+
               {/* 🔢 数字显示 */}
               <section>
                 <h3 className="text-xs font-bold text-gray-400 mb-3">🔢 数字显示</h3>
@@ -371,6 +388,12 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
               {/* 底部间距 */}
               <div className="h-4" />
             </div>
+
+            {/* 统计子面板（从设置内打开） */}
+            <StatsPanel
+              isOpen={showStatsView}
+              onClose={() => setShowStatsView(false)}
+            />
 
             {/* Toast 消息 */}
             <AnimatePresence>
