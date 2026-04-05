@@ -186,7 +186,7 @@
     rgba(234, 179, 8, 0.4) 100%
   );
   background-size: 200% 100%;
-  animation: wave-sweep 1s ease-in-out infinite;
+  animation: wave-sweep 1s linear infinite;
 }
 
 /* 粒子飘落（金币雨） */
