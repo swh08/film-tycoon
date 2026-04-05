@@ -203,8 +203,8 @@ export default function ShopTab() {
 
         <div className="flex flex-col gap-2">
           {adOffers.map(offer => {
-            const isCountingDown = adCooldown !== null && activeCooldownOfferId === offerId;
-            const isOtherCountingDown = adCooldown !== null && activeCooldownOfferId !== offerId;
+            const isCountingDown = adCooldown !== null && activeCooldownOfferId === offer.id;
+            const isOtherCountingDown = adCooldown !== null && activeCooldownOfferId !== offer.id;
 
             return (
               <div
