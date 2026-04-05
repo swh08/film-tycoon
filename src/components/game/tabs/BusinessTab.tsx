@@ -476,10 +476,6 @@ export default function BusinessTab() {
                       style={{ width: `${Math.min((bs.progress ?? 0) * 100, 100)}%` }}
                       transition={{ duration: 0.1 }}
                     />
-                    {/* 店长标识 */}
-                    {bs.hasManager && (
-                      <div className="absolute right-1 top-1/2 -translate-y-1/2 text-xs">👤</div>
-                    )}
                   </div>
                 </div>
               )}
