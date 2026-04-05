@@ -666,6 +666,7 @@ export function formatCash(n: number): string {
 }
 
 export function formatTime(seconds: number): string {
+  if (seconds < 10) return seconds.toFixed(1) + '秒';
   if (seconds < 60) return Math.ceil(seconds) + '秒';
   if (seconds < 3600) return Math.floor(seconds / 60) + '分钟';
   const hours = Math.floor(seconds / 3600);
