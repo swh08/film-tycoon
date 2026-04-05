@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
-import { formatCash, formatNumber, calcTotalIncomePerSecond, getMarketTrendText } from '@/game/formulas';
+import { formatCash, formatNumberSmart, calcTotalIncomePerSecond, getMarketTrendText } from '@/game/formulas';
 import { calcPrestigeMultiplier } from '@/game/config/prestige';
 import { ACHIEVEMENTS } from '@/game/config/achievements';
 import { BUSINESSES } from '@/game/config/businesses';
@@ -145,9 +145,9 @@ export default function TopHUD({ onAchievementOpen, onSettingsOpen }: TopHUDProp
               <AnimatedNumber
                 value={prestigePoints}
                 className="text-xs font-bold text-orange-300 tabular-nums"
-                formatFn={(n) => Math.floor(n).toString()}
+                formatFn={formatNumberSmart}
               />
-              <span className="text-[10px] text-orange-400/80">×{formatNumber(calcPrestigeMultiplier(prestigePoints))}</span>
+              <span className="text-[10px] text-orange-400/80">×{formatNumberSmart(calcPrestigeMultiplier(prestigePoints))}</span>
             </div>
           )}
         </div>

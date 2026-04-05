@@ -5,7 +5,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
-import { formatCash, formatNumber, calcTotalIncomePerSecond, calcRevenuePerSecond } from '@/game/formulas';
+import { formatCash, formatNumberSmart, calcTotalIncomePerSecond, calcRevenuePerSecond } from '@/game/formulas';
 import { BUSINESSES } from '@/game/config/businesses';
 import { ACHIEVEMENTS } from '@/game/config/achievements';
 
@@ -123,13 +123,13 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                   <StatCard
                     icon="💎"
                     label="钻石数量"
-                    value={diamonds.toLocaleString()}
+                    value={formatNumberSmart(diamonds)}
                     color="text-cyan-300"
                   />
                   <StatCard
                     icon="🤝"
                     label="人脉点数"
-                    value={prestigePoints.toLocaleString()}
+                    value={formatNumberSmart(prestigePoints)}
                     color="text-orange-300"
                   />
                 </div>
@@ -176,7 +176,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                               {hasMgr && <span className="text-[8px] text-green-400">👤</span>}
                             </div>
                             <span className="text-xs font-bold text-yellow-300 tabular-nums">
-                              ×{qty.toLocaleString()}
+                              ×{formatNumberSmart(qty)}
                               {ips > 0 && (
                                 <span className="text-[10px] text-green-400/80 ml-1">
                                   {formatCash(ips)}/s
@@ -204,13 +204,13 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                   <StatCard
                     icon="👆"
                     label="手动点击次数"
-                    value={totalManualTaps.toLocaleString()}
+                    value={formatNumberSmart(totalManualTaps)}
                     color="text-pink-300"
                   />
                   <StatCard
                     icon="🛒"
                     label="总购买次数"
-                    value={totalPurchases.toLocaleString()}
+                    value={formatNumberSmart(totalPurchases)}
                     color="text-purple-300"
                   />
                   <StatCard
