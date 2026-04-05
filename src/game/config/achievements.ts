@@ -9,7 +9,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'earn_1k',
     name: '第一桶金',
-    description: '累计收入达到 ¥1,000',
+    description: '累计收入达到 🪙1,000',
     icon: '💰',
     condition: { type: 'total_earned', value: 1000 },
     reward: { type: 'cash', value: 500 },
@@ -17,7 +17,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'earn_100k',
     name: '小有积蓄',
-    description: '累计收入达到 ¥100,000',
+    description: '累计收入达到 🪙100,000',
     icon: '🏦',
     condition: { type: 'total_earned', value: 100000 },
     reward: { type: 'cash', value: 50000 },
@@ -25,7 +25,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'earn_1m',
     name: '贴膜百万富翁',
-    description: '累计收入达到 ¥1,000,000',
+    description: '累计收入达到 🪙1,000,000',
     icon: '💵',
     condition: { type: 'total_earned', value: 1000000 },
     reward: { type: 'cash', value: 500000 },
@@ -33,7 +33,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'earn_1b',
     name: '亿万贴膜王',
-    description: '累计收入达到 ¥1,000,000,000',
+    description: '累计收入达到 🪙1,000,000,000',
     icon: '🤑',
     condition: { type: 'total_earned', value: 1000000000 },
     reward: { type: 'diamond', value: 5 },
@@ -41,7 +41,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'earn_100b',
     name: '膜界首富',
-    description: '累计收入达到 ¥100,000,000,000',
+    description: '累计收入达到 🪙100,000,000,000',
     icon: '👑',
     condition: { type: 'total_earned', value: 100000000000 },
     reward: { type: 'diamond', value: 15 },
@@ -49,7 +49,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'earn_1t',
     name: '宇宙膜帝',
-    description: '累计收入达到 ¥1,000,000,000,000',
+    description: '累计收入达到 🪙1,000,000,000,000',
     icon: '🌌',
     condition: { type: 'total_earned', value: 1000000000000 },
     reward: { type: 'diamond', value: 50 },

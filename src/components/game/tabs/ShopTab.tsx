@@ -99,7 +99,7 @@ export default function ShopTab() {
               <div className="text-4xl mb-2">🎯</div>
               <h3 className="text-xl font-black mb-1">精准投放成功！</h3>
               <p className="text-lg text-yellow-200 font-bold">+{formatCash(instantCash)}</p>
-              <p className="text-[10px] text-gray-400 mt-1">总收入1%或¥1,000，取较高值</p>
+              <p className="text-[10px] text-gray-400 mt-1">总收入1%或🪙1,000，取较高值</p>
             </div>
           ),
         });
@@ -367,7 +367,7 @@ export default function ShopTab() {
                       className="px-3 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 
                                  text-white text-xs font-bold active:scale-95 transition-transform"
                     >
-                      ¥{offer.cost}
+                      🪙{offer.cost}
                     </button>
                   ) : (
                     <span className="text-xs text-gray-500">已购买</span>

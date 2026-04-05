@@ -662,7 +662,7 @@ export function formatNumberSmart(n: number): string {
 }
 
 export function formatCash(n: number): string {
-  return '¥' + formatNumberSmart(n);
+  return '🪙' + formatNumberSmart(n);
 }
 
 export function formatTime(seconds: number): string {
