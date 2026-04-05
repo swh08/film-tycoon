@@ -343,15 +343,15 @@ export default function BusinessTab() {
         <h2 className="text-sm font-bold text-yellow-400">🏪 我的生意</h2>
         <div className="flex items-center gap-2">
           {/* 全局购买模式切换 */}
-          <div className="flex rounded-lg overflow-hidden border border-gray-600">
+          <div className="flex rounded-lg overflow-hidden">
             {BUY_MODES.map(m => (
               <button
                 key={m.value}
                 onClick={() => setBuyMode(m.value)}
-                className={`px-2 py-1 text-[10px] font-bold transition-colors
+                className={`px-2 py-1.5 text-[10px] font-bold transition-all duration-150
                   ${buyMode === m.value
-                    ? 'bg-yellow-600 text-white'
-                    : 'bg-gray-700 text-gray-400'
+                    ? 'bg-gradient-to-b from-yellow-400 to-amber-600 text-white shadow-[0_3px_0_0_#92400e]'
+                    : 'bg-gradient-to-b from-gray-400 to-gray-600 text-gray-200 shadow-[0_3px_0_0_#374151] active:shadow-[0_1px_0_0_#374151] active:translate-y-[2px]'
                   }`}
               >
                 {m.label}
