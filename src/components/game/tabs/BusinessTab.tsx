@@ -234,7 +234,10 @@ export default function BusinessTab() {
     purchasedAngelUpgrades,
     purchasedBusinessUpgrades,
     marketMultipliers,
+    managerLevels,
+    hiredManagers,
     businessModes,
+    activeEvents,
     buyBusiness,
     manualProduce,
     advanceTutorial,
@@ -401,9 +404,14 @@ export default function BusinessTab() {
           : Math.ceil(def.baseCost * (purchasedAngelUpgrades.length > 0 ? calcAngelUpgradeEffects(purchasedAngelUpgrades).globalCostReduce : 1));
         const canAfford = cash >= cost && actualBuyCount > 0;
 
-        // 收益计算
-        const cycleTime = quantity > 0 ? calcCycleTime(def, { upgrades, prestigePoints, adBuffs } as any, adBuffs) : def.baseCycleSec;
-        const revenue = quantity > 0 ? calcRevenuePerCycle(def, quantity, { upgrades, prestigePoints } as any, adBuffs) : def.baseRevenue;
+        // 收益计算（传入完整state确保显示值与实际tick一致）
+        const calcState = {
+          upgrades, prestigePoints, adBuffs,
+          purchasedBusinessUpgrades, purchasedAngelUpgrades,
+          managerLevels, hiredManagers, businessModes, activeEvents,
+        } as any;
+        const cycleTime = quantity > 0 ? calcCycleTime(def, calcState, adBuffs) : def.baseCycleSec;
+        const revenue = quantity > 0 ? calcRevenuePerCycle(def, quantity, calcState, adBuffs) : def.baseRevenue;
         const milestoneMult = calcMilestoneMultiplier(def, quantity);
         const nextMs = getNextMilestone(def, quantity);
 
