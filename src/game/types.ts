@@ -298,6 +298,11 @@ export interface GameState {
   activeEvents: ActiveGameEvent[];      // 当前激活的事件列表
   lastEventCheck: number;                // 上次事件检查时间戳
   eventCooldownUntil: number;            // 事件冷却截止时间戳
+
+  // 显示偏好
+  numberFormat: 'abbreviation' | 'scientific'; // 数字显示格式
+  musicVolume: number;                   // 背景音乐音量 0-1
+  sfxVolume: number;                     // 音效音量 0-1
 }
 
 /** 格式化数字用的后缀 */

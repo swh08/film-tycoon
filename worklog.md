@@ -108,3 +108,81 @@ Stage Summary:
 - 详细收益分解Tooltip：点击ℹ️按钮查看完整乘数分解（基础→里程碑→全局升级→产线升级→人脉→转生→广告→市场→店长→模式→事件），含最终收益/周期/秒收入
 - 事件激活系统：11种随机事件（利润/速度/全能/成本），每30秒10%概率触发，最多2个同时激活，自动倒计时+奖励发放，顶栏+通知弹窗+商城Tab三处显示
 - 收益公式完整链路更新：基础×数量×里程碑×全局升级×产线升级×人脉升级×转生×店长等级×广告buff×市场波动×经营模式×事件增益
+
+---
+## Task ID: 5 — Feature Agent
+### Work Task
+实现4大高优先级功能：AnimatedNumber动画计数器、扩展数字格式化、统计面板、设置面板
+
+### Work Summary
+
+#### Task 1: 💰 AnimatedNumber 动画计数器
+- 创建 `src/components/game/AnimatedNumber.tsx`：基于 requestAnimationFrame + easeOutCubic 缓动函数的数字滚动组件
+  - 接受 value/formatFn/className/duration props
+  - 使用 useRef 跟踪当前显示值，避免每次帧更新触发 React 重渲染
+  - 300ms 动画时长，值变化时平滑过渡，新值到达时跳转到新目标
+- 更新 `src/components/game/TopHUD.tsx`：
+  - 现金显示改用 `<AnimatedNumber value={cash} formatFn={formatCash} />`
+  - 每秒收入显示改用 AnimatedNumber
+  - 钻石数量改用 AnimatedNumber（formatFn 为整数格式）
+  - 人脉点数改用 AnimatedNumber
+  - 移除原 🔊/🔇 音效按钮，替换为 ⚙️ 设置按钮
+  - 新增 📊 统计按钮（onStatsOpen prop）
+  - TopHUD props 签名扩展为：onAchievementOpen + onStatsOpen + onSettingsOpen
+
+#### Task 2: 🔢 扩展数字格式化
+- 更新 `src/game/types.ts`：
+  - GameState 新增 `numberFormat: 'abbreviation' | 'scientific'`
+  - GameState 新增 `musicVolume: number`（0-1）和 `sfxVolume: number`（0-1）
+- 重写 `src/game/formulas.ts` 中的数字格式化系统：
+  - `formatNumber(n, format?)` 支持两种模式：
+    - **abbreviation**：单字母后缀 K~Dc（10^3~10^33），超出后双字母系统 Aa(10^36), Ab(10^39), ..., Az(10^60), Ba(10^63), ... 无限扩展
+    - **scientific**：科学计数法 1.23e15
+  - 边界处理：负数、NaN/Infinity(显示∞)、超大数(>10^1000显示∞)、极小正数(<0.01)
+  - 新增 `syncNumberFormat()` 模块级缓存同步函数（避免循环依赖）
+  - 新增 `formatNumberSmart()` 读取缓存的格式偏好
+  - `formatCash()` 改用 `formatNumberSmart()`，自动跟随用户设置
+- 更新 `src/store/gameStore.ts`：
+  - 新增 `setNumberFormat`/`setMusicVolume`/`setSfxVolume` actions
+  - createInitialState 添加默认值：numberFormat='abbreviation', musicVolume=0.5, sfxVolume=0.8
+  - safeState 迁移兼容旧存档
+  - store 初始化时调用 syncNumberFormat 同步格式缓存
+  - setNumberFormat 时同步更新缓存
+
+#### Task 3: 📊 统计面板
+- 创建 `src/components/game/StatsPanel.tsx`：
+  - 全屏覆盖层面板（framer-motion 动画，从底部滑入）
+  - Props: isOpen/onClose
+  - 7个统计区块：
+    - 💰 资源统计：当前现金、钻石数量、人脉点数
+    - 📈 收入统计：历史总收入、当前每秒收入（含每小时收入）
+    - 🎯 产线统计：10条产线各自的图标+名称+数量+店长标记+每秒收入
+    - ⏱️&👆 游戏数据：游戏时长(X天X小时X分)、手动点击次数、总购买次数、雇佣店长数
+    - 🔄 转生统计：转生次数、人脉升级数、产线升级数
+    - 🏆 成就进度：进度条+完成率百分比
+  - 所有数字使用 tabular-nums 和 formatCash/formatNumber
+  - 深色主题 + 蓝色调头部，与游戏风格统一
+- 集成到 `src/app/page.tsx`：showStats state + StatsPanel 组件
+- TopHUD 新增 📊 按钮触发 onStatsOpen
+
+#### Task 4: ⚙️ 设置面板
+- 创建 `src/components/game/SettingsPanel.tsx`：
+  - 全屏覆盖层面板（framer-motion 动画，从底部滑入）
+  - Props: isOpen/onClose
+  - 4个设置区块：
+    - 🔊 音频设置：音效总开关（自定义 toggle）、背景音乐滑块(0-100%)、音效音量滑块(0-100%)
+    - 🔢 数字显示：缩写/科学计数法切换按钮（选中态高亮）
+    - 💾 存档管理：
+      - 导出存档：复制 JSON 到剪贴板（含 fallback 方案）
+      - 导入存档：可展开 textarea + 解析验证 + 加载
+      - 重置游戏：可展开确认区域（二次确认）
+    - ℹ️ 关于：游戏名+版本号 v1.0.0
+  - 内置 Toast 消息提示（导入成功/失败等）
+  - 所有操作自动持久化到 store
+- 集成到 `src/app/page.tsx`：showSettings state + SettingsPanel 组件
+- TopHUD 旧 🔊/🔇 按钮替换为 ⚙️ 按钮
+
+#### 编译验证
+- `next build` 编译成功，无错误
+- `npm run lint` 仅剩 EventNotification.tsx 预存的 setState-in-effect 警告（非本次修改引入）
+- dev server 运行正常，所有页面 200

@@ -11,6 +11,8 @@ import BottomTabs, { type TabId } from '@/components/game/BottomTabs';
 import { PopupProvider } from '@/components/game/PopupLayer';
 import OfflineRewardPopup from '@/components/game/OfflineRewardPopup';
 import AchievementPanel from '@/components/game/AchievementPanel';
+import StatsPanel from '@/components/game/StatsPanel';
+import SettingsPanel from '@/components/game/SettingsPanel';
 import DailyRewardPopup from '@/components/game/DailyRewardPopup';
 import EventNotification from '@/components/game/EventNotification';
 
@@ -31,6 +33,8 @@ export default function GamePage() {
   const setActiveTab = useGameStore(s => s.setActiveTab);
   const [isReady, setIsReady] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showStats, setShowStats] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [showDailyReward, setShowDailyReward] = useState(false);
   const updateProgress = useGameStore(s => s.updateProgress);
   const save = useGameStore(s => s.save);
@@ -112,7 +116,11 @@ export default function GamePage() {
     <PopupProvider>
       <div className="fixed inset-0 flex flex-col bg-gray-950 overflow-hidden select-none">
         {/* 顶部HUD */}
-        <TopHUD onAchievementOpen={() => setShowAchievements(true)} />
+        <TopHUD
+          onAchievementOpen={() => setShowAchievements(true)}
+          onStatsOpen={() => setShowStats(true)}
+          onSettingsOpen={() => setShowSettings(true)}
+        />
 
         {/* 主内容区 */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin">
@@ -129,6 +137,18 @@ export default function GamePage() {
         <AchievementPanel
           isOpen={showAchievements}
           onClose={() => setShowAchievements(false)}
+        />
+
+        {/* 统计面板 */}
+        <StatsPanel
+          isOpen={showStats}
+          onClose={() => setShowStats(false)}
+        />
+
+        {/* 设置面板 */}
+        <SettingsPanel
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
         />
 
         {/* 每日登录奖励 */}

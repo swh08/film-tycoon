@@ -7,7 +7,7 @@ import { BUSINESSES } from '../game/config/businesses';
 import { MANAGERS } from '../game/config/managers';
 import { GLOBAL_UPGRADES } from '../game/config/upgrades';
 import { ANGEL_UPGRADES } from '../game/config/angel-upgrades';
-import { calcBuyCost, calcBuyCostWithDiscount, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects, calcAngelUpgradeEffects, calcAngelBusinessProfitMult, checkAchievementConditions, calcBusinessUpgradeProfitMult, calcBusinessUpgradeCycleReduce, calcManagerUpgradeCost, generateMarketMultipliers, calcManagerLevelCycleReduce, calcManagerLevelProfitMult, getTodayStr, isConsecutiveDay, tryTriggerEvent, calcEventCostReduce } from '../game/formulas';
+import { calcBuyCost, calcBuyCostWithDiscount, calcUpgradeCost, calcUpgradeCostBulk, calcGlobalEffects, calcAngelUpgradeEffects, calcAngelBusinessProfitMult, checkAchievementConditions, calcBusinessUpgradeProfitMult, calcBusinessUpgradeCycleReduce, calcManagerUpgradeCost, generateMarketMultipliers, calcManagerLevelCycleReduce, calcManagerLevelProfitMult, getTodayStr, isConsecutiveDay, tryTriggerEvent, calcEventCostReduce, syncNumberFormat } from '../game/formulas';
 import { BUSINESS_UPGRADES } from '../game/config/business-upgrades';
 import { ACHIEVEMENTS } from '../game/config/achievements';
 import { DAILY_REWARDS } from '../game/config/daily-rewards';
@@ -62,6 +62,9 @@ function createInitialState(): GameState {
     activeEvents: [] as ActiveGameEvent[],
     lastEventCheck: Date.now(),
     eventCooldownUntil: 0,
+    numberFormat: 'abbreviation' as const,
+    musicVolume: 0.5,
+    sfxVolume: 0.8,
   };
 }
 
@@ -152,6 +155,13 @@ interface GameActions {
   // 音效开关
   setSoundEnabled: (enabled: boolean) => void;
 
+  // 数字格式
+  setNumberFormat: (format: 'abbreviation' | 'scientific') => void;
+
+  // 音量
+  setMusicVolume: (v: number) => void;
+  setSfxVolume: (v: number) => void;
+
   // 市场波动
   tickMarket: () => void;
 
@@ -216,11 +226,15 @@ export const useGameStore = create<GameStore>((set, get) => {
     })),
     lastEventCheck: initial.lastEventCheck ?? Date.now(),
     eventCooldownUntil: initial.eventCooldownUntil ?? 0,
+    numberFormat: (initial as any).numberFormat ?? 'abbreviation',
+    musicVolume: (initial as any).musicVolume ?? 0.5,
+    sfxVolume: (initial as any).sfxVolume ?? 0.8,
   };
 
   // 同步音效设置
   if (typeof window !== 'undefined') {
     setSoundEnabled(safeState.soundEnabled);
+    syncNumberFormat(safeState.numberFormat);
   }
 
   return {
@@ -235,6 +249,22 @@ export const useGameStore = create<GameStore>((set, get) => {
     setSoundEnabled: (enabled: boolean) => {
       set({ soundEnabled: enabled });
       setSoundEnabled(enabled);
+      get().save();
+    },
+
+    setNumberFormat: (format: 'abbreviation' | 'scientific') => {
+      set({ numberFormat: format });
+      syncNumberFormat(format);
+      get().save();
+    },
+
+    setMusicVolume: (v: number) => {
+      set({ musicVolume: Math.max(0, Math.min(1, v)) });
+      get().save();
+    },
+
+    setSfxVolume: (v: number) => {
+      set({ sfxVolume: Math.max(0, Math.min(1, v)) });
       get().save();
     },
 

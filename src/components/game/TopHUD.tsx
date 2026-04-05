@@ -9,12 +9,15 @@ import { formatCash, formatNumber, calcTotalIncomePerSecond, getMarketTrendText 
 import { calcPrestigeMultiplier } from '@/game/config/prestige';
 import { ACHIEVEMENTS } from '@/game/config/achievements';
 import { BUSINESSES } from '@/game/config/businesses';
+import AnimatedNumber from './AnimatedNumber';
 
 export interface TopHUDProps {
   onAchievementOpen?: () => void;
+  onStatsOpen?: () => void;
+  onSettingsOpen?: () => void;
 }
 
-export default function TopHUD({ onAchievementOpen }: TopHUDProps) {
+export default function TopHUD({ onAchievementOpen, onStatsOpen, onSettingsOpen }: TopHUDProps) {
   const cash = useGameStore(s => s.cash);
   const diamonds = useGameStore(s => s.diamonds);
   const adBuffs = useGameStore(s => s.adBuffs);
@@ -23,8 +26,6 @@ export default function TopHUD({ onAchievementOpen }: TopHUDProps) {
   const prestigePoints = useGameStore(s => s.prestigePoints);
   const unlockedAchievements = useGameStore(s => s.unlockedAchievements);
   const marketMultipliers = useGameStore(s => s.marketMultipliers);
-  const soundEnabled = useGameStore(s => s.soundEnabled);
-  const setSoundEnabledStore = useGameStore(s => s.setSoundEnabled);
   const activeEvents = useGameStore(s => s.activeEvents);
 
   const [incomePerSec, setIncomePerSec] = useState(0);
@@ -84,12 +85,18 @@ export default function TopHUD({ onAchievementOpen }: TopHUDProps) {
       {/* 现金 */}
       <div className="flex flex-col items-start min-w-0 flex-1">
         <span className="text-[10px] text-yellow-300/70 font-medium tracking-wider">💰 现金</span>
-        <span className="text-base font-bold text-yellow-100 truncate tabular-nums">
-          {formatCash(cash)}
-        </span>
+        <AnimatedNumber
+          value={cash}
+          formatFn={formatCash}
+          className="text-base font-bold text-yellow-100 truncate tabular-nums"
+        />
         {incomePerSec > 0 && (
           <span className="text-[10px] text-green-400 font-medium">
-            +{formatCash(incomePerSec)}/秒
+            +<AnimatedNumber
+              value={incomePerSec}
+              formatFn={formatCash}
+              className="text-[10px] text-green-400 font-medium tabular-nums"
+            />/秒
           </span>
         )}
       </div>
@@ -125,6 +132,16 @@ export default function TopHUD({ onAchievementOpen }: TopHUDProps) {
 
       {/* 右侧区域 */}
       <div className="flex items-center gap-1.5">
+        {/* 统计入口 */}
+        {onStatsOpen && (
+          <button
+            onClick={onStatsOpen}
+            className="flex items-center justify-center w-7 h-7 rounded-full bg-blue-600/30 hover:bg-blue-600/50 transition-colors"
+          >
+            <span className="text-xs">📊</span>
+          </button>
+        )}
+
         {/* 成就入口 */}
         {onAchievementOpen && (
           <button
@@ -140,25 +157,34 @@ export default function TopHUD({ onAchievementOpen }: TopHUDProps) {
           </button>
         )}
 
-        {/* 音效开关 */}
-        <button
-          onClick={() => setSoundEnabledStore(!soundEnabled)}
-          className={`flex items-center justify-center w-7 h-7 rounded-full transition-colors text-xs
-            ${soundEnabled ? 'bg-gray-700/50 hover:bg-gray-600/50' : 'bg-gray-700/30 opacity-50'}`}
-        >
-          {soundEnabled ? '🔊' : '🔇'}
-        </button>
+        {/* 设置入口 */}
+        {onSettingsOpen && (
+          <button
+            onClick={onSettingsOpen}
+            className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-600/30 hover:bg-gray-600/50 transition-colors"
+          >
+            <span className="text-xs">⚙️</span>
+          </button>
+        )}
 
         {/* 钻石 & 人脉 */}
         <div className="flex flex-col items-end gap-0.5">
           <div className="flex items-center gap-1">
             <span className="text-sm">💎</span>
-            <span className="text-sm font-bold text-cyan-300 tabular-nums">{diamonds}</span>
+            <AnimatedNumber
+              value={diamonds}
+              className="text-sm font-bold text-cyan-300 tabular-nums"
+              formatFn={(n) => Math.floor(n).toString()}
+            />
           </div>
           {prestigePoints > 0 && (
             <div className="flex items-center gap-1">
               <span className="text-xs">🤝</span>
-              <span className="text-xs font-bold text-orange-300 tabular-nums">{prestigePoints}</span>
+              <AnimatedNumber
+                value={prestigePoints}
+                className="text-xs font-bold text-orange-300 tabular-nums"
+                formatFn={(n) => Math.floor(n).toString()}
+              />
               <span className="text-[10px] text-orange-400/80">×{formatNumber(calcPrestigeMultiplier(prestigePoints))}</span>
             </div>
           )}

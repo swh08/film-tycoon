@@ -575,30 +575,90 @@ export function isConsecutiveDay(lastDate: string, today: string): boolean {
 
 // === 数字格式化 ===
 
-export function formatNumber(n: number): string {
-  if (n < 0) return '-' + formatNumber(-n);
-  if (n < 1000) return Math.floor(n).toString();
-  
-  const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
-  let tier = 0;
-  let scaled = n;
-  
-  while (scaled >= 1000 && tier < suffixes.length - 1) {
-    scaled /= 1000;
-    tier++;
-  }
-  
+/** 单字母后缀列表（前11级：10^3 到 10^33） */
+const SINGLE_SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+
+/** 生成双字母后缀：Aa=10^36, Ab=10^39, ..., Az=10^60, Ba=10^63, ... */
+function getDoubleLetterSuffix(tier: number): string {
+  // tier=0 → Aa, tier=1 → Ab, ..., tier=25 → Az, tier=26 → Ba, ...
+  const first = String.fromCharCode(65 + Math.floor(tier / 26)); // A, B, C, ...
+  const second = String.fromCharCode(97 + (tier % 26)); // a, b, c, ...
+  return first + second;
+}
+
+/** 格式化一个已缩放的数字为字符串 */
+function formatScaled(scaled: number): string {
   if (scaled < 10) {
-    return scaled.toFixed(2) + suffixes[tier];
+    return scaled.toFixed(2);
   } else if (scaled < 100) {
-    return scaled.toFixed(1) + suffixes[tier];
+    return scaled.toFixed(1);
   } else {
-    return Math.floor(scaled) + suffixes[tier];
+    return Math.floor(scaled).toString();
   }
 }
 
+/**
+ * 格式化数字
+ * @param n 要格式化的数字
+ * @param format 'abbreviation' 使用缩写后缀 / 'scientific' 使用科学计数法
+ */
+export function formatNumber(n: number, format?: 'abbreviation' | 'scientific'): string {
+  if (n < 0) return '-' + formatNumber(-n, format);
+  if (!isFinite(n)) return '∞';
+  // 非常大的数
+  if (n >= 1e1000) return '∞';
+  // 极小的正数
+  if (n > 0 && n < 0.01) {
+    if (format === 'scientific') {
+      return n.toExponential(2);
+    }
+    return n.toFixed(4);
+  }
+  if (n < 1000) return Math.floor(n).toString();
+
+  if (format === 'scientific') {
+    const exp = Math.floor(Math.log10(n));
+    const mantissa = n / Math.pow(10, exp);
+    return mantissa.toFixed(2) + 'e' + exp;
+  }
+
+  // 缩写模式
+  const singleMaxTier = SINGLE_SUFFIXES.length - 1; // 11 (Dc)
+  let tier = 0;
+  let scaled = n;
+
+  while (scaled >= 1000) {
+    scaled /= 1000;
+    tier++;
+  }
+
+  // 超出单字母范围（> Dc = 10^33）时使用双字母系统
+  if (tier > singleMaxTier) {
+    const doubleTier = tier - singleMaxTier - 1; // 0-based index for double letters
+    const suffix = getDoubleLetterSuffix(doubleTier);
+    return formatScaled(scaled) + suffix;
+  }
+
+  return formatScaled(scaled) + SINGLE_SUFFIXES[tier];
+}
+
+// === 数字格式缓存（避免循环依赖） ===
+
+/** 模块级缓存：当前数字格式偏好 */
+let _cachedNumberFormat: 'abbreviation' | 'scientific' = 'abbreviation';
+
+/** 由 gameStore 初始化时调用，同步格式偏好到此模块 */
+export function syncNumberFormat(format: 'abbreviation' | 'scientific') {
+  _cachedNumberFormat = format;
+}
+
+/** 自动选择格式的 formatNumber（读取缓存的全局设置） */
+export function formatNumberSmart(n: number): string {
+  return formatNumber(n, _cachedNumberFormat);
+}
+
 export function formatCash(n: number): string {
-  return '¥' + formatNumber(n);
+  return '¥' + formatNumberSmart(n);
 }
 
 export function formatTime(seconds: number): string {
