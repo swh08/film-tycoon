@@ -7,7 +7,7 @@ import { useGameStore } from '@/store/gameStore';
 import { PRESTIGE_RULE, calcPrestigeGain, calcPrestigeMultiplier } from '@/game/config/prestige';
 import { ANGEL_UPGRADES, ANGEL_UPGRADE_TIERS } from '@/game/config/angel-upgrades';
 import { BUSINESSES } from '@/game/config/businesses';
-import { calcAngelUpgradeEffects, formatCash, formatNumber } from '@/game/formulas';
+import { calcAngelUpgradeEffects, formatCash, formatNumber, formatNumberSmart } from '@/game/formulas';
 import { usePopup } from '../PopupLayer';
 
 // ============================================================
@@ -38,11 +38,11 @@ function PrestigeConfirmPopup({ onConfirm }: { onConfirm: () => void }) {
       <div className="bg-white/10 rounded-xl p-3 mb-4 text-left space-y-2">
         <div className="flex justify-between text-sm">
           <span className="text-white/70">当前{PRESTIGE_RULE.currencyName}:</span>
-          <span className="text-yellow-400 font-bold">{prestigePoints}</span>
+          <span className="text-yellow-400 font-bold">{formatNumberSmart(prestigePoints)}</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-white/70">本次获得:</span>
-          <span className="text-green-400 font-bold">+{gain} 🤝</span>
+          <span className="text-green-400 font-bold">+{formatNumberSmart(gain)} 🤝</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-white/70">转生后总加成:</span>
@@ -241,7 +241,7 @@ export default function PrestigeTab() {
           <div className="bg-black/20 rounded-xl p-3">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs text-gray-400">当前{PRESTIGE_RULE.currencyName}</span>
-              <span className="text-lg font-black text-yellow-400">{prestigePoints}</span>
+              <span className="text-lg font-black text-yellow-400">{formatNumberSmart(prestigePoints)}</span>
             </div>
             <div className="h-2 rounded-full bg-gray-700">
               <div
