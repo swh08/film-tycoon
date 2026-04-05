@@ -40,7 +40,6 @@ export interface BusinessDef {
   managerId: number;
   unlockRule: UnlockRule;
   flavorText: string;
-  autoBuyUnlockCost: number; // 钻石费用，解锁自动购买
 }
 
 /** 店长定义 (ManagerDef) */
@@ -309,8 +308,6 @@ export interface GameState {
   // 背景音乐开关
   musicEnabled: boolean;                  // BGM 是否开启
 
-  // 自动购买系统
-  autoBuySettings: Record<number, { enabled: boolean; intervalSec: number; lastAutoBuyTime: number }>; // businessId -> 自动购买配置
 
   // 广告每日限制
   adWatchCountToday: number;             // 今日已看广告次数

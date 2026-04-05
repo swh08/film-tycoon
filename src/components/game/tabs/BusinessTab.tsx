@@ -235,7 +235,6 @@ export default function BusinessTab() {
     purchasedBusinessUpgrades,
     marketMultipliers,
     businessModes,
-    autoBuySettings,
     buyBusiness,
     manualProduce,
     advanceTutorial,
@@ -243,9 +242,6 @@ export default function BusinessTab() {
     buyMode,
     setBuyMode,
     setBusinessMode,
-    unlockAutoBuy,
-    setAutoBuyInterval,
-    toggleAutoBuy,
   } = useGameStore();
 
   const { showPopup } = usePopup();
@@ -619,65 +615,6 @@ export default function BusinessTab() {
                     <br />
                     <span className="text-[10px] font-normal opacity-80">{formatCash(cost)}</span>
                   </button>
-
-                  {/* 🤖 自动购买按钮 */}
-                  {(() => {
-                    const autoSetting = autoBuySettings?.[def.id];
-                    if (!autoSetting && quantity > 0) {
-                      // 未解锁：显示解锁按钮
-                      return (
-                        <button
-                          onClick={() => unlockAutoBuy(def.id)}
-                          disabled={diamonds < def.autoBuyUnlockCost}
-                          className={`flex-shrink-0 px-2 py-2 rounded-lg text-xs font-bold transition-all duration-150
-                            active:scale-95 border
-                            ${diamonds >= def.autoBuyUnlockCost
-                              ? 'bg-gray-700 border-cyan-500/30 text-cyan-400 hover:bg-gray-600'
-                              : 'bg-gray-800 border-gray-600/30 text-gray-600 cursor-not-allowed'
-                            }`}
-                          title={`🤖 解锁自动购买（${def.autoBuyUnlockCost}💎）`}
-                        >
-                          🤖
-                        </button>
-                      );
-                    } else if (autoSetting && quantity > 0) {
-                      // 已解锁：显示开关
-                      return (
-                        <div className="flex flex-col items-center gap-0.5">
-                          <button
-                            onClick={() => toggleAutoBuy(def.id, !autoSetting.enabled)}
-                            className={`w-8 h-8 rounded-lg text-sm font-bold transition-all duration-150
-                              active:scale-95 border flex items-center justify-center
-                              ${autoSetting.enabled
-                                ? 'bg-cyan-600/30 border-cyan-400/50 text-cyan-300'
-                                : 'bg-gray-700 border-gray-600/30 text-gray-500'
-                              }`}
-                            title={autoSetting.enabled ? `🤖 自动购买中（每${autoSetting.intervalSec}s）` : '🤖 自动购买已关闭'}
-                          >
-                            🤖
-                          </button>
-                          {autoSetting.enabled && (
-                            <div className="flex rounded overflow-hidden border border-gray-600">
-                              {[1, 5, 10, 30].map(sec => (
-                                <button
-                                  key={sec}
-                                  onClick={() => setAutoBuyInterval(def.id, sec)}
-                                  className={`px-1 py-0 text-[8px] font-bold transition-colors
-                                    ${autoSetting.intervalSec === sec
-                                      ? 'bg-cyan-600 text-white'
-                                      : 'bg-gray-700 text-gray-500'
-                                    }`}
-                                >
-                                  {sec}s
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
 
                   {/* 专属升级按钮 */}
                   {(() => {

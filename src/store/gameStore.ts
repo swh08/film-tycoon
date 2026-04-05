@@ -66,7 +66,6 @@ function createInitialState(): GameState {
     musicVolume: 0.5,
     sfxVolume: 0.8,
     musicEnabled: false,
-    autoBuySettings: {} as Record<number, { enabled: boolean; intervalSec: number; lastAutoBuyTime: number }>,
     adWatchCountToday: 0,
     lastAdWatchDate: '',
     dailyAdLimit: 20,
@@ -247,7 +246,6 @@ export const useGameStore = create<GameStore>((set, get) => {
     musicVolume: (initial as any).musicVolume ?? 0.5,
     sfxVolume: (initial as any).sfxVolume ?? 0.8,
     musicEnabled: (initial as any).musicEnabled ?? false,
-    autoBuySettings: (initial as any).autoBuySettings ?? {},
     adWatchCountToday: (initial as any).adWatchCountToday ?? 0,
     lastAdWatchDate: (initial as any).lastAdWatchDate ?? '',
     dailyAdLimit: (initial as any).dailyAdLimit ?? 20,
@@ -296,54 +294,7 @@ export const useGameStore = create<GameStore>((set, get) => {
       get().save();
     },
 
-    // === Task 2: 自动购买系统 ===
-    unlockAutoBuy: (businessId: number): boolean => {
-      const state = get();
-      const def = BUSINESSES.find(b => b.id === businessId);
-      if (!def) return false;
-      if (state.autoBuySettings[businessId]) return false; // 已解锁
-      if (state.diamonds < def.autoBuyUnlockCost) return false;
-
-      set(s => ({
-        diamonds: s.diamonds - def.autoBuyUnlockCost,
-        autoBuySettings: {
-          ...s.autoBuySettings,
-          [businessId]: { enabled: true, intervalSec: 5, lastAutoBuyTime: Date.now() },
-        },
-      }));
-      get().save();
-      return true;
-    },
-
-    setAutoBuyInterval: (businessId: number, interval: number) => {
-      set(s => {
-        const existing = s.autoBuySettings[businessId];
-        if (!existing) return s;
-        return {
-          autoBuySettings: {
-            ...s.autoBuySettings,
-            [businessId]: { ...existing, intervalSec: interval },
-          },
-        };
-      });
-      get().save();
-    },
-
-    toggleAutoBuy: (businessId: number, enabled: boolean) => {
-      set(s => {
-        const existing = s.autoBuySettings[businessId];
-        if (!existing) return s;
-        return {
-          autoBuySettings: {
-            ...s.autoBuySettings,
-            [businessId]: { ...existing, enabled },
-          },
-        };
-      });
-      get().save();
-    },
-
-    // === Task 4: 广告每日限制 ===
+    // === 广告每日限制 ===
     watchAd: (): boolean => {
       const state = get();
       const today = getTodayStr();
@@ -353,8 +304,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         set({ adWatchCountToday: 0, lastAdWatchDate: today });
       }
 
-      const currentState = get();
-      if (currentState.adWatchCountToday >= currentState.dailyAdLimit) return false;
+      if (state.adWatchCountToday >= state.dailyAdLimit) return false;
 
       set(s => ({
         adWatchCountToday: s.adWatchCountToday + 1,
@@ -767,7 +717,6 @@ export const useGameStore = create<GameStore>((set, get) => {
         activeEvents: [],  // 事件清除
         lastEventCheck: Date.now(),
         eventCooldownUntil: 0,
-        autoBuySettings: {}, // 自动购买重置
       }));
       get().save();
     },
@@ -840,47 +789,7 @@ export const useGameStore = create<GameStore>((set, get) => {
       const marketMultipliers = state.marketMultipliers || {};
       const managerLevels = state.managerLevels || {};
 
-      // === 自动购买系统 tick ===
-      const now = Date.now();
-      const autoBuySettings = state.autoBuySettings || {};
-      let autoBuyTriggered = false;
-      for (const [busIdStr, settings] of Object.entries(autoBuySettings)) {
-        if (!settings.enabled) continue;
-        const busId = parseInt(busIdStr);
-        if (now - settings.lastAutoBuyTime >= settings.intervalSec * 1000) {
-          // 尝试购买
-          const def = BUSINESSES.find(b => b.id === busId);
-          if (!def) continue;
-          const bs = state.businesses.find(b => b.businessId === busId);
-          if (!bs || bs.quantity <= 0) continue;
-
-          // 根据当前 buyMode 决定购买数量
-          let buyCount = state.buyMode;
-          if (buyCount === 0) {
-            buyCount = calcMaxBuyable(def, bs.quantity, state.cash, state.purchasedAngelUpgrades);
-          }
-          if (buyCount > 0) {
-            const cost = calcBuyCostWithDiscount(def, bs.quantity, buyCount, state.purchasedAngelUpgrades);
-            if (state.cash >= cost) {
-              // 执行购买
-              const success = get().buyBusiness(busId, buyCount);
-              if (success) autoBuyTriggered = true;
-            }
-          }
-          // 更新 lastAutoBuyTime
-          set(s => ({
-            autoBuySettings: {
-              ...s.autoBuySettings,
-              [busId]: { ...s.autoBuySettings[busId], lastAutoBuyTime: now },
-            },
-          }));
-        }
-      }
-
-      // 如果自动购买触发了，重新获取 state
-      const currentState = autoBuyTriggered ? get() : state;
-
-      const newBusinesses = currentState.businesses.map(bs => {
+      const newBusinesses = state.businesses.map(bs => {
         if (bs.quantity <= 0) return { ...bs };
         if (!bs.hasManager && bs.progress <= 0) return { ...bs };
 
@@ -888,25 +797,25 @@ export const useGameStore = create<GameStore>((set, get) => {
         if (!def) return { ...bs };
 
         // 计算实际周期
-        const globalEffects = calcGlobalEffects(currentState.upgrades);
+        const globalEffects = calcGlobalEffects(state.upgrades);
         let cycle = def.baseCycleSec * globalEffects.cycleMultiplier;
-        cycle *= calcBusinessUpgradeCycleReduce(bs.businessId, currentState.purchasedBusinessUpgrades || []);
+        cycle *= calcBusinessUpgradeCycleReduce(bs.businessId, state.purchasedBusinessUpgrades || []);
         cycle *= angelEffects.globalCycleReduce;
-        cycle *= calcManagerLevelCycleReduce(bs.businessId, managerLevels, currentState.hiredManagers);
-        const rushBuff = currentState.adBuffs.find(b => b.type === 'rush_order');
+        cycle *= calcManagerLevelCycleReduce(bs.businessId, managerLevels, state.hiredManagers);
+        const rushBuff = state.adBuffs.find(b => b.type === 'rush_order');
         if (rushBuff) cycle *= 0.2;
         // 利润/速度模式
-        const bizMode = currentState.businessModes?.[bs.businessId];
+        const bizMode = state.businessModes?.[bs.businessId];
         if (bizMode === 'speed') cycle *= 0.5;
         if (bizMode === 'profit') cycle *= 1.5;
         // 事件增益（速度类/全能类）
-        if (currentState.activeEvents) {
-          for (const evt of currentState.activeEvents) {
+        if (state.activeEvents) {
+          for (const evt of state.activeEvents) {
             if (evt.boostType === 'speed_mult' || evt.boostType === 'all_mult') cycle /= evt.boostValue;
           }
         }
         // Task 4: speed_boost buff
-        const speedBuff = currentState.adBuffs.find(b => b.type === 'speed_boost');
+        const speedBuff = state.adBuffs.find(b => b.type === 'speed_boost');
         if (speedBuff) cycle /= speedBuff.value;
         cycle = Math.max(0.05, cycle);
 
@@ -919,12 +828,12 @@ export const useGameStore = create<GameStore>((set, get) => {
             if (bs.quantity >= ms.at) revenue *= ms.multiplier;
           }
           revenue *= globalEffects.profitMultiplier;
-          revenue *= calcBusinessUpgradeProfitMult(bs.businessId, currentState.purchasedBusinessUpgrades || []);
-          revenue *= calcAngelBusinessProfitMult(bs.businessId, currentState.purchasedAngelUpgrades || []);
+          revenue *= calcBusinessUpgradeProfitMult(bs.businessId, state.purchasedBusinessUpgrades || []);
+          revenue *= calcAngelBusinessProfitMult(bs.businessId, state.purchasedAngelUpgrades || []);
           revenue *= angelEffects.globalProfitMult;
-          revenue *= calcPrestigeMultiplier(currentState.prestigePoints);
-          revenue *= calcManagerLevelProfitMult(bs.businessId, managerLevels, currentState.hiredManagers);
-          if (currentState.adBuffs.some(b => b.type === 'double_revenue')) revenue *= 2;
+          revenue *= calcPrestigeMultiplier(state.prestigePoints);
+          revenue *= calcManagerLevelProfitMult(bs.businessId, managerLevels, state.hiredManagers);
+          if (state.adBuffs.some(b => b.type === 'double_revenue')) revenue *= 2;
           if (rushBuff) revenue *= 3;
           // 市场波动
           revenue *= marketMultipliers[bs.businessId] ?? 1;
@@ -932,8 +841,8 @@ export const useGameStore = create<GameStore>((set, get) => {
           if (bizMode === 'profit') revenue *= 1.5;
           if (bizMode === 'speed') revenue *= 0.8;
           // 事件增益（利润类/全能类）
-          if (currentState.activeEvents) {
-            for (const evt of currentState.activeEvents) {
+          if (state.activeEvents) {
+            for (const evt of state.activeEvents) {
               if (evt.boostType === 'profit_mult' || evt.boostType === 'all_mult') revenue *= evt.boostValue;
             }
           }
@@ -957,11 +866,11 @@ export const useGameStore = create<GameStore>((set, get) => {
 
       // 定期检查成就（每3秒）
       const checkNow = Date.now();
-      if (checkNow - currentState.lastAchievementCheck >= 3000) {
+      if (checkNow - state.lastAchievementCheck >= 3000) {
         get().checkAchievements();
       }
 
-      if (currentState.adBuffs.length > 0) {
+      if (state.adBuffs.length > 0) {
         get().tickAdBuffs(deltaSec);
       }
 
