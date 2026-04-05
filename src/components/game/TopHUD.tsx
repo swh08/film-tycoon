@@ -6,7 +6,6 @@
 import { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { formatCash, formatNumberSmart, calcTotalIncomePerSecond, getMarketTrendText } from '@/game/formulas';
-import { calcPrestigeMultiplier } from '@/game/config/prestige';
 import { BUSINESSES } from '@/game/config/businesses';
 import AnimatedNumber from './AnimatedNumber';
 
@@ -133,7 +132,6 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
                 className="text-xs font-bold text-orange-300 tabular-nums"
                 formatFn={formatNumberSmart}
               />
-              <span className="text-[10px] text-orange-400/80">×{formatNumberSmart(calcPrestigeMultiplier(prestigePoints))}</span>
             </div>
           )}
           {onSettingsOpen && (
