@@ -25,6 +25,7 @@ export default function ShopTab() {
     watchAd,
     getRemainingAds,
     dailyAdLimit,
+    activeEvents,
   } = useGameStore();
 
   const { showPopup } = usePopup();
@@ -378,21 +379,66 @@ export default function ShopTab() {
         </div>
       </div>
 
-      {/* 限时活动 — 当前激活事件 + 未来事件预览 */}
+      {/* 限时活动 — 当前激活事件 */}
+      {activeEvents && activeEvents.length > 0 && (
+        <div>
+          <h2 className="text-sm font-bold text-purple-400 mb-2 px-1">⚡ 当前激活事件</h2>
+          <div className="flex flex-col gap-2">
+            {activeEvents.map(evt => {
+              const boostText = evt.boostType === 'profit_mult' ? `利润×${evt.boostValue}` :
+                evt.boostType === 'speed_mult' ? `速度×${evt.boostValue}` :
+                evt.boostType === 'all_mult' ? `全属性×${evt.boostValue}` :
+                `成本${Math.round(evt.boostValue * 100)}%`;
+              return (
+                <div
+                  key={evt.id}
+                  className="rounded-xl p-3 border bg-gradient-to-r from-purple-900/50 to-pink-900/30 border-purple-400/50 animate-pulse"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-purple-900/50 flex items-center justify-center text-xl flex-shrink-0">
+                      {evt.icon}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-bold text-white">{evt.name}</h3>
+                        <span className="text-[10px] font-bold text-purple-300">{boostText}</span>
+                      </div>
+                      <p className="text-[10px] text-gray-400 mt-0.5">{evt.description}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[9px] text-purple-300">⏱ {Math.ceil(evt.remainingSec)}秒</span>
+                        {evt.reward && (
+                          <span className="text-[9px] text-green-400">
+                            🎁 {evt.reward.type === 'cash' ? formatCash(evt.reward.value) : `${evt.reward.value}💎`}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 随机事件目录 */}
       <div>
         <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1">🎊 随机事件系统</h2>
         <p className="text-[10px] text-gray-500 mb-2 px-1">随机事件会自动触发，为你带来临时增益！</p>
         <div className="flex flex-col gap-2">
-          {GAME_EVENTS.slice(0, 5).map(event => {
+          {GAME_EVENTS.map(event => {
             const unlocked = totalEarned >= event.minTotalEarned;
+            const isActive = activeEvents?.some(e => e.eventDefId === event.id);
 
             return (
               <div
                 key={event.id}
                 className={`rounded-xl p-3 border transition-all
-                  ${unlocked
-                    ? 'bg-gradient-to-r from-purple-900/30 to-pink-900/20 border-purple-500/30'
-                    : 'bg-gray-900/30 border-gray-700/20 opacity-40'
+                  ${isActive
+                    ? 'bg-gradient-to-r from-purple-900/50 to-pink-900/30 border-purple-400/50'
+                    : unlocked
+                      ? 'bg-gradient-to-r from-gray-800 to-gray-850 border-gray-600/30'
+                      : 'bg-gray-900/30 border-gray-700/20 opacity-40'
                   }`}
               >
                 <div className="flex items-start gap-3">
@@ -402,15 +448,20 @@ export default function ShopTab() {
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-bold text-white">{event.name}</h3>
-                      <span className={`text-[10px] font-bold ${
-                        event.boostType === 'profit_mult' || event.boostType === 'all_mult'
-                          ? 'text-yellow-400' : event.boostType === 'speed_mult' ? 'text-cyan-400' : 'text-green-400'
-                      }`}>{
-                        event.boostType === 'profit_mult' ? `利润×${event.boostValue}` :
-                        event.boostType === 'speed_mult' ? `速度×${event.boostValue}` :
-                        event.boostType === 'all_mult' ? `全属性×${event.boostValue}` :
-                        `成本${Math.round(event.boostValue*100)}%`
-                      }</span>
+                      <div className="flex items-center gap-1">
+                        {isActive && (
+                          <span className="text-[9px] bg-purple-500/30 text-purple-300 px-1.5 py-0.5 rounded font-bold">进行中</span>
+                        )}
+                        <span className={`text-[10px] font-bold ${
+                          event.boostType === 'profit_mult' || event.boostType === 'all_mult'
+                            ? 'text-yellow-400' : event.boostType === 'speed_mult' ? 'text-cyan-400' : 'text-green-400'
+                        }`}>{
+                          event.boostType === 'profit_mult' ? `利润×${event.boostValue}` :
+                          event.boostType === 'speed_mult' ? `速度×${event.boostValue}` :
+                          event.boostType === 'all_mult' ? `全属性×${event.boostValue}` :
+                          `成本${Math.round(event.boostValue*100)}%`
+                        }</span>
+                      </div>
                     </div>
                     <p className="text-[10px] text-gray-400 mt-0.5">{event.description}</p>
                     <div className="flex items-center gap-2 mt-1">

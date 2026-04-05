@@ -225,3 +225,26 @@ Stage Summary:
 - 3个bug全部修复：useEffect缺失、渲染期setState、单buff显示
 - TopHUD现在支持同时显示所有4种buff类型，每种有不同颜色
 - buff倒计时正常工作（game loop → updateProgress → tickAdBuffs 每60fps递减）
+
+---
+Task ID: 2
+Agent: Main
+Task: 随机事件系统全面审计与bug修复
+
+Work Log:
+- 全面审计事件系统11个文件，发现7个bug
+- BUG#1[严重]: buyBusiness未调用calcEventCostReduce，cost_reduce事件完全无效 → 添加事件成本折扣计算
+- BUG#2[中等]: ShopTab只展示前5个静态事件目录，不显示活跃事件 → 新增"当前激活事件"区块，全部事件目录展示
+- BUG#3[中等]: TopHUD事件倒计时用数组索引作React key → 改用evt.text作为稳定key
+- BUG#4[中等]: 全局冷却使用被触发事件的独立cooldownSec，稀有事件阻塞所有事件 → 固定60秒全局冷却
+- BUG#5[轻微]: EventNotification用useState模拟useRef → 改用useRef，消除多余渲染
+- BUG#6[轻微]: EventNotification只显示第一个新事件 → 新增队列机制，支持多事件排队展示
+- BUG#7[轻微]: tickEvents多次独立set()调用 → 合并为单次set，减少组件重渲染
+- 构建验证通过
+
+Stage Summary:
+- 7个bug全部修复，事件系统现在完整工作
+- cost_reduce事件现在正确影响购买价格
+- 商城展示当前活跃事件+完整事件目录（全部11个）
+- 事件通知支持多事件排队，显示队列计数
+- tickEvents性能优化：从最多4次set降到1次

@@ -170,9 +170,9 @@ export default function TopHUD({ onAchievementOpen, onSettingsOpen }: TopHUDProp
       {/* === 第二行：动态buff/事件/市场（无内容时自动隐藏） === */}
       {hasSecondRow && (
         <div className="flex items-center gap-1.5 px-3 pb-1.5 overflow-x-auto">
-          {eventTimers.map((evt, idx) => (
+          {eventTimers.map((evt) => (
             <div
-              key={idx}
+              key={evt.text}
               className="flex-shrink-0 px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-600/80 to-pink-600/80
                              text-white text-[10px] font-bold animate-pulse shadow-md shadow-purple-500/40"
             >

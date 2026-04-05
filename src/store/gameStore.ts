@@ -477,27 +477,26 @@ export const useGameStore = create<GameStore>((set, get) => {
         .map(e => ({ ...e, remainingSec: e.remainingSec - deltaSec }))
         .filter(e => e.remainingSec > 0);
 
-      // 发放已完成事件的奖励
+      // 发放已完成事件的奖励（累计后一次性set）
       const expiredEvents = state.activeEvents.filter(e => e.remainingSec - deltaSec <= 0);
+      let cashReward = 0;
+      let diamondReward = 0;
       for (const expired of expiredEvents) {
         const def = GAME_EVENTS.find(ev => ev.id === expired.eventDefId);
         if (def?.reward) {
-          set(s => {
-            if (def.reward!.type === 'cash') {
-              return { cash: s.cash + def.reward!.value, totalEarned: s.totalEarned + def.reward!.value };
-            } else if (def.reward!.type === 'diamond') {
-              return { diamonds: s.diamonds + def.reward!.value };
-            }
-            return s;
-          });
+          if (def.reward.type === 'cash') cashReward += def.reward.value;
+          else if (def.reward.type === 'diamond') diamondReward += def.reward.value;
         }
       }
 
       let newlyTriggered: ActiveGameEvent | null = null;
+      let eventCooldownUntil = state.eventCooldownUntil;
+      let lastEventCheck = state.lastEventCheck;
 
       // 尝试触发新事件（每30秒检查一次，概率触发）
       const checkInterval = 30000;
       if (now - state.lastEventCheck >= checkInterval) {
+        lastEventCheck = now;
         // 10% 概率触发新事件（每次检查）
         if (Math.random() < 0.10) {
           const newState = { ...state, activeEvents: updatedEvents, lastEventCheck: now };
@@ -505,23 +504,30 @@ export const useGameStore = create<GameStore>((set, get) => {
           if (newEvent) {
             updatedEvents = [...updatedEvents, newEvent];
             newlyTriggered = newEvent;
-            // 设置冷却
-            const def = GAME_EVENTS.find(e => e.id === newEvent.eventDefId);
-            const cooldownMs = (def?.cooldownSec ?? 120) * 1000;
-            set(s => ({
-              eventCooldownUntil: now + cooldownMs,
-              lastEventCheck: now,
-            }));
-          } else {
-            set({ lastEventCheck: now });
+            // 设置固定全局冷却（60秒），避免稀有事件的长冷却阻塞所有事件
+            eventCooldownUntil = now + 60 * 1000;
           }
-        } else {
-          set({ lastEventCheck: now });
         }
       }
 
-      if (expiredEvents.length > 0 || updatedEvents.length !== state.activeEvents.length) {
-        set({ activeEvents: updatedEvents });
+      // 单次set合并所有状态变更
+      const hasChanges = expiredEvents.length > 0
+        || updatedEvents.length !== state.activeEvents.length
+        || lastEventCheck !== state.lastEventCheck
+        || eventCooldownUntil !== state.eventCooldownUntil;
+
+      if (hasChanges) {
+        set(s => ({
+          ...(
+            cashReward > 0 ? { cash: s.cash + cashReward, totalEarned: s.totalEarned + cashReward } : {}
+          ),
+          ...(
+            diamondReward > 0 ? { diamonds: s.diamonds + diamondReward } : {}
+          ),
+          activeEvents: updatedEvents,
+          eventCooldownUntil,
+          lastEventCheck,
+        }));
         get().save();
       }
 
@@ -556,7 +562,10 @@ export const useGameStore = create<GameStore>((set, get) => {
       if (bsIdx === -1) return false;
       const currentQty = state.businesses[bsIdx].quantity;
 
-      const cost = calcBuyCostWithDiscount(def, currentQty, count, state.purchasedAngelUpgrades);
+      let cost = calcBuyCostWithDiscount(def, currentQty, count, state.purchasedAngelUpgrades);
+      // 应用事件成本折扣
+      const eventCostMult = calcEventCostReduce(state.activeEvents);
+      cost = Math.ceil(cost * eventCostMult);
       if (state.cash < cost) return false;
 
       set(s => {
