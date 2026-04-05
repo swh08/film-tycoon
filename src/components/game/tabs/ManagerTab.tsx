@@ -65,7 +65,7 @@ export default function ManagerTab() {
             return (
               <div
                 key={manager.id}
-                className={`rounded-xl p-3 border transition-all duration-200
+                className={`rounded-xl p-3 border transition-all duration-200 shadow-md shadow-black/20
                   ${isHired
                     ? `${rarity.bg} ${rarity.border}`
                     : 'bg-gray-800 border-gray-700/40'
@@ -231,7 +231,7 @@ export default function ManagerTab() {
             return (
               <div
                 key={manager.id}
-                className={`rounded-xl p-3 border transition-all duration-200
+                className={`rounded-xl p-3 border transition-all duration-200 shadow-md shadow-black/20
                   ${isHired
                     ? `${rarity.bg} ${rarity.border} ring-1 ring-yellow-500/30`
                     : 'bg-gray-800 border-gray-700/40'

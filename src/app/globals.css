@@ -83,10 +83,22 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-gray-950 text-white;
+    @apply text-white;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     overscroll-behavior: none;
+    /* 游戏背景：径向渐变 + 微妙纹理 */
+    background-color: #0a0a14;
+    background-image:
+      radial-gradient(ellipse at 50% 0%, rgba(120, 80, 20, 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(40, 20, 80, 0.08) 0%, transparent 50%),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 255, 255, 0.008) 2px,
+        rgba(255, 255, 255, 0.008) 4px
+      );
   }
 }
 

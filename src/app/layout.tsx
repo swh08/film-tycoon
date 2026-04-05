@@ -22,7 +22,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#1a1a2e",
+  themeColor: "#0a0a14",
 };
 
 export default function RootLayout({
@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body className="antialiased bg-gray-950 text-white overflow-hidden">
+      <body className="antialiased text-white overflow-hidden">
         {children}
       </body>
     </html>

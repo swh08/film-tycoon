@@ -414,8 +414,8 @@ export default function BusinessTab() {
               rounded-xl overflow-hidden border transition-all duration-200
               ${isUnlocked
                 ? quantity > 0
-                  ? 'bg-gradient-to-r from-gray-800 to-gray-850 border-yellow-600/40'
-                  : 'bg-gradient-to-r from-gray-800/50 to-gray-850/50 border-gray-600/30'
+                  ? 'bg-gradient-to-r from-gray-800/90 to-gray-850/90 border-yellow-600/40 shadow-lg shadow-yellow-900/10'
+                  : 'bg-gradient-to-r from-gray-800/50 to-gray-850/50 border-gray-600/30 shadow-md shadow-black/20'
                 : 'bg-gray-900/50 border-gray-700/20 opacity-60'
               }
               ${!isUnlocked ? 'relative' : ''}
@@ -472,7 +472,7 @@ export default function BusinessTab() {
                   </div>
                   <div className="h-3 rounded-full bg-gray-700 overflow-hidden relative">
                     <motion.div
-                      className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400"
+                      className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400 progress-glow"
                       style={{ width: `${Math.min((bs.progress ?? 0) * 100, 100)}%` }}
                       transition={{ duration: 0.1 }}
                     />

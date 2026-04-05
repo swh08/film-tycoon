@@ -101,7 +101,7 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
           <AnimatedNumber
             value={cash}
             formatFn={formatCash}
-            className="text-base font-bold text-yellow-100 truncate tabular-nums"
+            className="text-base font-bold gold-shimmer truncate tabular-nums"
           />
           {incomePerSec > 0 && (
             <span className="text-[10px] text-green-400 font-medium flex-shrink-0">
