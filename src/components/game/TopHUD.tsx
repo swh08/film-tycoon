@@ -28,7 +28,7 @@ export default function TopHUD({ onAchievementOpen, onSettingsOpen }: TopHUDProp
   const activeEvents = useGameStore(s => s.activeEvents);
 
   const [incomePerSec, setIncomePerSec] = useState(0);
-  const [buffTimer, setBuffTimer] = useState('');
+  const [buffTimers, setBuffTimers] = useState<{icon: string; text: string; color: string}[]>([]);
   const [eventTimers, setEventTimers] = useState<{icon: string; text: string; remaining: number}[]>([]);
 
   useEffect(() => {
@@ -37,17 +37,31 @@ export default function TopHUD({ onAchievementOpen, onSettingsOpen }: TopHUDProp
       const ips = calcTotalIncomePerSecond(state, state.adBuffs);
       setIncomePerSec(ips);
 
-      const doubleRev = state.adBuffs.find(b => b.type === 'double_revenue');
-      const rush = state.adBuffs.find(b => b.type === 'rush_order');
-      if (doubleRev) {
-        const m = Math.floor(doubleRev.remainingSec / 60);
-        const s = Math.floor(doubleRev.remainingSec % 60);
-        setBuffTimer(`🔥双倍 ${m}:${s.toString().padStart(2, '0')}`);
-      } else if (rush) {
-        setBuffTimer(`🚀爆单 ${Math.ceil(rush.remainingSec)}s`);
-      } else {
-        setBuffTimer('');
+      // 构建所有活跃buff的倒计时标签
+      const buffs: {icon: string; text: string; color: string}[] = [];
+      for (const buff of state.adBuffs) {
+        switch (buff.type) {
+          case 'double_revenue': {
+            const m = Math.floor(buff.remainingSec / 60);
+            const s = Math.floor(buff.remainingSec % 60);
+            buffs.push({ icon: '🔥', text: `双倍 ${m}:${s.toString().padStart(2, '0')}`, color: 'from-red-500/80 to-orange-500/80 shadow-red-500/40' });
+            break;
+          }
+          case 'rush_order':
+            buffs.push({ icon: '🚀', text: `爆单 ${Math.ceil(buff.remainingSec)}s`, color: 'from-orange-500/80 to-yellow-500/80 shadow-orange-500/40' });
+            break;
+          case 'speed_boost':
+            buffs.push({ icon: '⚡', text: `加速 ${Math.ceil(buff.remainingSec)}s`, color: 'from-cyan-500/80 to-blue-500/80 shadow-cyan-500/40' });
+            break;
+          case 'extra_offline': {
+            const m = Math.floor(buff.remainingSec / 60);
+            const s = Math.floor(buff.remainingSec % 60);
+            buffs.push({ icon: '⏰', text: `离线加成 ${m}:${s.toString().padStart(2, '0')}`, color: 'from-green-500/80 to-emerald-500/80 shadow-green-500/40' });
+            break;
+          }
+        }
       }
+      setBuffTimers(buffs);
 
       // 事件计时器
       const events = state.activeEvents || [];
@@ -78,7 +92,7 @@ export default function TopHUD({ onAchievementOpen, onSettingsOpen }: TopHUDProp
   const hasMarketEvent = avgMarket < 0.85 || avgMarket > 1.15;
 
   // 第二行是否有内容
-  const hasSecondRow = eventTimers.length > 0 || buffTimer || hasMarketEvent;
+  const hasSecondRow = eventTimers.length > 0 || buffTimers.length > 0 || hasMarketEvent;
 
   return (
     <div className="sticky top-0 z-40 bg-gradient-to-r from-amber-900 via-yellow-800 to-amber-900 
@@ -165,12 +179,15 @@ export default function TopHUD({ onAchievementOpen, onSettingsOpen }: TopHUDProp
               {evt.icon} {evt.remaining}s
             </div>
           ))}
-          {buffTimer && (
-            <div className="flex-shrink-0 px-2 py-0.5 rounded-full bg-red-500/80 text-white text-[10px] font-bold 
-                            animate-pulse shadow-md shadow-red-500/40">
-              {buffTimer}
+          {buffTimers.map((buff, idx) => (
+            <div
+              key={idx}
+              className={`flex-shrink-0 px-2 py-0.5 rounded-full bg-gradient-to-r ${buff.color}
+                             text-white text-[10px] font-bold animate-pulse shadow-md`}
+            >
+              {buff.icon} {buff.text}
             </div>
-          )}
+          ))}
           {hasMarketEvent && (
             <div className={`flex-shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ${
               avgMarket > 1.15 ? 'bg-green-600/80 text-green-100' : 'bg-red-600/80 text-red-100'

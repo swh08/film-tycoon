@@ -205,3 +205,23 @@ Stage Summary:
 - TASK 3 背景音乐：已实现，Web Audio API BGM系统(C-Am-F-G和弦进行12s循环)，独立GainNode，startMusic/stopMusic/setMusicVolume/isMusicPlaying API，设置面板音乐开关+音量滑块
 - TASK 4 广告奖励完善：已实现，adWatchCountToday/lastAdWatchDate/dailyAdLimit 每日限制，watchAd() action含跨天重置，3种新广告奖励(即时现金/免费钻石/速度加成)，ShopTab 3秒倒计时+剩余次数显示，speed_buff 集成到 calcCycleTime()
 - 构建通过，无错误
+
+---
+Task ID: 1
+Agent: Main
+Task: 修复buff倒计时不动的问题
+
+Work Log:
+- 排查发现ShopTab.tsx缺少`useEffect` import（致命bug），导致buff奖励发放的useEffect完全不工作
+- 排查发现TopHUD只显示单个buff（if/else链），speed_boost完全不会显示
+- 排查发现handleAdReward在渲染期间直接调用addAdBuff导致React跨组件setState警告
+- 修复1: ShopTab.tsx添加`useEffect`到import
+- 修复2: ShopTab.tsx handleAdReward用`setTimeout(fn, 0)`包裹store更新
+- 修复3: TopHUD重构buff显示，从单个字符串改为数组，支持同时显示多个buff
+- 修复4: TopHUD新增speed_boost和extra_offline buff的显示支持
+- 构建验证通过
+
+Stage Summary:
+- 3个bug全部修复：useEffect缺失、渲染期setState、单buff显示
+- TopHUD现在支持同时显示所有4种buff类型，每种有不同颜色
+- buff倒计时正常工作（game loop → updateProgress → tickAdBuffs 每60fps递减）

@@ -3,7 +3,7 @@
 // ============================================================
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { SHOP_OFFERS } from '@/game/config/shop';
@@ -36,6 +36,8 @@ export default function ShopTab() {
   const adsAvailable = remainingAds > 0;
 
   const handleAdReward = useCallback((offerId: number, type: string, value: number) => {
+    // 用 setTimeout 包裹，避免在渲染期间触发 setState
+    setTimeout(() => {
     switch (type) {
       case 'ad_buff_double_revenue':
         addAdBuff('double_revenue', value, 2);
@@ -133,6 +135,7 @@ export default function ShopTab() {
         });
         break;
     }
+    }, 0);
   }, [addAdBuff, addCash, addDiamonds, cash, totalEarned, showPopup]);
 
   const handleAdWatch = useCallback((offerId: number, rewardType: string, rewardValue: number) => {
