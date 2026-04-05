@@ -471,20 +471,29 @@ export default function BusinessTab() {
                 </div>
               </div>
 
-              {/* 生产进度条 */}
-              {quantity > 0 && (
+              {/* 生产进度条（周期<0.5秒时改为旋转图标，避免闪烁） */}
+              {quantity > 0 && bs.hasManager && (
                 <div className="mb-2">
                   <div className="flex items-center justify-between text-[10px] text-gray-400 mb-1">
                     <span>{formatCash(revenue)}/次</span>
                     <span>{formatTime(cycleTime)}/次</span>
                   </div>
-                  <div className="h-3 rounded-full bg-gray-700 overflow-hidden relative">
-                    <motion.div
-                      className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400 progress-glow"
-                      style={{ width: `${Math.min((bs.progress ?? 0) * 100, 100)}%` }}
-                      transition={{ duration: 0.1 }}
-                    />
-                  </div>
+                  {cycleTime < 0.5 ? (
+                    <div className="h-3 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
+                      <svg className="w-4 h-4 animate-spin text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 2v6h-6" /><path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                        <path d="M3 22v-6h6" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="h-3 rounded-full bg-gray-700 overflow-hidden relative">
+                      <motion.div
+                        className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400 progress-glow"
+                        style={{ width: `${Math.min((bs.progress ?? 0) * 100, 100)}%` }}
+                        transition={{ duration: 0.1 }}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 
