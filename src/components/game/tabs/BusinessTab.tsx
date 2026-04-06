@@ -489,21 +489,22 @@ export default function BusinessTab() {
                 </div>
               )}
 
-              {/* 提示信息行：市场波动 + 里程碑 合并一行 */}
+              {/* 提示信息行：里程碑靠左 + 市场靠右 */}
               {quantity > 0 && (
-                <div className="flex items-center gap-2 text-[10px] mb-1.5 flex-wrap">
+                <div className="flex items-center justify-between text-[10px] mb-1.5">
+                  <span className="text-gray-500">
+                    {nextMs
+                      ? <>🎯 下一里程碑: {nextMs.at}级 <span className="text-pink-400">×{nextMs.multiplier}</span></>
+                      : milestoneMult > 1 && <span className="text-pink-400/60">✨ 已达 ×{formatNumber(milestoneMult)}</span>
+                    }
+                  </span>
                   {(() => {
                     if (!marketMultipliers || marketMultipliers[def.id] === undefined) return null;
                     const mMult = marketMultipliers[def.id] ?? 1;
                     if (mMult >= 0.9 && mMult <= 1.1) return null;
                     const trend = getMarketTrendText(mMult);
-                    return <span className={`font-bold ${trend.color}`}>📊 ×{mMult.toFixed(2)}</span>;
+                    return <span className={`font-bold ${trend.color}`}>📊 市场{trend.text} (×{mMult.toFixed(2)})</span>;
                   })()}
-                  {nextMs && (
-                    <span className="text-gray-500">
-                      🎯 {nextMs.at}级 <span className="text-pink-400">×{nextMs.multiplier}</span>
-                    </span>
-                  )}
                 </div>
               )}
 
