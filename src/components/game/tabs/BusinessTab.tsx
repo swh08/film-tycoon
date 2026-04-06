@@ -453,11 +453,31 @@ export default function BusinessTab() {
                     `}>
                       {def.icon}
                     </div>
-                    {/* 数量/里程角标 */}
+                    {/* 数量/里程进度条角标 */}
                     {quantity > 0 && (
-                      <span className="absolute -bottom-1 -right-1 h-5 rounded-full bg-gray-800 border border-yellow-500/50 flex items-center justify-center text-[8px] font-black text-yellow-400 tabular-nums px-1">
-                        {quantity}{nextMs ? `/${nextMs.at}` : ''}
-                      </span>
+                      (() => {
+                        let prevAt = 0;
+                        for (let i = def.milestones.length - 1; i >= 0; i--) {
+                          if (quantity >= def.milestones[i].at) {
+                            prevAt = def.milestones[i].at;
+                            break;
+                          }
+                        }
+                        const progress = nextMs
+                          ? Math.min((quantity - prevAt) / (nextMs.at - prevAt), 1)
+                          : 1;
+                        return (
+                          <div className="absolute -bottom-1.5 -right-1.5 w-10 h-4 rounded-full bg-gray-800 border border-yellow-500/50 overflow-hidden flex items-center justify-center">
+                            <div
+                              className={`absolute inset-0 rounded-full transition-all duration-300 ${nextMs ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gradient-to-r from-green-400 to-emerald-400'}`}
+                              style={{ width: `${progress * 100}%`, opacity: 0.6 }}
+                            />
+                            <span className="relative text-[7px] font-black text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.9)] tabular-nums">
+                              {quantity}{nextMs ? `/${nextMs.at}` : ''}
+                            </span>
+                          </div>
+                        );
+                      })()
                     )}
                   </div>
                   {/* 里程碑进度条（在头像正下方） */}
