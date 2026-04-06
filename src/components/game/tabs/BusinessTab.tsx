@@ -467,12 +467,12 @@ export default function BusinessTab() {
                           ? Math.min((quantity - prevAt) / (nextMs.at - prevAt), 1)
                           : 1;
                         return (
-                          <div className="absolute -bottom-1.5 -right-1.5 w-10 h-4 rounded-full bg-gray-800 border border-yellow-500/50 overflow-hidden flex items-center justify-center">
+                          <div className="absolute -bottom-1 -right-1 min-w-[1.25rem] h-5 rounded-full bg-gray-800 border border-yellow-500/50 overflow-hidden flex items-center justify-center">
                             <div
                               className={`absolute inset-0 rounded-full transition-all duration-300 ${nextMs ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gradient-to-r from-green-400 to-emerald-400'}`}
                               style={{ width: `${progress * 100}%`, opacity: 0.6 }}
                             />
-                            <span className="relative text-[7px] font-black text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.9)] tabular-nums">
+                            <span className="relative text-[8px] font-black text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.9)] tabular-nums">
                               {quantity}{nextMs ? `/${nextMs.at}` : ''}
                             </span>
                           </div>
