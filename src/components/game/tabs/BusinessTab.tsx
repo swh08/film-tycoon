@@ -439,17 +439,42 @@ export default function BusinessTab() {
             )}
 
             <div className="p-3">
-              {/* === AC风格：左侧圆形头像 + 右侧信息 === */}
+              {/* === AC风格：左侧圆形头像（含下方进度条） + 右侧信息 === */}
               <div className="flex items-start gap-3 mb-2">
-                {/* 圆形头像 */}
-                <div className={`
-                  w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center text-2xl
-                  ${quantity > 0
-                    ? 'bg-gradient-to-br from-yellow-500/30 to-amber-600/30 border-2 border-yellow-500/50'
-                    : 'bg-gray-700/50 border-2 border-gray-600/30'
-                  }
-                `}>
-                  {def.icon}
+                {/* 左侧：圆形头像 + 里程碑进度条 */}
+                <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                  <div className={`
+                    w-14 h-14 rounded-full flex items-center justify-center text-3xl
+                    ${quantity > 0
+                      ? 'bg-gradient-to-br from-yellow-500/30 to-amber-600/30 border-2 border-yellow-500/50'
+                      : 'bg-gray-700/50 border-2 border-gray-600/30'
+                    }
+                  `}>
+                    {def.icon}
+                  </div>
+                  {/* 里程碑进度条（在头像正下方） */}
+                  {quantity > 0 && (
+                    (() => {
+                      let prevAt = 0;
+                      for (let i = def.milestones.length - 1; i >= 0; i--) {
+                        if (quantity >= def.milestones[i].at) {
+                          prevAt = def.milestones[i].at;
+                          break;
+                        }
+                      }
+                      const progress = nextMs
+                        ? Math.min((quantity - prevAt) / (nextMs.at - prevAt), 1)
+                        : 1;
+                      return (
+                        <div className="w-14 h-2 rounded-full bg-gray-700 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${nextMs ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gradient-to-r from-green-400 to-emerald-400'}`}
+                            style={{ width: `${progress * 100}%` }}
+                          />
+                        </div>
+                      );
+                    })()
+                  )}
                 </div>
 
                 {/* 右侧信息 */}
@@ -457,9 +482,7 @@ export default function BusinessTab() {
                   <div className="flex items-center justify-between">
                     <div className="min-w-0">
                       <h3 className="text-sm font-bold text-white truncate">{def.name}</h3>
-                      {quantity > 0 && (
-                        <p className="text-[10px] text-gray-400">{formatCash(revenue)}/次 · {formatTime(cycleTime)}/次</p>
-                      )}
+                      <p className="text-[10px] text-gray-400">{def.flavorText}</p>
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0">
                       {quantity > 0 && (
@@ -471,59 +494,42 @@ export default function BusinessTab() {
                           <span className="text-white text-[9px] font-bold">详</span>
                         </button>
                       )}
-                      <span className="text-lg font-black text-yellow-400 tabular-nums">×{quantity}</span>
+                      <div className="text-right">
+                        <span className="text-lg font-black text-yellow-400 tabular-nums">×{quantity}</span>
+                        {milestoneMult > 1 && (
+                          <div className="text-[10px] font-bold text-pink-400">×{formatNumber(milestoneMult)}</div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  {milestoneMult > 1 && (
-                    <span className="text-[10px] font-bold text-pink-400">×{formatNumber(milestoneMult)} 倍率</span>
+                  {quantity > 0 && (
+                    <div className="flex items-center justify-between text-[10px] mt-1">
+                      <span className="text-gray-400">{formatCash(revenue)}/次</span>
+                      <span className="text-gray-400">{formatTime(cycleTime)}/次</span>
+                    </div>
+                  )}
+                  {/* 里程碑目标 + 市场波动 */}
+                  {quantity > 0 && (
+                    <div className="flex items-center justify-between text-[10px] mt-0.5">
+                      <span className="text-gray-500">
+                        {nextMs
+                          ? <><span className="text-gray-500">🎯</span> <span className="text-pink-400">{nextMs.at}级</span> ×{nextMs.multiplier}</>
+                          : <span className="text-green-400/60">✨ 全部达成</span>
+                        }
+                      </span>
+                      {(() => {
+                        if (!marketMultipliers || marketMultipliers[def.id] === undefined) return null;
+                        const mMult = marketMultipliers[def.id] ?? 1;
+                        if (mMult >= 0.9 && mMult <= 1.1) return null;
+                        const trend = getMarketTrendText(mMult);
+                        return <span className={`font-bold ${trend.color}`}>📊 ×{mMult.toFixed(2)}</span>;
+                      })()}
+                    </div>
                   )}
                 </div>
               </div>
 
-              {/* === 里程碑进度条（AC核心：显示购买量→下一里程碑） === */}
-              {quantity > 0 && (
-                <div className="mb-2">
-                  {(() => {
-                    // 找到当前里程碑区间
-                    let prevAt = 0;
-                    for (let i = def.milestones.length - 1; i >= 0; i--) {
-                      if (quantity >= def.milestones[i].at) {
-                        prevAt = def.milestones[i].at;
-                        break;
-                      }
-                    }
-                    const progress = nextMs
-                      ? Math.min((quantity - prevAt) / (nextMs.at - prevAt), 1)
-                      : 1;
-                    return (
-                      <div className="h-2.5 rounded-full bg-gray-700 overflow-hidden">
-                        <motion.div
-                          className={`h-full rounded-full transition-colors ${nextMs ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gradient-to-r from-green-400 to-emerald-400'}`}
-                          style={{ width: `${progress * 100}%` }}
-                          transition={{ duration: 0.3 }}
-                        />
-                      </div>
-                    );
-                  })()}
-                  <div className="flex items-center justify-between text-[10px] mt-0.5">
-                    <span className="text-gray-500">
-                      {nextMs
-                        ? <>🎯 {nextMs.at}级 <span className="text-pink-400">×{nextMs.multiplier}</span></>
-                        : <span className="text-green-400/60">✨ 已达最高里程碑</span>
-                      }
-                    </span>
-                    {(() => {
-                      if (!marketMultipliers || marketMultipliers[def.id] === undefined) return null;
-                      const mMult = marketMultipliers[def.id] ?? 1;
-                      if (mMult >= 0.9 && mMult <= 1.1) return null;
-                      const trend = getMarketTrendText(mMult);
-                      return <span className={`font-bold ${trend.color}`}>📊 ×{mMult.toFixed(2)}</span>;
-                    })()}
-                  </div>
-                </div>
-              )}
-
-              {/* === 生产进度条（细线，在里程碑进度条下方） === */}
+              {/* === 生产进度条（细线） === */}
               {quantity > 0 && bs.hasManager && (
                 <div className="mb-2 h-1.5 rounded-full bg-gray-700/50 overflow-hidden">
                   {cycleTime < 0.5 ? (
