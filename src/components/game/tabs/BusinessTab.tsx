@@ -442,16 +442,25 @@ export default function BusinessTab() {
               {/* === AC风格：左侧圆形头像 + 右侧信息 === */}
               <div className="flex items-start gap-3 mb-2">
                 {/* 左侧：圆形头像 + 里程碑进度条 */}
-                <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                  <div className={`
-                    w-14 h-14 rounded-full flex items-center justify-center text-3xl
-                    ${quantity > 0
-                      ? 'bg-gradient-to-br from-yellow-500/30 to-amber-600/30 border-2 border-yellow-500/50'
-                      : 'bg-gray-700/50 border-2 border-gray-600/30'
-                    }
-                  `}>
-                    {def.icon}
+                <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                  <div className="relative">
+                    <div className={`
+                      w-14 h-14 rounded-full flex items-center justify-center text-3xl
+                      ${quantity > 0
+                        ? 'bg-gradient-to-br from-yellow-500/30 to-amber-600/30 border-2 border-yellow-500/50'
+                        : 'bg-gray-700/50 border-2 border-gray-600/30'
+                      }
+                    `}>
+                      {def.icon}
+                    </div>
+                    {/* 数量角标 */}
+                    {quantity > 0 && (
+                      <span className="absolute -bottom-1 -right-1 min-w-[1.25rem] h-5 rounded-full bg-gray-800 border border-yellow-500/50 flex items-center justify-center text-[10px] font-black text-yellow-400 tabular-nums px-1">
+                        {quantity}
+                      </span>
+                    )}
                   </div>
+                  {/* 里程碑进度条（在头像正下方） */}
                   {quantity > 0 && (
                     (() => {
                       let prevAt = 0;
@@ -465,16 +474,11 @@ export default function BusinessTab() {
                         ? Math.min((quantity - prevAt) / (nextMs.at - prevAt), 1)
                         : 1;
                       return (
-                        <div className="w-14 h-3.5 rounded-full bg-gray-700/70 overflow-hidden relative">
+                        <div className="w-14 h-2 rounded-full bg-gray-700 overflow-hidden">
                           <div
-                            className={`absolute inset-y-0 left-0 rounded-full transition-all duration-300 ${nextMs ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gradient-to-r from-green-400 to-emerald-400'}`}
+                            className={`h-full rounded-full ${nextMs ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gradient-to-r from-green-400 to-emerald-400'}`}
                             style={{ width: `${progress * 100}%` }}
                           />
-                          <div className="absolute inset-0 flex items-center justify-center text-[8px] font-bold">
-                            <span className="text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
-                              {quantity}{nextMs ? `/${nextMs.at}` : ''}
-                            </span>
-                          </div>
                         </div>
                       );
                     })()
