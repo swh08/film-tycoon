@@ -443,14 +443,22 @@ export default function BusinessTab() {
               <div className="flex items-start gap-3 mb-2">
                 {/* 左侧：圆形头像 + 里程碑进度条 */}
                 <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                  <div className={`
-                    w-14 h-14 rounded-full flex items-center justify-center text-3xl
-                    ${quantity > 0
-                      ? 'bg-gradient-to-br from-yellow-500/30 to-amber-600/30 border-2 border-yellow-500/50'
-                      : 'bg-gray-700/50 border-2 border-gray-600/30'
-                    }
-                  `}>
-                    {def.icon}
+                  <div className="relative">
+                    <div className={`
+                      w-14 h-14 rounded-full flex items-center justify-center text-3xl
+                      ${quantity > 0
+                        ? 'bg-gradient-to-br from-yellow-500/30 to-amber-600/30 border-2 border-yellow-500/50'
+                        : 'bg-gray-700/50 border-2 border-gray-600/30'
+                      }
+                    `}>
+                      {def.icon}
+                    </div>
+                    {/* 数量角标 */}
+                    {quantity > 0 && (
+                      <span className="absolute -bottom-1 -right-1 min-w-[1.25rem] h-5 rounded-full bg-gray-800 border border-yellow-500/50 flex items-center justify-center text-[10px] font-black text-yellow-400 tabular-nums px-1">
+                        {quantity}
+                      </span>
+                    )}
                   </div>
                   {/* 里程碑进度条（在头像正下方） */}
                   {quantity > 0 && (
@@ -494,12 +502,9 @@ export default function BusinessTab() {
                           <span className="text-white text-[9px] font-bold">详</span>
                         </button>
                       )}
-                      <div className="text-right">
-                        <span className="text-lg font-black text-yellow-400 tabular-nums">×{quantity}</span>
-                        {milestoneMult > 1 && (
-                          <div className="text-[10px] font-bold text-pink-400">×{formatNumber(milestoneMult)}</div>
-                        )}
-                      </div>
+                      {milestoneMult > 1 && (
+                        <span className="text-[10px] font-bold text-pink-400">×{formatNumber(milestoneMult)}</span>
+                      )}
                     </div>
                   </div>
                   {quantity > 0 && (
