@@ -567,9 +567,9 @@ export default function BusinessTab() {
                                shadow-[0_3px_0_0_#374151]
                                cursor-pointer [&>option]:bg-gray-800 [&>option]:text-gray-100 [&>option]:py-1"
                   >
-                    <option value="">⚖️ 默认</option>
-                    <option value="profit">💰 利润</option>
-                    <option value="speed">⚡ 速度</option>
+                    <option value="">默认</option>
+                    <option value="profit">利润</option>
+                    <option value="speed">速度</option>
                   </select>
 
                   {/* 3. 专属升级 */}
@@ -592,7 +592,7 @@ export default function BusinessTab() {
                           }
                         `}
                       >
-                        🔧 {purchased}/{bizUpgrades.length}
+                        {purchased}/{bizUpgrades.length}
                       </button>
                     );
                   })()}
