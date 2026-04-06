@@ -441,8 +441,8 @@ export default function BusinessTab() {
             <div className="p-3">
               {/* === AC风格：左侧圆形头像 + 右侧信息 === */}
               <div className="flex items-start gap-3 mb-2">
-                {/* 左侧：圆形头像 + 里程碑进度条 */}
-                <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                {/* 左侧：圆形头像 + 里程碑进度条（overlay） */}
+                <div className="relative flex-shrink-0">
                   <div className={`
                     w-14 h-14 rounded-full flex items-center justify-center text-3xl
                     ${quantity > 0
@@ -465,7 +465,7 @@ export default function BusinessTab() {
                         ? Math.min((quantity - prevAt) / (nextMs.at - prevAt), 1)
                         : 1;
                       return (
-                        <div className="w-14 h-3.5 rounded-full bg-gray-700/70 overflow-hidden relative">
+                        <div className="absolute -bottom-1.5 left-0 right-0 h-3.5 rounded-full bg-gray-700/70 overflow-hidden">
                           <div
                             className={`absolute inset-y-0 left-0 rounded-full transition-all duration-300 ${nextMs ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gradient-to-r from-green-400 to-emerald-400'}`}
                             style={{ width: `${progress * 100}%` }}
