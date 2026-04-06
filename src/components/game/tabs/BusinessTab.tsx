@@ -456,7 +456,7 @@ export default function BusinessTab() {
                       className="w-6 h-6 rounded-full bg-gray-700/80 hover:bg-gray-600/80 flex items-center justify-center text-[10px] text-gray-300 transition-colors active:scale-90"
                       title="收益分解详情"
                     >
-                      📋
+                      <span className="font-serif italic text-white">i</span>
                     </button>
                   )}
                   <div className="text-right">
