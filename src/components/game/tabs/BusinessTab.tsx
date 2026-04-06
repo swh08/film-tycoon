@@ -471,7 +471,7 @@ export default function BusinessTab() {
               </div>
 
               {/* 生产进度条 */}
-              {quantity > 0 && (bs.hasManager || bs.progress > 0) && (
+              {quantity > 0 && (
                 <div className="mb-2">
                   <div className="flex items-center justify-between text-[10px] text-gray-400 mb-1">
                     <span>{formatCash(revenue)}/次</span>
