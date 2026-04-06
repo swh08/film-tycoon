@@ -127,7 +127,11 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
           {onSettingsOpen && (
             <button
               onClick={onSettingsOpen}
-              className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-600/30 hover:bg-gray-600/50 transition-colors"
+              className="flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-b from-gray-400 to-gray-600
+                         shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.3)]
+                         hover:from-gray-300 hover:to-gray-500
+                         active:shadow-[0_1px_0_0_#374151,0_2px_4px_rgba(0,0,0,0.2)] active:translate-y-[2px]
+                         transition-all duration-150"
             >
               <span className="text-xs">⚙️</span>
             </button>
