@@ -10,11 +10,11 @@ import { calcManagerUpgradeCost, formatCash } from '@/game/formulas';
 import type { Rarity } from '@/game/types';
 import { playHire, playUpgrade, playUIClick } from '@/game/sound';
 
-const RARITY_CONFIG: Record<Rarity, { label: string; color: string; bg: string; border: string }> = {
-  common: { label: '普通', color: 'text-gray-300', bg: 'bg-gray-700', border: 'border-gray-600' },
-  rare: { label: '稀有', color: 'text-blue-400', bg: 'bg-blue-900/30', border: 'border-blue-500/40' },
-  epic: { label: '史诗', color: 'text-purple-400', bg: 'bg-purple-900/30', border: 'border-purple-500/40' },
-  legendary: { label: '传说', color: 'text-yellow-400', bg: 'bg-yellow-900/20', border: 'border-yellow-500/40' },
+const RARITY_CONFIG: Record<Rarity, { label: string; color: string; bg: string }> = {
+  common: { label: '普通', color: 'text-gray-300', bg: 'bg-gray-700' },
+  rare: { label: '稀有', color: 'text-blue-400', bg: 'bg-blue-900/30' },
+  epic: { label: '史诗', color: 'text-purple-400', bg: 'bg-purple-900/30' },
+  legendary: { label: '传说', color: 'text-yellow-400', bg: 'bg-yellow-900/20' },
 };
 
 export default function ManagerTab() {
@@ -65,10 +65,10 @@ export default function ManagerTab() {
             return (
               <div
                 key={manager.id}
-                className={`rounded-xl p-3 border transition-all duration-200 shadow-md shadow-black/20
+                className={`rounded-xl p-3 transition-all duration-200 shadow-md shadow-black/20
                   ${isHired
-                    ? `${rarity.bg} ${rarity.border}`
-                    : 'bg-gray-800 border-gray-700/40'
+                    ? rarity.bg
+                    : 'bg-gray-800'
                   }
                   ${!hasBusiness && !isHired ? 'opacity-50' : ''}
                 `}
@@ -229,10 +229,10 @@ export default function ManagerTab() {
             return (
               <div
                 key={manager.id}
-                className={`rounded-xl p-3 border transition-all duration-200 shadow-md shadow-black/20
+                className={`rounded-xl p-3 transition-all duration-200 shadow-md shadow-black/20
                   ${isHired
-                    ? `${rarity.bg} ${rarity.border} ring-1 ring-yellow-500/30`
-                    : 'bg-gray-800 border-gray-700/40'
+                    ? `${rarity.bg} ring-1 ring-yellow-500/30`
+                    : 'bg-gray-800'
                   }
                 `}
               >

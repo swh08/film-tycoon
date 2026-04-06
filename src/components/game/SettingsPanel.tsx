@@ -155,7 +155,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 <h3 className="text-xs font-bold text-gray-400 mb-3">🔊 音频设置</h3>
                 <div className="space-y-3">
                   {/* 音效总开关 */}
-                  <div className="flex items-center justify-between bg-gray-800/60 rounded-xl p-3 border border-gray-700/40">
+                  <div className="flex items-center justify-between bg-gray-800/60 rounded-xl p-3">
                     <div>
                       <p className="text-xs font-medium text-gray-200">音效开关</p>
                       <p className="text-[10px] text-gray-500">关闭后所有音效静音</p>
@@ -175,7 +175,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   </div>
 
                   {/* 音乐音量 */}
-                  <div className="bg-gray-800/60 rounded-xl p-3 border border-gray-700/40">
+                  <div className="bg-gray-800/60 rounded-xl p-3">
                     <div className="flex items-center justify-between mb-2">
                       <div>
                         <p className="text-xs font-medium text-gray-200">🎵 背景音乐</p>
@@ -210,7 +210,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   </div>
 
                   {/* 音效音量 */}
-                  <div className="bg-gray-800/60 rounded-xl p-3 border border-gray-700/40">
+                  <div className="bg-gray-800/60 rounded-xl p-3">
                     <div className="flex items-center justify-between mb-2">
                       <div>
                         <p className="text-xs font-medium text-gray-200">🔉 音效音量</p>
@@ -236,7 +236,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
               <section>
                 <button
                   onClick={() => setShowStatsView(true)}
-                  className="w-full bg-blue-900/30 hover:bg-blue-900/50 rounded-xl p-3 border border-blue-600/30 transition-colors flex items-center gap-3"
+                  className="w-full bg-blue-900/30 hover:bg-blue-900/50 rounded-xl p-3 transition-colors flex items-center gap-3"
                 >
                   <span className="text-lg">📊</span>
                   <div className="text-left flex-1">
@@ -253,10 +253,10 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setNumberFormat('abbreviation')}
-                    className={`rounded-xl p-3 border text-center transition-all ${
+                    className={`rounded-xl p-3 text-center transition-all ${
                       numberFormat === 'abbreviation'
-                        ? 'bg-amber-900/40 border-amber-500/50 ring-1 ring-amber-500/30'
-                        : 'bg-gray-800/60 border-gray-700/40 hover:border-gray-600'
+                        ? 'bg-amber-900/40 ring-1 ring-amber-500/30'
+                        : 'bg-gray-800/60'
                     }`}
                   >
                     <p className="text-sm font-bold text-yellow-300 tabular-nums">1.23M</p>
@@ -264,10 +264,10 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   </button>
                   <button
                     onClick={() => setNumberFormat('scientific')}
-                    className={`rounded-xl p-3 border text-center transition-all ${
+                    className={`rounded-xl p-3 text-center transition-all ${
                       numberFormat === 'scientific'
-                        ? 'bg-amber-900/40 border-amber-500/50 ring-1 ring-amber-500/30'
-                        : 'bg-gray-800/60 border-gray-700/40 hover:border-gray-600'
+                        ? 'bg-amber-900/40 ring-1 ring-amber-500/30'
+                        : 'bg-gray-800/60'
                     }`}
                   >
                     <p className="text-sm font-bold text-yellow-300 tabular-nums">1.23e6</p>
@@ -283,7 +283,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   {/* 导出 */}
                   <button
                     onClick={handleExport}
-                    className="w-full bg-gray-800/60 hover:bg-gray-700/60 rounded-xl p-3 border border-gray-700/40 transition-colors flex items-center gap-3"
+                    className="w-full bg-gray-800/60 hover:bg-gray-700/60 rounded-xl p-3 transition-colors flex items-center gap-3"
                   >
                     <span className="text-lg">📤</span>
                     <div className="text-left">
@@ -293,7 +293,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   </button>
 
                   {/* 导入 */}
-                  <div className="bg-gray-800/60 rounded-xl border border-gray-700/40 overflow-hidden">
+                  <div className="bg-gray-800/60 rounded-xl overflow-hidden">
                     <button
                       onClick={() => setShowImportArea(!showImportArea)}
                       className="w-full p-3 flex items-center gap-3 hover:bg-gray-700/30 transition-colors"
@@ -331,7 +331,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   </div>
 
                   {/* 重置游戏 */}
-                  <div className="bg-red-900/20 rounded-xl border border-red-800/30 overflow-hidden">
+                  <div className="bg-red-900/20 rounded-xl overflow-hidden">
                     <button
                       onClick={() => setShowResetConfirm(!showResetConfirm)}
                       className="w-full p-3 flex items-center gap-3 hover:bg-red-900/20 transition-colors"
@@ -375,7 +375,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
               {/* ℹ️ 关于 */}
               <section>
                 <h3 className="text-xs font-bold text-gray-400 mb-3">ℹ️ 关于</h3>
-                <div className="bg-gray-800/60 rounded-xl p-3 border border-gray-700/40">
+                <div className="bg-gray-800/60 rounded-xl p-3">
                   <div className="text-center">
                     <p className="text-lg">📱</p>
                     <p className="text-sm font-bold text-yellow-400">贴膜大亨</p>

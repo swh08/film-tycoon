@@ -100,7 +100,7 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
           </div>
 
           {/* 今日奖励详情 */}
-          <div className="bg-gradient-to-r from-yellow-900/30 to-amber-900/20 rounded-xl p-4 border border-yellow-500/30 mb-4">
+          <div className="bg-gradient-to-r from-yellow-900/30 to-amber-900/20 rounded-xl p-4 mb-4">
             <div className="flex items-center gap-3">
               <div className="text-4xl">{currentReward.icon}</div>
               <div className="flex-1">

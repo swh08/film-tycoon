@@ -94,7 +94,7 @@ function AngelUpgradePopup({ upgradeId }: { upgradeId: number }) {
       <h3 className="text-lg font-black mb-1">{def.name}</h3>
       <p className="text-xs text-gray-400 mb-3">{def.description}</p>
 
-      <div className="bg-red-900/30 rounded-xl p-3 mb-4 border border-red-500/30">
+      <div className="bg-red-900/30 rounded-xl p-3 mb-4">
         <p className="text-sm font-bold text-red-400">
           消耗 {def.cost} 🤝 {PRESTIGE_RULE.currencyName}
         </p>
@@ -129,10 +129,10 @@ function AngelUpgradeCard({ upgrade, onBuy }: { upgrade: typeof ANGEL_UPGRADES[0
 
   return (
     <div
-      className={`rounded-xl p-2.5 border transition-all duration-200
+      className={`rounded-xl p-2.5 transition-all duration-200
         ${isPurchased
-          ? 'bg-green-900/20 border-green-500/30'
-          : 'bg-gray-700/50 border-gray-600/30'
+          ? 'bg-green-900/20'
+          : 'bg-gray-700/50'
         }`}
     >
       <div className="flex items-center gap-2">
@@ -229,7 +229,7 @@ export default function PrestigeTab() {
   return (
     <div className="flex flex-col gap-4 px-3 py-3 pb-4">
       {/* 转生状态卡片 */}
-      <div className="rounded-2xl p-4 bg-gradient-to-br from-amber-900/50 to-yellow-900/30 border border-yellow-600/40">
+      <div className="rounded-2xl p-4 bg-gradient-to-br from-amber-900/50 to-yellow-900/30">
         <div className="text-center mb-4">
           <div className="text-4xl mb-2">{PRESTIGE_RULE.currencyIcon}</div>
           <h2 className="text-lg font-black text-yellow-400">{PRESTIGE_RULE.currencyName}</h2>
@@ -276,7 +276,7 @@ export default function PrestigeTab() {
       </div>
 
       {/* 转生操作区 */}
-      <div className="rounded-2xl p-4 bg-gray-800 border border-gray-700/40">
+      <div className="rounded-2xl p-4 bg-gray-800">
         <h3 className="text-sm font-bold text-white mb-3">🔄 转生重置</h3>
 
         {!unlockMet ? (
@@ -297,7 +297,7 @@ export default function PrestigeTab() {
         ) : (
           <div className="text-center">
             {/* 预计获得 */}
-            <div className="bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-xl p-3 mb-3 border border-orange-500/30">
+            <div className="bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-xl p-3 mb-3">
               <p className="text-xs text-gray-400 mb-1">本次转生预计获得</p>
               <div className="text-2xl font-black text-orange-400">
                 +{formatNumberSmart(gain)} 🤝
@@ -340,7 +340,7 @@ export default function PrestigeTab() {
       </div>
 
       {/* 人脉升级商店 — 按分层显示 */}
-      <div className="rounded-2xl p-4 bg-gray-800 border border-purple-600/40">
+      <div className="rounded-2xl p-4 bg-gray-800">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-bold text-white">🏪 人脉升级商店</h3>
           <span className="text-[10px] text-yellow-400 font-bold">
@@ -416,7 +416,7 @@ export default function PrestigeTab() {
                 </>
               ) : (
                 /* 锁定状态 */
-                <div className="rounded-xl p-4 bg-gray-900/40 border border-gray-700/20 text-center">
+                <div className="rounded-xl p-4 bg-gray-900/40 text-center">
                   <span className="text-2xl">🔒</span>
                   <p className="text-xs text-gray-600 mt-1">
                     转生{tier.minPrestigeCount}次后解锁 {tier.upgrades?.length ?? tierUpgrades.length} 个人脉升级
@@ -442,7 +442,7 @@ export default function PrestigeTab() {
       </div>
 
       {/* 成就统计 */}
-      <div className="rounded-2xl p-4 bg-gray-800 border border-gray-700/40">
+      <div className="rounded-2xl p-4 bg-gray-800">
         <h3 className="text-sm font-bold text-white mb-3">📊 商业版图统计</h3>
         <div className="grid grid-cols-2 gap-2">
           <StatCard label="历史总收入" value={formatCash(totalEarned)} icon="💰" />

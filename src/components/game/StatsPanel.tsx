@@ -37,7 +37,7 @@ function StatCard({ icon, label, value, subValue, color = 'text-yellow-300' }: {
   color?: string;
 }) {
   return (
-    <div className="bg-gray-800/60 rounded-xl p-3 border border-gray-700/40">
+    <div className="bg-gray-800/60 rounded-xl p-3">
       <div className="flex items-center gap-2 mb-1">
         <span className="text-sm">{icon}</span>
         <span className="text-[10px] text-gray-400 font-medium">{label}</span>
@@ -158,7 +158,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
               {/* 🎯 产线统计 */}
               <section>
                 <h3 className="text-xs font-bold text-gray-400 mb-2">🎯 产线统计</h3>
-                <div className="bg-gray-800/60 rounded-xl border border-gray-700/40 p-3">
+                <div className="bg-gray-800/60 rounded-xl p-3">
                   <div className="grid grid-cols-2 gap-x-3 gap-y-2">
                     {BUSINESSES.map(biz => {
                       const bs = businesses.find(b => b.businessId === biz.id);
@@ -250,7 +250,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
               {/* 🏆 成就进度 */}
               <section>
                 <h3 className="text-xs font-bold text-gray-400 mb-2">🏆 成就进度</h3>
-                <div className="bg-gray-800/60 rounded-xl border border-gray-700/40 p-3">
+                <div className="bg-gray-800/60 rounded-xl p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-gray-300">已解锁成就</span>
                     <span className="text-sm font-bold text-yellow-400 tabular-nums">
