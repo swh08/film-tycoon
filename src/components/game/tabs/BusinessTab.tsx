@@ -628,7 +628,7 @@ export default function BusinessTab() {
                     }}
                     disabled={!canAfford}
                     className={`
-                      flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-150
+                      flex-1 py-1.5 rounded-lg text-xs font-bold transition-all duration-150
                       active:scale-[0.97]
                       ${canAfford
                         ? 'bg-gradient-to-b from-yellow-400 to-amber-600 text-white hover:from-yellow-300 hover:to-amber-500 shadow-[0_3px_0_0_#92400e,0_4px_8px_rgba(120,53,15,0.3)] active:shadow-[0_1px_0_0_#92400e,0_2px_4px_rgba(120,53,15,0.2)] active:translate-y-[2px]'
