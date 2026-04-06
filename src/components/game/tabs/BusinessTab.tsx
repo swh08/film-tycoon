@@ -533,7 +533,7 @@ export default function BusinessTab() {
                     className="flex-shrink-0 px-1.5 py-1.5 rounded-lg text-[10px] font-bold
                                bg-gradient-to-b from-gray-400 to-gray-600 text-gray-200
                                shadow-[0_3px_0_0_#374151]
-                               cursor-pointer"
+                               cursor-pointer [&>option]:bg-gray-800 [&>option]:text-gray-100 [&>option]:py-1"
                   >
                     <option value="">⚖️ 默认</option>
                     <option value="profit">💰 利润</option>
