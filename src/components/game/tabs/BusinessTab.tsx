@@ -453,10 +453,10 @@ export default function BusinessTab() {
                     `}>
                       {def.icon}
                     </div>
-                    {/* 数量角标 */}
+                    {/* 数量/里程角标 */}
                     {quantity > 0 && (
-                      <span className="absolute -bottom-1 -right-1 min-w-[1.25rem] h-5 rounded-full bg-gray-800 border border-yellow-500/50 flex items-center justify-center text-[10px] font-black text-yellow-400 tabular-nums px-1">
-                        {quantity}
+                      <span className="absolute -bottom-1 -right-1 h-5 rounded-full bg-gray-800 border border-yellow-500/50 flex items-center justify-center text-[8px] font-black text-yellow-400 tabular-nums px-1">
+                        {quantity}{nextMs ? `/${nextMs.at}` : ''}
                       </span>
                     )}
                   </div>
