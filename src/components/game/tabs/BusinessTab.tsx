@@ -470,14 +470,14 @@ export default function BusinessTab() {
                 </div>
               </div>
 
-              {/* 生产进度条（周期<0.5秒时改为旋转图标，避免闪烁） */}
-              {quantity > 0 && bs.hasManager && (
+              {/* 生产进度条 */}
+              {quantity > 0 && (bs.hasManager || bs.progress > 0) && (
                 <div className="mb-2">
                   <div className="flex items-center justify-between text-[10px] text-gray-400 mb-1">
                     <span>{formatCash(revenue)}/次</span>
                     <span>{formatTime(cycleTime)}/次</span>
                   </div>
-                  {cycleTime < 0.5 ? (
+                  {cycleTime < 0.5 && bs.hasManager ? (
                     <div className="h-3 rounded-full bg-gray-700 overflow-hidden relative">
                       <div className="h-full rounded-full progress-wave" />
                     </div>
