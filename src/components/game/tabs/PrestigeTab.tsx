@@ -13,7 +13,7 @@ import { usePopup } from '../PopupLayer';
 // ============================================================
 // 转生确认弹窗 — 响应式组件，数据实时更新
 // ============================================================
-function PrestigeConfirmPopup({ onConfirm }: { onConfirm: () => void }) {
+function PrestigeConfirmPopup() {
   const { closePopup } = usePopup();
   const totalEarned = useGameStore(s => s.totalEarned);
   const prestigePoints = useGameStore(s => s.prestigePoints);
@@ -105,8 +105,8 @@ function AngelUpgradePopup({ upgradeId }: { upgradeId: number }) {
 
       <button
         onClick={handleBuy}
-        className="w-full py-2.5 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-red-500 
-                   text-white active:scale-95 transition-transform"
+        className="w-full py-2.5 rounded-xl font-bold bg-gradient-to-b from-orange-400 to-red-600 
+                   text-white transition-all duration-150 shadow-[0_3px_0_0_#991b1b,0_4px_8px_rgba(127,29,29,0.3)] active:shadow-[0_1px_0_0_#991b1b,0_2px_4px_rgba(127,29,29,0.2)] active:translate-y-[2px]"
       >
         确认购买
       </button>
@@ -209,7 +209,7 @@ export default function PrestigeTab() {
     showPopup({
       id: 'prestige_confirm',
       type: 'confirm',
-      content: <PrestigeConfirmPopup onConfirm={() => {}} />,
+      content: <PrestigeConfirmPopup />,
     });
   };
 

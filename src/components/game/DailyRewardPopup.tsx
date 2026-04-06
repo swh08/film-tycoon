@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { DAILY_REWARDS } from '@/game/config/daily-rewards';
 import { formatCash } from '@/game/formulas';
-import { playDailyReward, playUIClick } from '@/game/sound';
+import { playDailyReward } from '@/game/sound';
 
 interface DailyRewardPopupProps {
   isOpen: boolean;
@@ -129,9 +129,10 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
           {/* 领取按钮 */}
           <button
             onClick={handleClaim}
-            className="w-full py-3 rounded-xl font-black text-lg bg-gradient-to-r from-yellow-500 to-amber-500
-                       text-gray-900 active:scale-95 transition-transform shadow-lg shadow-yellow-600/30
-                       hover:from-yellow-400 hover:to-amber-400"
+            className="w-full py-3 rounded-xl font-black text-lg bg-gradient-to-b from-yellow-300 to-amber-600
+                       text-gray-900 transition-all duration-150 shadow-[0_3px_0_0_#92400e,0_4px_8px_rgba(120,53,15,0.3)]
+                       hover:from-yellow-200 hover:to-amber-500
+                       active:shadow-[0_1px_0_0_#92400e,0_2px_4px_rgba(120,53,15,0.2)] active:translate-y-[2px]"
           >
             🎁 领取奖励
           </button>

@@ -82,8 +82,10 @@ export default function OfflineRewardPopup() {
 
               <button
                 onClick={handleClaim}
-                className="w-full py-3 rounded-xl font-bold text-lg bg-gradient-to-r from-green-500 to-emerald-500 
-                           active:scale-95 transition-transform shadow-lg shadow-green-900/40"
+                className="w-full py-3 rounded-xl font-bold text-lg bg-gradient-to-b from-green-400 to-green-600 
+                           text-white active:shadow-[0_1px_0_0_#166534,0_2px_4px_rgba(21,128,61,0.2)] active:translate-y-[2px]
+                           transition-all duration-150 shadow-[0_3px_0_0_#166534,0_4px_8px_rgba(21,128,61,0.3)]
+                           hover:from-green-300 hover:to-green-500"
               >
                 🎉 一键领取！
               </button>

@@ -76,9 +76,11 @@ export function PopupProvider({ children }: { children: ReactNode }) {
                 {popup.content}
                 <button
                   onClick={closePopup}
-                  className="mt-4 w-full py-2.5 rounded-xl font-bold text-base
-                             bg-white/20 hover:bg-white/30 active:bg-white/40
-                             transition-all duration-150"
+                  className={`mt-4 w-full py-2.5 rounded-xl font-bold text-base transition-all duration-150
+                    ${popup.type === 'confirm'
+                      ? 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-200 shadow-[0_3px_0_0_#374151,0_4px_8px_rgba(0,0,0,0.3)] hover:from-gray-400 hover:to-gray-600 active:shadow-[0_1px_0_0_#374151,0_2px_4px_rgba(0,0,0,0.2)] active:translate-y-[2px]'
+                      : 'bg-gradient-to-b from-white/30 to-white/10 text-white shadow-[0_3px_0_0_rgba(0,0,0,0.3),0_4px_8px_rgba(0,0,0,0.2)] hover:from-white/40 hover:to-white/20 active:shadow-[0_1px_0_0_rgba(0,0,0,0.2),0_2px_4px_rgba(0,0,0,0.1)] active:translate-y-[2px]'
+                    }`}
                 >
                   {popup.type === 'confirm' ? '取消' : '好的！'}
                 </button>

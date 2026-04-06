@@ -24,7 +24,7 @@ import {
 } from '@/game/formulas';
 import { usePopup } from '@/components/game/PopupLayer';
 import { playTap, playBuy, playUIClick } from '@/game/sound';
-import type { BusinessMode } from '@/game/types';
+
 
 // ============================================================
 // 产线专属升级弹窗内容 — 独立组件，实时订阅 store
@@ -93,10 +93,10 @@ function BusinessUpgradePopupContent({ businessId }: { businessId: number }) {
                     useGameStore.getState().buyBusinessUpgrade(upgrade.id);
                   }}
                   disabled={!canAfford}
-                  className={`mt-2 w-full py-2 rounded-lg text-xs font-bold transition-all active:scale-[0.97]
+                  className={`mt-2 w-full py-2 rounded-lg text-xs font-bold transition-all duration-150
                     ${canAfford
-                      ? 'bg-gradient-to-r from-yellow-600 to-amber-500 text-white hover:from-yellow-500 hover:to-amber-400'
-                      : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                      ? 'bg-gradient-to-b from-yellow-400 to-amber-600 text-white hover:from-yellow-300 hover:to-amber-500 shadow-[0_3px_0_0_#92400e,0_4px_8px_rgba(120,53,15,0.3)] active:shadow-[0_1px_0_0_#92400e,0_2px_4px_rgba(120,53,15,0.2)] active:translate-y-[2px]'
+                      : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 cursor-not-allowed shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.2)]'
                     }`}
                 >
                   购买 · {formatCash(upgrade.cost)}
@@ -226,7 +226,6 @@ function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
 export default function BusinessTab() {
   const {
     cash,
-    diamonds,
     businesses,
     adBuffs,
     upgrades,
@@ -392,7 +391,7 @@ export default function BusinessTab() {
         const quantity = bs.quantity;
 
         // 检查是否解锁
-        const isUnlocked = checkUnlock(def.id, businesses, cash);
+        const isUnlocked = checkUnlock(def.id, businesses);
 
         const buyModeVal = buyMode;
         // 实际购买数量（最大模式动态计算）
@@ -422,8 +421,8 @@ export default function BusinessTab() {
               rounded-xl overflow-hidden border transition-all duration-200
               ${isUnlocked
                 ? quantity > 0
-                  ? 'bg-gradient-to-r from-gray-800/90 to-gray-850/90 border-yellow-600/40 shadow-lg shadow-yellow-900/10'
-                  : 'bg-gradient-to-r from-gray-800/50 to-gray-850/50 border-gray-600/30 shadow-md shadow-black/20'
+                  ? 'bg-gradient-to-r from-gray-800/90 to-gray-900/90 border-yellow-600/40 shadow-lg shadow-yellow-900/10'
+                  : 'bg-gradient-to-r from-gray-800/50 to-gray-900/50 border-gray-600/30 shadow-md shadow-black/20'
                 : 'bg-gray-900/50 border-gray-700/20 opacity-60'
               }
               ${!isUnlocked ? 'relative' : ''}
@@ -596,9 +595,12 @@ export default function BusinessTab() {
                             advanceTutorial('first_tap');
                           }
                         }}
-                        className="px-3 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600
-                                   text-white text-xs font-bold active:scale-95 transition-transform
-                                   hover:from-green-500 hover:to-emerald-500 shadow-md shadow-green-900/30"
+                        className="px-3 py-2 rounded-lg bg-gradient-to-b from-green-500 to-green-700
+                                   text-white text-xs font-bold
+                                   hover:from-green-400 hover:to-green-600
+                                   shadow-[0_3px_0_0_#166534,0_4px_8px_rgba(21,128,61,0.3)]
+                                   active:shadow-[0_1px_0_0_#166534,0_2px_4px_rgba(21,128,61,0.2)] active:translate-y-[2px]
+                                   transition-all duration-150"
                       >
                         贴膜！
                       </button>
@@ -659,7 +661,7 @@ export default function BusinessTab() {
 }
 
 /** 检查产线是否解锁 */
-function checkUnlock(businessId: number, businesses: any[], cash: number): boolean {
+function checkUnlock(businessId: number, businesses: any[]): boolean {
   if (businessId === 1) return true; // 第一档永远解锁
   const def = BUSINESSES.find(b => b.id === businessId);
   if (!def) return false;

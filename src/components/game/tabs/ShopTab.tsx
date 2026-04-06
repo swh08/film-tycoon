@@ -223,7 +223,7 @@ export default function ShopTab() {
             return (
               <div
                 key={offer.id}
-                className="rounded-xl p-3 bg-gradient-to-r from-gray-800 to-gray-850 border border-green-600/30 shadow-md shadow-green-900/10"
+                className="rounded-xl p-3 bg-gradient-to-r from-gray-800 to-gray-900 border border-green-600/30 shadow-md shadow-green-900/10"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-green-900/30 flex items-center justify-center text-xl flex-shrink-0">
@@ -437,7 +437,7 @@ export default function ShopTab() {
                   ${isActive
                     ? 'bg-gradient-to-r from-purple-900/50 to-pink-900/30 border-purple-400/50'
                     : unlocked
-                      ? 'bg-gradient-to-r from-gray-800 to-gray-850 border-gray-600/30'
+                      ? 'bg-gradient-to-r from-gray-800 to-gray-900 border-gray-600/30'
                       : 'bg-gray-900/30 border-gray-700/20 opacity-40'
                   }`}
               >
