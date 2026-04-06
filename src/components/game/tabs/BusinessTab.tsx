@@ -511,53 +511,36 @@ export default function BusinessTab() {
                 </div>
               )}
 
-              {/* 策略 + 操作 合并一行 */}
+              {/* 操作区 */}
               {quantity > 0 && isUnlocked && (
-                <div className="flex items-center justify-between gap-2">
-                  {/* 策略切换 */}
-                  <div className="flex rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setBusinessMode(def.id, 'profit')}
-                      className={`px-2 py-1.5 text-[10px] font-bold transition-all duration-150
-                        ${(businessModes?.[def.id] === 'profit')
-                          ? 'bg-gradient-to-b from-yellow-400 to-amber-600 text-white shadow-[0_3px_0_0_#92400e]'
-                          : 'bg-gradient-to-b from-gray-400 to-gray-600 text-gray-200 shadow-[0_3px_0_0_#374151] active:shadow-[0_1px_0_0_#374151] active:translate-y-[2px]'
-                        }`}
-                    >
-                      💰
-                    </button>
-                    <button
-                      onClick={() => setBusinessMode(def.id, 'speed')}
-                      className={`px-2 py-1.5 text-[10px] font-bold transition-all duration-150
-                        ${(businessModes?.[def.id] === 'speed')
-                          ? 'bg-gradient-to-b from-blue-400 to-indigo-600 text-white shadow-[0_3px_0_0_#312e81]'
-                          : 'bg-gradient-to-b from-gray-400 to-gray-600 text-gray-200 shadow-[0_3px_0_0_#374151] active:shadow-[0_1px_0_0_#374151] active:translate-y-[2px]'
-                        }`}
-                    >
-                      ⚡
-                    </button>
-                    <button
-                      onClick={() => {
+                <div className="flex items-center gap-1.5 justify-end min-w-0">
+                  {/* 策略下拉 */}
+                  <select
+                    value={businessModes?.[def.id] || ''}
+                    onChange={(e) => {
+                      const v = e.target.value as 'profit' | 'speed' | '';
+                      if (v) {
+                        setBusinessMode(def.id, v);
+                      } else {
                         useGameStore.setState(s => ({
                           businessModes: Object.fromEntries(
                             Object.entries(s.businessModes).filter(([k]) => parseInt(k) !== def.id)
                           ),
                         }));
                         useGameStore.getState().save();
-                      }}
-                      className={`px-2 py-1.5 text-[10px] font-bold transition-all duration-150
-                        ${(!businessModes?.[def.id])
-                          ? 'bg-gradient-to-b from-green-400 to-green-600 text-white shadow-[0_3px_0_0_#166534]'
-                          : 'bg-gradient-to-b from-gray-400 to-gray-600 text-gray-200 shadow-[0_3px_0_0_#374151] active:shadow-[0_1px_0_0_#374151] active:translate-y-[2px]'
-                        }`}
-                    >
-                      ⚖️
-                    </button>
-                  </div>
+                      }
+                    }}
+                    className="flex-shrink-0 px-1.5 py-1.5 rounded-lg text-[10px] font-bold
+                               bg-gradient-to-b from-gray-400 to-gray-600 text-gray-200
+                               shadow-[0_3px_0_0_#374151]
+                               cursor-pointer"
+                  >
+                    <option value="">⚖️ 默认</option>
+                    <option value="profit">💰 利润</option>
+                    <option value="speed">⚡ 速度</option>
+                  </select>
 
-                  {/* 操作区：贴膜/自动 + 购买 + 专属升级 */}
-                  <div className="flex items-center gap-1.5 flex-1 justify-end min-w-0">
-                    {bs.hasManager ? (
+                  {bs.hasManager ? (
                       <div className="flex items-center gap-1 px-1.5 py-1.5 rounded-lg bg-cyan-600/20 text-cyan-400 text-[10px] font-bold select-none flex-shrink-0">
                         <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M21 2v6h-6" />
@@ -632,7 +615,6 @@ export default function BusinessTab() {
                         </button>
                       );
                     })()}
-                  </div>
                 </div>
               )}
 
