@@ -103,10 +103,10 @@ export default function AchievementPanel({ isOpen, onClose }: AchievementPanelPr
                           <div
                             key={ach.id}
                             className={`
-                              rounded-xl p-2.5 border transition-all
+                              rounded-xl p-2.5 transition-all
                               ${isUnlocked
-                                ? 'bg-gradient-to-r from-yellow-900/30 to-amber-900/20 border-yellow-500/30'
-                                : 'bg-gray-800/50 border-gray-700/30 opacity-70'
+                                ? 'bg-gradient-to-r from-yellow-900/30 to-amber-900/20'
+                                : 'bg-gray-800/50 opacity-70'
                               }
                             `}
                           >
