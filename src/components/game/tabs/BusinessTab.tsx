@@ -55,12 +55,12 @@ function BusinessUpgradePopupContent({ businessId }: { businessId: number }) {
           return (
             <div
               key={upgrade.id}
-              className={`rounded-xl p-3 border transition-all
+              className={`rounded-xl p-3 transition-all
                 ${isPurchased
-                  ? 'bg-green-900/20 border-green-500/30'
+                  ? 'bg-green-900/20'
                   : canSee
-                    ? 'bg-gray-700/50 border-gray-600/30'
-                    : 'bg-gray-800/30 border-gray-700/20 opacity-50'
+                    ? 'bg-gray-700/50'
+                    : 'bg-gray-800/30 opacity-50'
                 }`}
             >
               <div className="flex items-center gap-2.5">
@@ -162,7 +162,7 @@ function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
       {breakdown ? (
         <div className="space-y-3">
           {/* 基础信息 */}
-          <div className="bg-gray-700/50 rounded-xl p-3 border border-gray-600/30">
+          <div className="bg-gray-700/50 rounded-xl p-3">
             <div className="flex justify-between text-xs mb-1">
               <span className="text-gray-400">基础单价</span>
               <span className="text-white font-bold">{formatCash(breakdown.baseRevenue)}</span>
@@ -180,7 +180,7 @@ function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
 
           {/* 乘数列表 */}
           {breakdown.items.length > 0 ? (
-            <div className="bg-gray-700/50 rounded-xl p-3 border border-gray-600/30">
+            <div className="bg-gray-700/50 rounded-xl p-3">
               <h4 className="text-[10px] text-gray-500 font-bold mb-2">📊 加成倍率</h4>
               <div className="space-y-1.5">
                 {breakdown.items.map((item, idx) => (
@@ -198,7 +198,7 @@ function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
           )}
 
           {/* 最终结果 */}
-          <div className="bg-gradient-to-r from-yellow-900/30 to-amber-900/20 rounded-xl p-3 border border-yellow-500/30">
+          <div className="bg-gradient-to-r from-yellow-900/30 to-amber-900/20 rounded-xl p-3">
             <div className="flex justify-between text-xs mb-1">
               <span className="text-gray-400">最终收益/次</span>
               <span className="text-yellow-400 font-black">{formatCash(breakdown.finalRevenue)}</span>

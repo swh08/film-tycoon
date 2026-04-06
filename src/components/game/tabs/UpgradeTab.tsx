@@ -92,8 +92,7 @@ export default function UpgradeTab() {
                   <div
                     key={def.id}
                     className="rounded-xl p-3 bg-gradient-to-r from-gray-800 to-gray-900 
-                               border border-gray-700/40 transition-all duration-200
-                               hover:border-yellow-600/40"
+                               transition-all duration-200"
                   >
                     <div className="flex items-start gap-3">
                       {/* 图标 */}
