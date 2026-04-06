@@ -470,26 +470,22 @@ export default function BusinessTab() {
                 </div>
               </div>
 
-              {/* 生产进度条 */}
+              {/* 生产进度条（含收益/时长） */}
               {quantity > 0 && (
-                <div className="mb-2">
-                  <div className="flex items-center justify-between text-[10px] text-gray-400 mb-1">
-                    <span>{formatCash(revenue)}/次</span>
-                    <span>{formatTime(cycleTime)}/次</span>
-                  </div>
+                <div className="mb-2 relative h-5 rounded-full bg-gray-700 overflow-hidden">
                   {cycleTime < 0.5 && bs.hasManager ? (
-                    <div className="h-3 rounded-full bg-gray-700 overflow-hidden relative">
-                      <div className="h-full rounded-full progress-wave" />
-                    </div>
+                    <div className="h-full rounded-full progress-wave" />
                   ) : (
-                    <div className="h-3 rounded-full bg-gray-700 overflow-hidden relative">
-                      <motion.div
-                        className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400 progress-glow"
-                        style={{ width: `${Math.min((bs.progress ?? 0) * 100, 100)}%` }}
-                        transition={{ duration: 0.1 }}
-                      />
-                    </div>
+                    <motion.div
+                      className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400 progress-glow"
+                      style={{ width: `${Math.min((bs.progress ?? 0) * 100, 100)}%` }}
+                      transition={{ duration: 0.1 }}
+                    />
                   )}
+                  <div className="absolute inset-0 flex items-center justify-between px-2 text-[10px] font-bold">
+                    <span className="text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">{formatCash(revenue)}/次</span>
+                    <span className="text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">{formatTime(cycleTime)}/次</span>
+                  </div>
                 </div>
               )}
 
