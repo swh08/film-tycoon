@@ -418,12 +418,12 @@ export default function BusinessTab() {
           <div
             key={def.id}
             className={`
-              rounded-xl overflow-hidden border transition-all duration-200
+              rounded-xl overflow-hidden transition-all duration-200
               ${isUnlocked
                 ? quantity > 0
-                  ? 'bg-gradient-to-r from-gray-800/90 to-gray-900/90 border-yellow-600/40 shadow-lg shadow-yellow-900/10'
-                  : 'bg-gradient-to-r from-gray-800/50 to-gray-900/50 border-gray-600/30 shadow-md shadow-black/20'
-                : 'bg-gray-900/50 border-gray-700/20 opacity-60'
+                  ? 'bg-gradient-to-r from-gray-800/90 to-gray-900/90 shadow-lg shadow-yellow-900/10'
+                  : 'bg-gradient-to-r from-gray-800/50 to-gray-900/50 shadow-md shadow-black/20'
+                : 'bg-gray-900/50 opacity-60'
               }
               ${!isUnlocked ? 'relative' : ''}
             `}
