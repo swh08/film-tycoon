@@ -441,8 +441,8 @@ export default function BusinessTab() {
             <div className="p-3">
               {/* === AC风格：左侧圆形头像 + 右侧信息 === */}
               <div className="flex items-start gap-3 mb-2">
-                {/* 左侧：圆形头像 + 里程碑进度条（overlay） */}
-                <div className="relative flex-shrink-0">
+                {/* 左侧：圆形头像 */}
+                <div className="flex-shrink-0">
                   <div className={`
                     w-14 h-14 rounded-full flex items-center justify-center text-3xl
                     ${quantity > 0
@@ -452,33 +452,6 @@ export default function BusinessTab() {
                   `}>
                     {def.icon}
                   </div>
-                  {quantity > 0 && (
-                    (() => {
-                      let prevAt = 0;
-                      for (let i = def.milestones.length - 1; i >= 0; i--) {
-                        if (quantity >= def.milestones[i].at) {
-                          prevAt = def.milestones[i].at;
-                          break;
-                        }
-                      }
-                      const progress = nextMs
-                        ? Math.min((quantity - prevAt) / (nextMs.at - prevAt), 1)
-                        : 1;
-                      return (
-                        <div className="absolute -bottom-1.5 left-0 right-0 h-3.5 rounded-full bg-gray-700/70 overflow-hidden">
-                          <div
-                            className={`absolute inset-y-0 left-0 rounded-full transition-all duration-300 ${nextMs ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gradient-to-r from-green-400 to-emerald-400'}`}
-                            style={{ width: `${progress * 100}%` }}
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center text-[8px] font-bold">
-                            <span className="text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
-                              {quantity}{nextMs ? `/${nextMs.at}` : ''}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })()
-                  )}
                 </div>
 
                 {/* 右侧信息 */}
@@ -511,6 +484,40 @@ export default function BusinessTab() {
                   )}
                 </div>
               </div>
+
+              {/* === 里程碑进度条（全宽，overlay 购买数/里程数） === */}
+              {quantity > 0 && (
+                (() => {
+                  let prevAt = 0;
+                  for (let i = def.milestones.length - 1; i >= 0; i--) {
+                    if (quantity >= def.milestones[i].at) {
+                      prevAt = def.milestones[i].at;
+                      break;
+                    }
+                  }
+                  const progress = nextMs
+                    ? Math.min((quantity - prevAt) / (nextMs.at - prevAt), 1)
+                    : 1;
+                  return (
+                    <div className="mb-2">
+                      <div className="relative h-3.5 rounded-full bg-gray-700/70 overflow-hidden">
+                        <div
+                          className={`absolute inset-y-0 left-0 rounded-full transition-all duration-300 ${nextMs ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gradient-to-r from-green-400 to-emerald-400'}`}
+                          style={{ width: `${progress * 100}%` }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-between px-2 text-[9px] font-bold">
+                          <span className="text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
+                            {quantity}{nextMs ? ` / ${nextMs.at}` : ' MAX'}
+                          </span>
+                          {nextMs && (
+                            <span className="text-white/80 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">×{nextMs.multiplier}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()
+              )}
 
 
 
