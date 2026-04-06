@@ -118,7 +118,7 @@ export default function EventNotification() {
           className="fixed top-16 left-4 right-4 z-50 max-w-sm mx-auto"
         >
           <div className="bg-gradient-to-r from-purple-800/95 to-pink-800/95 backdrop-blur-md
-                         rounded-xl p-3 border border-purple-400/40 shadow-xl shadow-purple-900/50">
+                         rounded-xl p-3 shadow-xl shadow-purple-900/50">
             <div className="flex items-center gap-3">
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}

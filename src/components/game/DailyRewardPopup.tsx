@@ -74,14 +74,13 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
                 <div
                   key={reward.day}
                   className={`
-                    relative flex flex-col items-center p-1.5 rounded-lg border transition-all
+                    relative flex flex-col items-center p-1.5 rounded-lg transition-all
                     ${isToday
-                      ? 'bg-gradient-to-b from-yellow-500/30 to-amber-600/20 border-yellow-400/60 ring-1 ring-yellow-400/40'
+                      ? 'bg-gradient-to-b from-yellow-500/30 to-amber-600/20 ring-1 ring-yellow-400/40'
                       : isPast
-                        ? 'bg-green-900/20 border-green-600/30'
-                        : 'bg-gray-700/30 border-gray-600/20'
+                        ? 'bg-green-900/20'
+                        : 'bg-gray-700/30'
                     }
-                    ${isLast7th && !isPast ? 'border-yellow-500/40' : ''}
                   `}
                 >
                   <span className="text-[8px] text-gray-400 mb-0.5">Day{reward.day}</span>
@@ -112,10 +111,10 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
                       key={idx}
                       className={`px-2 py-0.5 rounded-full text-[10px] font-bold
                         ${reward.type === 'diamond'
-                          ? 'bg-cyan-900/40 text-cyan-300 border border-cyan-500/30'
+                          ? 'bg-cyan-900/40 text-cyan-300'
                           : reward.type === 'buff'
-                            ? 'bg-red-900/40 text-red-300 border border-red-500/30'
-                            : 'bg-yellow-900/40 text-yellow-300 border border-yellow-500/30'
+                            ? 'bg-red-900/40 text-red-300'
+                            : 'bg-yellow-900/40 text-yellow-300'
                         }`}
                     >
                       {reward.label}
