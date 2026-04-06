@@ -513,8 +513,43 @@ export default function BusinessTab() {
 
               {/* 操作区 */}
               {quantity > 0 && isUnlocked && (
-                <div className="flex items-center gap-1.5 justify-end min-w-0">
-                  {/* 策略下拉 */}
+                <div className="flex items-center gap-1.5 min-w-0">
+                  {/* 1. 贴膜/自动 */}
+                  {bs.hasManager ? (
+                    <div className="flex items-center gap-1 px-1.5 py-1.5 rounded-lg bg-cyan-600/20 text-cyan-400 text-[10px] font-bold select-none flex-shrink-0">
+                      <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 2v6h-6" />
+                        <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                        <path d="M3 22v-6h6" />
+                        <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+                      </svg>
+                      自动
+                    </div>
+                  ) : bs.progress > 0 ? (
+                    <div className="px-2 py-1.5 rounded-lg bg-yellow-600/30 text-yellow-400 text-[10px] font-bold flex-shrink-0">
+                      生产中…
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        manualProduce(def.id);
+                        playTap();
+                        if (tutorialStep === 'none') {
+                          advanceTutorial('first_tap');
+                        }
+                      }}
+                      className="px-2 py-1.5 rounded-lg bg-gradient-to-b from-green-500 to-green-700
+                                 text-white text-[10px] font-bold flex-shrink-0
+                                 hover:from-green-400 hover:to-green-600
+                                 shadow-[0_3px_0_0_#166534,0_4px_8px_rgba(21,128,61,0.3)]
+                                 active:shadow-[0_1px_0_0_#166534,0_2px_4px_rgba(21,128,61,0.2)] active:translate-y-[2px]
+                                 transition-all duration-150"
+                    >
+                      贴膜！
+                    </button>
+                  )}
+
+                  {/* 2. 策略下拉 */}
                   <select
                     value={businessModes?.[def.id] || ''}
                     onChange={(e) => {
@@ -540,81 +575,49 @@ export default function BusinessTab() {
                     <option value="speed">⚡ 速度</option>
                   </select>
 
-                  {bs.hasManager ? (
-                      <div className="flex items-center gap-1 px-1.5 py-1.5 rounded-lg bg-cyan-600/20 text-cyan-400 text-[10px] font-bold select-none flex-shrink-0">
-                        <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M21 2v6h-6" />
-                          <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
-                          <path d="M3 22v-6h6" />
-                          <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
-                        </svg>
-                        自动
-                      </div>
-                    ) : bs.progress > 0 ? (
-                      <div className="px-2 py-1.5 rounded-lg bg-yellow-600/30 text-yellow-400 text-[10px] font-bold flex-shrink-0">
-                        生产中…
-                      </div>
-                    ) : (
+                  {/* 3. 专属升级 */}
+                  {(() => {
+                    const bizUpgrades = BUSINESS_UPGRADES.filter(u => u.businessId === def.id);
+                    if (bizUpgrades.length === 0 || quantity === 0) return null;
+                    const purchased = bizUpgrades.filter(u => purchasedBusinessUpgrades.includes(u.id)).length;
+                    const allBought = purchased === bizUpgrades.length;
+                    const hasBuyable = bizUpgrades.some(u => !purchasedBusinessUpgrades.includes(u.id) && quantity >= u.unlockQuantity);
+                    return (
                       <button
-                        onClick={() => {
-                          manualProduce(def.id);
-                          playTap();
-                          if (tutorialStep === 'none') {
-                            advanceTutorial('first_tap');
+                        onClick={() => showBusinessUpgradePopup(def.id)}
+                        className={`
+                          flex-shrink-0 px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-150
+                          ${allBought
+                            ? 'bg-gradient-to-b from-green-500 to-green-700 text-green-100 shadow-[0_3px_0_0_#166534,0_4px_8px_rgba(21,128,61,0.3)]'
+                            : hasBuyable
+                              ? 'bg-gradient-to-b from-blue-400 to-indigo-600 text-white shadow-[0_3px_0_0_#312e81,0_4px_8px_rgba(49,46,129,0.3)] active:shadow-[0_1px_0_0_#312e81,0_2px_4px_rgba(49,46,129,0.2)] active:translate-y-[2px]'
+                              : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.2)]'
                           }
-                        }}
-                        className="px-2 py-1.5 rounded-lg bg-gradient-to-b from-green-500 to-green-700
-                                   text-white text-[10px] font-bold flex-shrink-0
-                                   hover:from-green-400 hover:to-green-600
-                                   shadow-[0_3px_0_0_#166534,0_4px_8px_rgba(21,128,61,0.3)]
-                                   active:shadow-[0_1px_0_0_#166534,0_2px_4px_rgba(21,128,61,0.2)] active:translate-y-[2px]
-                                   transition-all duration-150"
+                        `}
                       >
-                        贴膜！
+                        🔧 {purchased}/{bizUpgrades.length}
                       </button>
-                    )}
+                    );
+                  })()}
 
-                    <button
-                      onClick={() => {
-                        if (canAfford) playBuy(); else playUIClick();
-                        handleBuy(def.id);
-                      }}
-                      disabled={!canAfford}
-                      className={`
-                        flex-1 min-w-0 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 truncate
-                        active:scale-[0.97]
-                        ${canAfford
-                          ? 'bg-gradient-to-b from-yellow-400 to-amber-600 text-white hover:from-yellow-300 hover:to-amber-500 shadow-[0_3px_0_0_#92400e,0_4px_8px_rgba(120,53,15,0.3)] active:shadow-[0_1px_0_0_#92400e,0_2px_4px_rgba(120,53,15,0.2)] active:translate-y-[2px]'
-                          : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 cursor-not-allowed shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.2)]'
-                        }
-                      `}
-                    >
-                      购买×{actualBuyCount} {formatCash(cost)}
-                    </button>
-
-                    {(() => {
-                      const bizUpgrades = BUSINESS_UPGRADES.filter(u => u.businessId === def.id);
-                      if (bizUpgrades.length === 0 || quantity === 0) return null;
-                      const purchased = bizUpgrades.filter(u => purchasedBusinessUpgrades.includes(u.id)).length;
-                      const allBought = purchased === bizUpgrades.length;
-                      const hasBuyable = bizUpgrades.some(u => !purchasedBusinessUpgrades.includes(u.id) && quantity >= u.unlockQuantity);
-                      return (
-                        <button
-                          onClick={() => showBusinessUpgradePopup(def.id)}
-                          className={`
-                            flex-shrink-0 px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-150
-                            ${allBought
-                              ? 'bg-gradient-to-b from-green-500 to-green-700 text-green-100 shadow-[0_3px_0_0_#166534,0_4px_8px_rgba(21,128,61,0.3)]'
-                              : hasBuyable
-                                ? 'bg-gradient-to-b from-blue-400 to-indigo-600 text-white shadow-[0_3px_0_0_#312e81,0_4px_8px_rgba(49,46,129,0.3)] active:shadow-[0_1px_0_0_#312e81,0_2px_4px_rgba(49,46,129,0.2)] active:translate-y-[2px]'
-                                : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.2)]'
-                            }
-                          `}
-                        >
-                          🔧 {purchased}/{bizUpgrades.length}
-                        </button>
-                      );
-                    })()}
+                  {/* 4. 购买（最右，flex-1占满剩余空间） */}
+                  <button
+                    onClick={() => {
+                      if (canAfford) playBuy(); else playUIClick();
+                      handleBuy(def.id);
+                    }}
+                    disabled={!canAfford}
+                    className={`
+                      flex-1 min-w-0 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 truncate
+                      active:scale-[0.97]
+                      ${canAfford
+                        ? 'bg-gradient-to-b from-yellow-400 to-amber-600 text-white hover:from-yellow-300 hover:to-amber-500 shadow-[0_3px_0_0_#92400e,0_4px_8px_rgba(120,53,15,0.3)] active:shadow-[0_1px_0_0_#92400e,0_2px_4px_rgba(120,53,15,0.2)] active:translate-y-[2px]'
+                        : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 cursor-not-allowed shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.2)]'
+                      }
+                    `}
+                  >
+                    购买×{actualBuyCount} {formatCash(cost)}
+                  </button>
                 </div>
               )}
 
