@@ -480,29 +480,6 @@ export default function BusinessTab() {
                       })()
                     )}
                   </div>
-                  {/* 里程碑进度条（在头像正下方） */}
-                  {quantity > 0 && (
-                    (() => {
-                      let prevAt = 0;
-                      for (let i = def.milestones.length - 1; i >= 0; i--) {
-                        if (quantity >= def.milestones[i].at) {
-                          prevAt = def.milestones[i].at;
-                          break;
-                        }
-                      }
-                      const progress = nextMs
-                        ? Math.min((quantity - prevAt) / (nextMs.at - prevAt), 1)
-                        : 1;
-                      return (
-                        <div className="w-14 h-2 rounded-full bg-gray-700 overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${nextMs ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gradient-to-r from-green-400 to-emerald-400'}`}
-                            style={{ width: `${progress * 100}%` }}
-                          />
-                        </div>
-                      );
-                    })()
-                  )}
                 </div>
 
                 {/* 右侧信息 */}
