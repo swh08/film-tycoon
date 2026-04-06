@@ -635,12 +635,12 @@ export default function BusinessTab() {
                       <button
                         onClick={() => showBusinessUpgradePopup(def.id)}
                         className={`
-                          flex-shrink-0 px-2.5 py-3 rounded-xl text-xs font-bold transition-all duration-150
+                          flex-shrink-0 px-2.5 py-2 rounded-lg text-xs font-bold transition-all duration-150
                           ${allBought
-                            ? 'bg-gradient-to-b from-green-500 to-green-700 text-green-100 shadow-[0_4px_0_0_#166534,0_6px_12px_rgba(21,128,61,0.3)]'
+                            ? 'bg-gradient-to-b from-green-500 to-green-700 text-green-100 shadow-[0_3px_0_0_#166534,0_4px_8px_rgba(21,128,61,0.3)]'
                             : hasBuyable
-                              ? 'bg-gradient-to-b from-blue-400 to-indigo-600 text-white shadow-[0_4px_0_0_#312e81,0_6px_12px_rgba(49,46,129,0.4)] active:shadow-[0_2px_0_0_#312e81,0_3px_6px_rgba(49,46,129,0.3)] active:translate-y-[2px]'
-                              : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_4px_0_0_#374151,0_6px_8px_rgba(0,0,0,0.3)]'
+                              ? 'bg-gradient-to-b from-blue-400 to-indigo-600 text-white shadow-[0_3px_0_0_#312e81,0_4px_8px_rgba(49,46,129,0.3)] active:shadow-[0_1px_0_0_#312e81,0_2px_4px_rgba(49,46,129,0.2)] active:translate-y-[2px]'
+                              : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.2)]'
                           }
                         `}
                       >
