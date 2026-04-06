@@ -613,17 +613,17 @@ export default function BusinessTab() {
                     }}
                     disabled={!canAfford}
                     className={`
-                      flex-1 py-3 rounded-xl text-xs font-bold transition-all duration-150
+                      flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-150
                       active:scale-[0.97]
                       ${canAfford
-                        ? 'bg-gradient-to-b from-yellow-400 to-amber-600 text-white hover:from-yellow-300 hover:to-amber-500 shadow-[0_4px_0_0_#92400e,0_6px_12px_rgba(120,53,15,0.4)] active:shadow-[0_2px_0_0_#92400e,0_3px_6px_rgba(120,53,15,0.3)] active:translate-y-[2px]'
-                        : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 cursor-not-allowed shadow-[0_4px_0_0_#374151,0_6px_8px_rgba(0,0,0,0.3)]'
+                        ? 'bg-gradient-to-b from-yellow-400 to-amber-600 text-white hover:from-yellow-300 hover:to-amber-500 shadow-[0_3px_0_0_#92400e,0_4px_8px_rgba(120,53,15,0.3)] active:shadow-[0_1px_0_0_#92400e,0_2px_4px_rgba(120,53,15,0.2)] active:translate-y-[2px]'
+                        : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 cursor-not-allowed shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.2)]'
                       }
                     `}
                   >
                     购买 {buyModeVal === 0 ? `×${actualBuyCount}` : `×${actualBuyCount}`}
                     <br />
-                    <span className="text-[10px] font-normal opacity-80">{formatCash(cost)}</span>
+                    <span className="text-[9px] font-normal opacity-80">{formatCash(cost)}</span>
                   </button>
 
                   {/* 专属升级按钮 */}
