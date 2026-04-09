@@ -191,11 +191,6 @@ interface GameActions {
   // === Task 3: 背景音乐 ===
   setMusicEnabled: (enabled: boolean) => void;
 
-  // === Task 2: 自动购买系统 ===
-  unlockAutoBuy: (businessId: number) => boolean;
-  setAutoBuyInterval: (businessId: number, interval: number) => void;
-  toggleAutoBuy: (businessId: number, enabled: boolean) => void;
-
   // === Task 4: 广告每日限制 ===
   watchAd: () => boolean;
   getRemainingAds: () => number;
@@ -242,13 +237,13 @@ export const useGameStore = create<GameStore>((set, get) => {
     })),
     lastEventCheck: initial.lastEventCheck ?? Date.now(),
     eventCooldownUntil: initial.eventCooldownUntil ?? 0,
-    numberFormat: (initial as any).numberFormat ?? 'abbreviation',
-    musicVolume: (initial as any).musicVolume ?? 0.5,
-    sfxVolume: (initial as any).sfxVolume ?? 0.8,
-    musicEnabled: (initial as any).musicEnabled ?? false,
-    adWatchCountToday: (initial as any).adWatchCountToday ?? 0,
-    lastAdWatchDate: (initial as any).lastAdWatchDate ?? '',
-    dailyAdLimit: (initial as any).dailyAdLimit ?? 20,
+    numberFormat: initial.numberFormat ?? 'abbreviation',
+    musicVolume: initial.musicVolume ?? 0.5,
+    sfxVolume: initial.sfxVolume ?? 0.8,
+    musicEnabled: initial.musicEnabled ?? false,
+    adWatchCountToday: initial.adWatchCountToday ?? 0,
+    lastAdWatchDate: initial.lastAdWatchDate ?? '',
+    dailyAdLimit: initial.dailyAdLimit ?? 20,
   };
 
   // 同步音效设置
@@ -324,14 +319,16 @@ export const useGameStore = create<GameStore>((set, get) => {
     tickMarket: () => {
       const state = get();
       const now = Date.now();
-      // 每90~150秒波动一次
-      const interval = 90000 + Math.random() * 60000;
-      if (now - state.lastMarketUpdate < interval) return;
+      // 每90~150秒波动一次（固定间隔，避免每帧重随机）
+      const nextTickAt = state._nextMarketTick || (state.lastMarketUpdate + 120000);
+      if (now < nextTickAt) return;
 
       const newMultipliers = generateMarketMultipliers();
+      const newInterval = 90000 + Math.random() * 60000;
       set({
         marketMultipliers: newMultipliers,
         lastMarketUpdate: now,
+        _nextMarketTick: now + newInterval,
       });
       get().save();
     },
@@ -361,6 +358,11 @@ export const useGameStore = create<GameStore>((set, get) => {
 
     claimDailyReward: () => {
       const state = get();
+      const today = getTodayStr();
+
+      // 防止重复领取
+      if (state.dailyRewardClaimedDate === today) return;
+
       const currentDay = ((state.loginStreak - 1) % 7) + 1;
       const reward = DAILY_REWARDS.find(r => r.day === currentDay);
 
@@ -373,7 +375,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         if (r.type === 'cash') cashReward += r.value;
         if (r.type === 'diamond') diamondReward += r.value;
         if (r.type === 'buff' && r.buffType && r.buffDuration) {
-          get().addAdBuff(r.buffType as any, r.buffDuration, 1);
+          get().addAdBuff(r.buffType, r.buffDuration, 1);
         }
       }
 
@@ -381,6 +383,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         cash: s.cash + cashReward,
         totalEarned: s.totalEarned + cashReward,
         diamonds: s.diamonds + diamondReward,
+        dailyRewardClaimedDate: today,
       }));
       get().save();
     },

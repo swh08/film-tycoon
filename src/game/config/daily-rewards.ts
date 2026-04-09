@@ -2,6 +2,8 @@
 // 每日登录奖励配置 — 7天周期循环
 // ============================================================
 
+import { AdBuffType } from '../types';
+
 export interface DailyRewardDef {
   day: number;            // 第几天 (1-7)
   icon: string;
@@ -11,7 +13,7 @@ export interface DailyRewardDef {
     type: 'cash' | 'diamond' | 'buff';
     value: number;
     label: string;
-    buffType?: string;    // buff类型（如果type=buff）
+    buffType?: AdBuffType;    // buff类型（如果type=buff）
     buffDuration?: number; // buff持续时间（秒）
   }[];
 }

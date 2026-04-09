@@ -29,9 +29,7 @@ interface BottomTabsProps {
 
 export default function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
   // 获取是否有未领取的离线收益提示
-  const lastOnline = useGameStore(s => s.lastOnlineTimestamp);
   const tutorialStep = useGameStore(s => s.tutorialStep);
-  const totalEarned = useGameStore(s => s.totalEarned);
 
   return (
     <nav className="sticky bottom-0 z-40 flex items-stretch bg-gradient-to-t from-gray-950 via-gray-900 to-gray-800 

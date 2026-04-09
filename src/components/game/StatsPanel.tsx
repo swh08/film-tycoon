@@ -4,6 +4,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { useMemo } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { formatCash, formatNumberSmart, calcTotalIncomePerSecond, calcRevenuePerSecond } from '@/game/formulas';
 import { BUSINESSES } from '@/game/config/businesses';
@@ -65,8 +66,10 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
   const adBuffs = useGameStore(s => s.adBuffs);
   const upgrades = useGameStore(s => s.upgrades);
 
-  const state = useGameStore.getState();
-  const incomePerSec = calcTotalIncomePerSecond(state, adBuffs);
+  const incomePerSec = useMemo(() => {
+    const s = useGameStore.getState();
+    return calcTotalIncomePerSecond(s, adBuffs);
+  }, [businesses, upgrades, adBuffs, hiredManagers, purchasedAngelUpgrades, purchasedBusinessUpgrades, prestigePoints]);
 
   return (
     <AnimatePresence>

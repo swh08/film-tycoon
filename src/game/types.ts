@@ -40,6 +40,7 @@ export interface BusinessDef {
   managerId: number;
   unlockRule: UnlockRule;
   flavorText: string;
+  autoBuyUnlockCost?: number; // 自动购买解锁费用（预留）
 }
 
 /** 店长定义 (ManagerDef) */
@@ -144,7 +145,7 @@ export interface OfferDef {
   showCondition?: { type: string; value: number };
 }
 
-/** 活动定义 (EventDef) */
+/** @deprecated 旧版活动定义，已被 GameEventDef 替代 */
 export interface EventDef {
   id: number;
   name: string;
@@ -288,6 +289,7 @@ export interface GameState {
   // 每日登录
   lastLoginDate: string;          // YYYY-MM-DD
   loginStreak: number;            // 连续登录天数
+  dailyRewardClaimedDate?: string; // YYYY-MM-DD 当日奖励已领取标记
 
   // 店长等级
   managerLevels: Record<number, number>; // managerId -> level
@@ -313,6 +315,9 @@ export interface GameState {
   adWatchCountToday: number;             // 今日已看广告次数
   lastAdWatchDate: string;               // YYYY-MM-DD 上次看广告日期
   dailyAdLimit: number;                  // 每日广告上限（默认20）
+
+  // 内部运行时字段（不持久化）
+  _nextMarketTick?: number;              // 下次市场波动时间戳
 }
 
 /** 格式化数字用的后缀 */

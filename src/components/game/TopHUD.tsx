@@ -18,7 +18,6 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
   const diamonds = useGameStore(s => s.diamonds);
   const adBuffs = useGameStore(s => s.adBuffs);
   const businesses = useGameStore(s => s.businesses);
-  const upgrades = useGameStore(s => s.upgrades);
   const prestigePoints = useGameStore(s => s.prestigePoints);
   const marketMultipliers = useGameStore(s => s.marketMultipliers);
   const activeEvents = useGameStore(s => s.activeEvents);

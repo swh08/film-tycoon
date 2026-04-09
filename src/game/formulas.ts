@@ -176,19 +176,19 @@ export function calcRevenuePerCycle(
   if (rushBuff) revenue *= 3;
 
   // 市场波动
-  const marketMult = (state as any).marketMultipliers?.[businessDef.id] ?? 1;
+  const marketMult = state.marketMultipliers?.[businessDef.id] ?? 1;
   revenue *= marketMult;
 
   // 店长等级加成（利润）
-  revenue *= calcManagerLevelProfitMult(businessDef.id, (state as any).managerLevels ?? {}, (state as any).hiredManagers ?? []);
+  revenue *= calcManagerLevelProfitMult(businessDef.id, state.managerLevels ?? {}, state.hiredManagers ?? []);
 
   // 利润/速度模式
-  const businessMode = (state as any).businessModes?.[businessDef.id] as BusinessMode | undefined;
+  const businessMode = state.businessModes?.[businessDef.id] as BusinessMode | undefined;
   if (businessMode === 'profit') revenue *= 1.5;
   if (businessMode === 'speed') revenue *= 0.8;
 
   // 事件增益（利润类/全能类）
-  const activeEvents = (state as any).activeEvents as ActiveGameEvent[] | undefined;
+  const activeEvents = state.activeEvents as ActiveGameEvent[] | undefined;
   if (activeEvents) {
     for (const evt of activeEvents) {
       if (evt.boostType === 'profit_mult' || evt.boostType === 'all_mult') {
@@ -228,15 +228,15 @@ export function calcCycleTime(
   if (speedBuff) cycle /= speedBuff.value;
 
   // 店长等级加成（速度）
-  cycle *= calcManagerLevelCycleReduce(businessDef.id, (state as any).managerLevels ?? {}, (state as any).hiredManagers ?? []);
+  cycle *= calcManagerLevelCycleReduce(businessDef.id, state.managerLevels ?? {}, state.hiredManagers ?? []);
 
   // 利润/速度模式
-  const businessMode = (state as any).businessModes?.[businessDef.id] as BusinessMode | undefined;
+  const businessMode = state.businessModes?.[businessDef.id] as BusinessMode | undefined;
   if (businessMode === 'speed') cycle *= 0.5;
   if (businessMode === 'profit') cycle *= 1.5;
 
   // 事件增益（速度类/全能类）
-  const activeEvents = (state as any).activeEvents as ActiveGameEvent[] | undefined;
+  const activeEvents = state.activeEvents as ActiveGameEvent[] | undefined;
   if (activeEvents) {
     for (const evt of activeEvents) {
       if (evt.boostType === 'speed_mult' || evt.boostType === 'all_mult') {
@@ -417,11 +417,10 @@ export function calcBusinessUpgradeCycleReduce(businessId: number, purchasedBusi
 // === 成就检查 ===
 
 /** 检查成就条件是否满足 */
-export function checkAchievementConditions(state: any): string[] {
+export function checkAchievementConditions(state: GameState): string[] {
   const newlyUnlocked: string[] = [];
 
   for (const ach of ACHIEVEMENTS) {
-    // 已解锁的跳过
     if (state.unlockedAchievements.includes(ach.id)) continue;
 
     let met = false;
@@ -435,10 +434,10 @@ export function checkAchievementConditions(state: any): string[] {
         met = state.totalPrestigeCount >= cond.value;
         break;
       case 'business_quantity_min':
-        met = state.businesses.some((b: any) => b.quantity >= cond.value);
+        met = state.businesses.some((b: BusinessState) => b.quantity >= cond.value);
         break;
       case 'businesses_unlocked':
-        met = state.businesses.filter((b: any) => b.quantity > 0).length >= cond.value;
+        met = state.businesses.filter((b: BusinessState) => b.quantity > 0).length >= cond.value;
         break;
       case 'managers_hired':
         met = state.hiredManagers.length >= cond.value;
@@ -456,7 +455,7 @@ export function checkAchievementConditions(state: any): string[] {
         met = (state.purchasedBusinessUpgrades || []).length >= cond.value;
         break;
       case 'global_upgrade_level':
-        met = state.upgrades.some((u: any) => u.level >= cond.value);
+        met = state.upgrades.some((u: UpgradeState) => u.level >= cond.value);
         break;
     }
 
@@ -756,20 +755,20 @@ export function calcDetailedBreakdown(
   }
 
   // 9. 市场波动
-  const marketMult = (state as any).marketMultipliers?.[businessDef.id] ?? 1;
+  const marketMult = state.marketMultipliers?.[businessDef.id] ?? 1;
   if (Math.abs(marketMult - 1) > 0.01) {
     const trendColor = marketMult >= 1 ? 'text-green-400' : 'text-red-400';
     items.push({ label: '市场波动', value: marketMult, displayValue: `×${marketMult.toFixed(2)}`, color: trendColor });
   }
 
   // 10. 店长等级利润
-  const mgrProfitMult = calcManagerLevelProfitMult(businessDef.id, (state as any).managerLevels ?? {}, (state as any).hiredManagers ?? []);
+  const mgrProfitMult = calcManagerLevelProfitMult(businessDef.id, state.managerLevels ?? {}, state.hiredManagers ?? []);
   if (mgrProfitMult > 1) {
     items.push({ label: '店长等级', value: mgrProfitMult, displayValue: `×${formatNumber(mgrProfitMult)}`, color: 'text-cyan-400' });
   }
 
   // 11. 利润/速度模式
-  const businessMode = (state as any).businessModes?.[businessDef.id] as BusinessMode | undefined;
+  const businessMode = state.businessModes?.[businessDef.id] as BusinessMode | undefined;
   if (businessMode === 'profit') {
     items.push({ label: '💰 利润模式', value: 1.5, displayValue: '×1.5', color: 'text-yellow-300' });
   } else if (businessMode === 'speed') {
@@ -777,7 +776,7 @@ export function calcDetailedBreakdown(
   }
 
   // 12. 事件增益
-  const activeEvents = (state as any).activeEvents as ActiveGameEvent[] | undefined;
+  const activeEvents = state.activeEvents as ActiveGameEvent[] | undefined;
   if (activeEvents && activeEvents.length > 0) {
     for (const evt of activeEvents) {
       if (evt.boostType === 'profit_mult' || evt.boostType === 'all_mult') {

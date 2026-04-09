@@ -6,9 +6,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
-import { formatCash } from '@/game/formulas';
+import { formatCash, calcRevenuePerCycle } from '@/game/formulas';
 import { BUSINESSES } from '@/game/config/businesses';
-import { EmojiIcon } from '@/components/game/GameIcon';
 
 interface FloatingText {
   id: number;
@@ -36,9 +35,8 @@ export default function RevenueFloatLayer() {
         if (prev > 0.9 && bs.progress < 0.1) {
           const def = BUSINESSES.find(b => b.id === bs.businessId);
           if (def) {
-            const ms = def.milestones.filter(m => bs.quantity >= m.at);
-            const msMult = ms.length > 0 ? ms[ms.length - 1].multiplier : 1;
-            const amount = def.baseRevenue * bs.quantity * msMult;
+            // 使用完整收益公式，包含所有加成
+            const amount = calcRevenuePerCycle(def, bs.quantity, state, state.adBuffs);
             const x = 50 + (Math.random() - 0.5) * 30;
 
             newFloats.push({
@@ -82,7 +80,7 @@ export default function RevenueFloatLayer() {
               textShadow: '0 0 10px rgba(251, 191, 36, 0.8), 0 0 20px rgba(251, 191, 36, 0.3), 0 2px 4px rgba(0,0,0,0.9)',
             }}
           >
-            <span className="mr-1"><EmojiIcon emoji={f.icon} size={14} /></span>+{formatCash(f.amount)}
+            <span className="mr-1">{f.icon}</span>+{formatCash(f.amount)}
           </motion.div>
         ))}
       </AnimatePresence>

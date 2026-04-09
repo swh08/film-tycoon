@@ -79,18 +79,25 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
   const handleImport = useCallback(() => {
     try {
       const data = JSON.parse(importText);
-      if (!data || typeof data.cash !== 'number') {
+      if (!data || typeof data !== 'object') {
         showToast('❌ 存档格式无效');
         return;
       }
-      // Validate critical fields
-      if (!Array.isArray(data.businesses)) {
-        showToast('❌ 存档格式无效');
+      // 验证关键字段
+      if (typeof data.cash !== 'number' || data.cash < 0) {
+        showToast('❌ 存档格式无效：现金数据错误');
         return;
       }
-      // Reset and load
-      resetGame();
-      // Re-apply the imported state by calling zustand setState
+      if (!Array.isArray(data.businesses) || data.businesses.length === 0) {
+        showToast('❌ 存档格式无效：缺少产线数据');
+        return;
+      }
+      // 数值范围校验
+      if (typeof data.prestigePoints === 'number' && data.prestigePoints < 0) data.prestigePoints = 0;
+      if (typeof data.diamonds === 'number' && data.diamonds < 0) data.diamonds = 0;
+      if (typeof data.totalEarned === 'number' && data.totalEarned < 0) data.totalEarned = 0;
+
+      // 直接 setState 覆盖（不需要先 resetGame，避免竞态）
       useGameStore.setState(data);
       useGameStore.getState().save();
       showToast('✅ 存档导入成功');
@@ -99,7 +106,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
     } catch {
       showToast('❌ JSON 解析失败');
     }
-  }, [importText, resetGame, showToast]);
+  }, [importText, showToast]);
 
   const handleReset = useCallback(() => {
     resetGame();
