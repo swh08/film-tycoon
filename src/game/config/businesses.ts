@@ -33,7 +33,7 @@ export const BUSINESSES: BusinessDef[] = [
     id: 2,
     name: '校园快贴车',
     order: 2,
-    icon: '🚲',
+    icon: '🚐',
     baseCost: 60,
     costCurve: 'exponential',
     costMultiplier: 1.15,
