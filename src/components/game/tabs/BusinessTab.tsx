@@ -442,7 +442,7 @@ export default function BusinessTab() {
               {/* === AC风格：左侧圆形头像 + 右侧信息 === */}
               <div className="flex items-start gap-3 mb-2">
                 {/* 左侧：圆形头像 + 里程碑进度条 */}
-                <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                <div className="flex flex-col items-center gap-1 flex-shrink-0 -mt-1">
                   <div className="relative">
                     <div className={`
                       w-14 h-14 rounded-full flex items-center justify-center text-3xl
