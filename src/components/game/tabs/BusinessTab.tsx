@@ -515,7 +515,7 @@ export default function BusinessTab() {
 
 
               {/* === 生产进度条（细线） === */}
-              {quantity > 0 && bs.hasManager && (
+              {quantity > 0 && (
                 <div className="mb-2 h-1.5 rounded-full bg-gray-700/50 overflow-hidden">
                   {cycleTime < 0.5 ? (
                     <div className="h-full rounded-full progress-wave" />
