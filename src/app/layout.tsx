@@ -1,5 +1,20 @@
 import type { Metadata, Viewport } from "next";
+import { ZCOOL_KuaiLe, Orbitron } from "next/font/google";
 import "./globals.css";
+
+const zcool = ZCOOL_KuaiLe({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-game",
+  display: "swap",
+});
+
+const orbitron = Orbitron({
+  weight: ["400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
+  variable: "--font-arcade",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "贴膜大亨 - 手膜产业帝国",
@@ -31,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="zh-CN" suppressHydrationWarning className={`${zcool.variable} ${orbitron.variable}`}>
       <body className="antialiased text-white overflow-hidden">
         {children}
       </body>
