@@ -59,64 +59,78 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
     </svg>
   ),
 
-  // === 2. 校园快贴车 — 面包车+车窗贴膜招牌 ===
+  // === 2. 校园快贴车 — 黑色面包车+贴膜招牌 ===
   van: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       {/* 地面 */}
       <line x1="1" y1="20" x2="23" y2="20" stroke="#374151" strokeWidth="0.8" strokeDasharray="2 1.5" />
       {/* 车身 */}
-      <rect x="1.5" y="7" width="15" height="11" rx="1.5" fill="#60A5FA" stroke="#2563EB" strokeWidth="0.8" />
+      <rect x="1.5" y="7" width="15" height="11" rx="1.5" fill="#1F2937" stroke="#111827" strokeWidth="0.8" />
       {/* 驾驶室 */}
-      <path d="M16.5 10.5L20.5 10.5L21.5 14L21.5 18L16.5 18Z" fill="#93C5FD" stroke="#2563EB" strokeWidth="0.8" />
+      <path d="M16.5 10.5L20.5 10.5L21.5 14L21.5 18L16.5 18Z" fill="#374151" stroke="#111827" strokeWidth="0.8" />
+      {/* 车身高光 */}
+      <rect x="2" y="7.5" width="14" height="1.5" rx="0.5" fill="#374151" opacity="0.5" />
       {/* 挡风玻璃 */}
-      <path d="M17 11L20 11L20.8 13.5L17 13.5Z" fill="#DBEAFE" opacity="0.9" />
+      <path d="M17 11L20 11L20.8 13.5L17 13.5Z" fill="#93C5FD" opacity="0.8" />
       {/* 货箱窗户 */}
-      <rect x="3.5" y="9" width="4.5" height="3.5" rx="0.5" fill="#DBEAFE" />
-      <rect x="9" y="9" width="4.5" height="3.5" rx="0.5" fill="#DBEAFE" />
+      <rect x="3.5" y="9" width="4.5" height="3.5" rx="0.5" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
+      <rect x="9" y="9" width="4.5" height="3.5" rx="0.5" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
       {/* 招牌 */}
       <rect x="3" y="14.5" width="11" height="2.2" rx="0.4" fill="#FDE68A" stroke="#D97706" strokeWidth="0.3" />
       <text x="8.5" y="16" textAnchor="middle" fill="#92400E" fontSize="1.3" fontWeight="bold">贴膜</text>
       {/* 车轮 */}
-      <circle cx="6" cy="19.5" r="2.2" fill="#1F2937" stroke="#111827" strokeWidth="0.5" />
-      <circle cx="6" cy="19.5" r="1" fill="#6B7280" />
-      <circle cx="6" cy="19.5" r="0.4" fill="#9CA3AF" />
-      <circle cx="18.5" cy="19.5" r="2.2" fill="#1F2937" stroke="#111827" strokeWidth="0.5" />
-      <circle cx="18.5" cy="19.5" r="1" fill="#6B7280" />
-      <circle cx="18.5" cy="19.5" r="0.4" fill="#9CA3AF" />
+      <circle cx="6" cy="19.5" r="2.2" fill="#111827" stroke="#030712" strokeWidth="0.5" />
+      <circle cx="6" cy="19.5" r="1" fill="#4B5563" />
+      <circle cx="6" cy="19.5" r="0.4" fill="#6B7280" />
+      <circle cx="18.5" cy="19.5" r="2.2" fill="#111827" stroke="#030712" strokeWidth="0.5" />
+      <circle cx="18.5" cy="19.5" r="1" fill="#4B5563" />
+      <circle cx="18.5" cy="19.5" r="0.4" fill="#6B7280" />
       {/* 车灯 */}
       <rect x="1.5" y="15.5" width="1.5" height="1.5" rx="0.3" fill="#FDE68A" />
       <rect x="20.2" y="15" width="1.3" height="1.8" rx="0.3" fill="#FCA5A5" />
+      {/* 车顶装饰 */}
+      <rect x="5" y="6.5" width="8" height="0.8" rx="0.3" fill="#374151" />
     </svg>
   ),
 
-  // === 3. 商场贴膜亭 — 购物亭柜台+人在后面 ===
+  // === 3. 商场贴膜亭 — 高级精品柜台+玻璃展柜 ===
   mall: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      {/* 顶棚 */}
-      <rect x="2" y="2" width="20" height="2.5" rx="0.8" fill="#7C3AED" stroke="#6D28D9" strokeWidth="0.5" />
-      <rect x="2.5" y="4.5" width="19" height="0.6" fill="#A78BFA" opacity="0.5" />
-      {/* 支柱 */}
-      <rect x="3" y="4.5" width="1.2" height="6" rx="0.2" fill="#A78BFA" />
-      <rect x="19.8" y="4.5" width="1.2" height="6" rx="0.2" fill="#A78BFA" />
-      {/* 招牌灯 */}
-      <rect x="6" y="3" width="12" height="1.2" rx="0.3" fill="#FDE68A" stroke="#D97706" strokeWidth="0.3" />
-      {/* 人（站在柜台后） */}
-      {Head({ cx: 12, cy: 8 })}
-      <path d="M9 10.5Q12 12 15 10.5V12H9Z" fill={C.shirt} stroke={C.shirtDark} strokeWidth="0.3" />
-      {/* 柜台 */}
-      <rect x="1.5" y="12" width="21" height="3" rx="0.8" fill="#D97706" stroke="#92400E" strokeWidth="0.5" />
-      <rect x="1.5" y="12" width="21" height="1" rx="0.3" fill="#FDE68A" opacity="0.4" />
-      {/* 柜台腿 */}
-      <rect x="3" y="15" width="1.2" height="5" rx="0.2" fill="#92400E" />
-      <rect x="19.8" y="15" width="1.2" height="5" rx="0.2" fill="#92400E" />
-      {/* 柜台上的手机展示架 */}
-      <rect x="4" y="10" width="2.5" height="2" rx="0.3" fill="#1F2937" />
-      <rect x="4.2" y="10.2" width="2.1" height="1.4" rx="0.2" fill="#93C5FD" />
-      <rect x="17.5" y="10" width="2.5" height="2" rx="0.3" fill="#1F2937" />
-      <rect x="17.7" y="10.2" width="2.1" height="1.4" rx="0.2" fill="#67E8F9" />
-      {/* 手 */}
-      <circle cx="8" cy="11.5" r="1" fill={C.skin} stroke={C.skinDark} strokeWidth="0.3" />
-      <circle cx="16" cy="11.5" r="1" fill={C.skin} stroke={C.skinDark} strokeWidth="0.3" />
+      {/* 大理石地面 */}
+      <rect x="1" y="19" width="22" height="3" rx="0.3" fill="#E2E8F0" />
+      <line x1="3" y1="20" x2="21" y2="20" stroke="#CBD5E1" strokeWidth="0.3" />
+      {/* 精品柜主体 */}
+      <rect x="2" y="10" width="20" height="9" rx="1" fill="#1E293B" stroke="#334155" strokeWidth="0.5" />
+      {/* 柜台台面（大理石感） */}
+      <rect x="1.5" y="9" width="21" height="2" rx="0.5" fill="#F1F5F9" stroke="#CBD5E1" strokeWidth="0.4" />
+      <rect x="1.5" y="9" width="21" height="0.8" rx="0.3" fill="white" opacity="0.5" />
+      {/* 玻璃展柜内背板 */}
+      <rect x="3" y="3" width="18" height="6" rx="0.8" fill="#1E293B" />
+      {/* 玻璃反光 */}
+      <rect x="3" y="3" width="18" height="6" rx="0.8" fill="#3B82F6" opacity="0.08" />
+      <line x1="5" y1="3" x2="4" y2="9" stroke="white" strokeWidth="0.4" opacity="0.15" />
+      {/* LED灯带 */}
+      <rect x="3" y="8.5" width="18" height="0.4" fill="#FDE68A" opacity="0.6" />
+      {/* 展柜内手机展示（3台斜放） */}
+      <rect x="5" y="4.5" width="3" height="3.5" rx="0.4" fill="#111827" stroke="#374151" strokeWidth="0.3" transform="rotate(-5 6.5 6.25)" />
+      <rect x="5.3" y="4.8" width="2.4" height="2.5" rx="0.2" fill="#0EA5E9" opacity="0.8" transform="rotate(-5 6.5 6.25)" />
+      <rect x="10" y="4.2" width="3.5" height="4" rx="0.4" fill="#111827" stroke="#374151" strokeWidth="0.3" transform="rotate(-3 11.75 6.2)" />
+      <rect x="10.4" y="4.5" width="2.8" height="2.8" rx="0.2" fill="#8B5CF6" opacity="0.8" transform="rotate(-3 11.75 6.2)" />
+      <rect x="16" y="4.5" width="3" height="3.5" rx="0.4" fill="#111827" stroke="#374151" strokeWidth="0.3" transform="rotate(-5 17.5 6.25)" />
+      <rect x="16.3" y="4.8" width="2.4" height="2.5" rx="0.2" fill="#22D3EE" opacity="0.8" transform="rotate(-5 17.5 6.25)" />
+      {/* 柜台内抽屉 */}
+      <rect x="3.5" y="12" width="17" height="2.5" rx="0.3" fill="#334155" stroke="#475569" strokeWidth="0.3" />
+      <rect x="10" y="12.8" width="4" height="0.8" rx="0.2" fill="#64748B" />
+      <rect x="3.5" y="15.5" width="17" height="2.5" rx="0.3" fill="#334155" stroke="#475569" strokeWidth="0.3" />
+      <rect x="10" y="16.3" width="4" height="0.8" rx="0.2" fill="#64748B" />
+      {/* 价格标签 */}
+      <rect x="5.5" y="11" width="2.5" height="1.2" rx="0.2" fill="#FDE68A" />
+      <text x="6.75" y="11.8" textAnchor="middle" fill="#92400E" fontSize="0.6" fontWeight="bold">¥99</text>
+      <rect x="11" y="11" width="2.5" height="1.2" rx="0.2" fill="#FDE68A" />
+      <text x="12.25" y="11.8" textAnchor="middle" fill="#92400E" fontSize="0.6" fontWeight="bold">¥199</text>
+      {/* 品牌名 */}
+      <rect x="6" y="7" width="12" height="1.2" rx="0.2" fill="white" opacity="0.15" />
+      <text x="12" y="7.8" textAnchor="middle" fill="white" fontSize="0.8" fontWeight="bold" opacity="0.7">PREMIUM</text>
     </svg>
   ),
 
