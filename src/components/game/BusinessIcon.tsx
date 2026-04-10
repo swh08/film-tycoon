@@ -1,50 +1,362 @@
 // ============================================================
-// BusinessIcon — 生意图标组件，支持自绘SVG + emoji fallback
+// BusinessIcon — 生意图标组件，统一卡通手绘风格SVG
 // ============================================================
 'use client';
 import React from 'react';
 
+// 共用颜色常量（与stall图标风格一致）
+const C = {
+  skin: '#FBBF24', skinDark: '#D97706', skinLight: '#FDE68A',
+  shirt: '#3B82F6', shirtDark: '#1D4ED8',
+  hair: '#1F2937', eye: '#1F2937',
+  white: 'white', apron: '#E2E8F0',
+  wood: '#D97706', woodDark: '#92400E', woodLight: '#78350F',
+  red: '#EF4444', redDark: '#DC2626',
+  metal: '#9CA3AF', metalDark: '#6B7280', metalLight: '#D1D5DB',
+  green: '#22C55E', greenDark: '#16A34A',
+  purple: '#A78BFA', purpleDark: '#7C3AED',
+  yellow: '#FBBF24', yellowDark: '#F59E0B',
+  gold: '#F59E0B', goldDark: '#D97706', goldLight: '#FDE68A',
+  cyan: '#67E8F9', cyanDark: '#06B6D4',
+  blue: '#60A5FA', blueDark: '#2563EB', blueLight: '#93C5FD', bluePale: '#DBEAFE',
+  pink: '#F472B6', pinkDark: '#EC4899',
+};
+
+// 共用人物头部
+function Head({ cx, cy, r = 3.2 }: { cx: number; cy: number; r?: number }) {
+  return <>
+    <circle cx={cx} cy={cy} r={r} fill={C.skin} stroke={C.skinDark} strokeWidth="0.6" />
+    <circle cx={cx - 1.3} cy={cy - 0.5} r="0.7" fill={C.eye} />
+    <circle cx={cx + 1.3} cy={cy - 0.5} r="0.7" fill={C.eye} />
+    <circle cx={cx - 1.1} cy={cy - 0.7} r="0.25" fill={C.white} />
+    <circle cx={cx + 1.5} cy={cy - 0.7} r="0.25" fill={C.white} />
+    <path d={`M${cx - 1.5} ${cy + 1.5}Q${cx} ${cy + 2.8} ${cx + 1.5} ${cy + 1.5}`} stroke={C.skinDark} strokeWidth="0.6" strokeLinecap="round" fill="none" />
+  </>;
+}
+
 const SVG_ICONS: Record<string, () => React.ReactNode> = {
+
+  // === 1. 路边钢化膜摊（已有） ===
   stall: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      {/* 棚顶三角 */}
       <path d="M2 6L12 1.5L22 6Z" fill="#EF4444" />
-      {/* 棚顶横条 */}
       <rect x="1.5" y="6" width="21" height="2.2" rx="0.5" fill="#DC2626" />
-      {/* 棚柱 */}
       <rect x="3" y="8.2" width="1.8" height="8" rx="0.3" fill="#A16207" />
       <rect x="19.2" y="8.2" width="1.8" height="8" rx="0.3" fill="#A16207" />
-      {/* 桌面 */}
       <rect x="1.5" y="16" width="21" height="2.5" rx="0.8" fill="#D97706" stroke="#92400E" strokeWidth="0.5" />
-      {/* 桌腿 */}
       <rect x="4" y="18.5" width="1.5" height="3.5" rx="0.3" fill="#78350F" />
       <rect x="18.5" y="18.5" width="1.5" height="3.5" rx="0.3" fill="#78350F" />
-      {/* 人头 */}
-      <circle cx="12" cy="10" r="3.2" fill="#FBBF24" stroke="#D97706" strokeWidth="0.6" />
-      {/* 眼睛 */}
-      <circle cx="10.7" cy="9.5" r="0.7" fill="#1F2937" />
-      <circle cx="13.3" cy="9.5" r="0.7" fill="#1F2937" />
-      {/* 眼睛高光 */}
-      <circle cx="10.9" cy="9.3" r="0.25" fill="white" />
-      <circle cx="13.5" cy="9.3" r="0.25" fill="white" />
-      {/* 微笑 */}
-      <path d="M10.5 11.5Q12 12.8 13.5 11.5" stroke="#92400E" strokeWidth="0.6" strokeLinecap="round" fill="none" />
-      {/* 身体/衣服 */}
+      {Head({ cx: 12, cy: 10 })}
       <path d="M8.5 13.2Q12 14.5 15.5 13.2V16H8.5Z" fill="#3B82F6" stroke="#1D4ED8" strokeWidth="0.3" />
-      {/* 围裙 */}
       <path d="M9.5 14.2V16H14.5V14.2" fill="white" opacity="0.85" stroke="#CBD5E1" strokeWidth="0.3" />
-      {/* 围裙口袋 */}
       <rect x="10.5" y="14.8" width="3" height="0.8" rx="0.2" fill="#E2E8F0" />
-      {/* 左手 */}
       <circle cx="7.2" cy="15" r="1.3" fill="#FBBF24" stroke="#D97706" strokeWidth="0.3" />
-      {/* 右手 */}
       <circle cx="16.8" cy="15" r="1.3" fill="#FBBF24" stroke="#D97706" strokeWidth="0.3" />
-      {/* 桌上手机 */}
       <rect x="8.8" y="14.5" width="3.2" height="1.8" rx="0.4" fill="#1F2937" />
       <rect x="9.1" y="14.7" width="2.6" height="1.2" rx="0.2" fill="#93C5FD" />
-      {/* 桌上贴膜工具 */}
       <rect x="13" y="14.8" width="2.2" height="1.4" rx="0.3" fill="#9CA3AF" />
       <rect x="13.3" y="15.1" width="1.6" height="0.8" rx="0.15" fill="#D1D5DB" />
+    </svg>
+  ),
+
+  // === 2. 校园快贴车 — 面包车+车窗贴膜招牌 ===
+  van: () => (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* 地面 */}
+      <line x1="1" y1="20" x2="23" y2="20" stroke="#374151" strokeWidth="0.8" strokeDasharray="2 1.5" />
+      {/* 车身 */}
+      <rect x="1.5" y="7" width="15" height="11" rx="1.5" fill="#60A5FA" stroke="#2563EB" strokeWidth="0.8" />
+      {/* 驾驶室 */}
+      <path d="M16.5 10.5L20.5 10.5L21.5 14L21.5 18L16.5 18Z" fill="#93C5FD" stroke="#2563EB" strokeWidth="0.8" />
+      {/* 挡风玻璃 */}
+      <path d="M17 11L20 11L20.8 13.5L17 13.5Z" fill="#DBEAFE" opacity="0.9" />
+      {/* 货箱窗户 */}
+      <rect x="3.5" y="9" width="4.5" height="3.5" rx="0.5" fill="#DBEAFE" />
+      <rect x="9" y="9" width="4.5" height="3.5" rx="0.5" fill="#DBEAFE" />
+      {/* 招牌 */}
+      <rect x="3" y="14.5" width="11" height="2.2" rx="0.4" fill="#FDE68A" stroke="#D97706" strokeWidth="0.3" />
+      <text x="8.5" y="16" textAnchor="middle" fill="#92400E" fontSize="1.3" fontWeight="bold">贴膜</text>
+      {/* 车轮 */}
+      <circle cx="6" cy="19.5" r="2.2" fill="#1F2937" stroke="#111827" strokeWidth="0.5" />
+      <circle cx="6" cy="19.5" r="1" fill="#6B7280" />
+      <circle cx="6" cy="19.5" r="0.4" fill="#9CA3AF" />
+      <circle cx="18.5" cy="19.5" r="2.2" fill="#1F2937" stroke="#111827" strokeWidth="0.5" />
+      <circle cx="18.5" cy="19.5" r="1" fill="#6B7280" />
+      <circle cx="18.5" cy="19.5" r="0.4" fill="#9CA3AF" />
+      {/* 车灯 */}
+      <rect x="1.5" y="15.5" width="1.5" height="1.5" rx="0.3" fill="#FDE68A" />
+      <rect x="20.2" y="15" width="1.3" height="1.8" rx="0.3" fill="#FCA5A5" />
+    </svg>
+  ),
+
+  // === 3. 商场贴膜亭 — 购物亭柜台+人在后面 ===
+  mall: () => (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* 顶棚 */}
+      <rect x="2" y="2" width="20" height="2.5" rx="0.8" fill="#7C3AED" stroke="#6D28D9" strokeWidth="0.5" />
+      <rect x="2.5" y="4.5" width="19" height="0.6" fill="#A78BFA" opacity="0.5" />
+      {/* 支柱 */}
+      <rect x="3" y="4.5" width="1.2" height="6" rx="0.2" fill="#A78BFA" />
+      <rect x="19.8" y="4.5" width="1.2" height="6" rx="0.2" fill="#A78BFA" />
+      {/* 招牌灯 */}
+      <rect x="6" y="3" width="12" height="1.2" rx="0.3" fill="#FDE68A" stroke="#D97706" strokeWidth="0.3" />
+      {/* 人（站在柜台后） */}
+      {Head({ cx: 12, cy: 8 })}
+      <path d="M9 10.5Q12 12 15 10.5V12H9Z" fill={C.shirt} stroke={C.shirtDark} strokeWidth="0.3" />
+      {/* 柜台 */}
+      <rect x="1.5" y="12" width="21" height="3" rx="0.8" fill="#D97706" stroke="#92400E" strokeWidth="0.5" />
+      <rect x="1.5" y="12" width="21" height="1" rx="0.3" fill="#FDE68A" opacity="0.4" />
+      {/* 柜台腿 */}
+      <rect x="3" y="15" width="1.2" height="5" rx="0.2" fill="#92400E" />
+      <rect x="19.8" y="15" width="1.2" height="5" rx="0.2" fill="#92400E" />
+      {/* 柜台上的手机展示架 */}
+      <rect x="4" y="10" width="2.5" height="2" rx="0.3" fill="#1F2937" />
+      <rect x="4.2" y="10.2" width="2.1" height="1.4" rx="0.2" fill="#93C5FD" />
+      <rect x="17.5" y="10" width="2.5" height="2" rx="0.3" fill="#1F2937" />
+      <rect x="17.7" y="10.2" width="2.1" height="1.4" rx="0.2" fill="#67E8F9" />
+      {/* 手 */}
+      <circle cx="8" cy="11.5" r="1" fill={C.skin} stroke={C.skinDark} strokeWidth="0.3" />
+      <circle cx="16" cy="11.5" r="1" fill={C.skin} stroke={C.skinDark} strokeWidth="0.3" />
+    </svg>
+  ),
+
+  // === 4. 连锁门店 — 店铺门面+招牌 ===
+  store: () => (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* 店面外墙 */}
+      <rect x="2" y="4" width="20" height="17" rx="1" fill="#E2E8F0" stroke="#94A3B8" strokeWidth="0.6" />
+      {/* 招牌底板 */}
+      <rect x="2" y="4" width="20" height="4.5" rx="1" fill="#2563EB" />
+      {/* 招牌文字 */}
+      <text x="12" y="7.2" textAnchor="middle" fill="white" fontSize="2.8" fontWeight="bold">贴膜</text>
+      {/* 招牌装饰灯 */}
+      <circle cx="4.5" cy="8.5" r="0.5" fill="#FDE68A" />
+      <circle cx="8" cy="8.5" r="0.5" fill="#FDE68A" />
+      <circle cx="12" cy="8.5" r="0.5" fill="#FDE68A" />
+      <circle cx="16" cy="8.5" r="0.5" fill="#FDE68A" />
+      <circle cx="19.5" cy="8.5" r="0.5" fill="#FDE68A" />
+      {/* 玻璃门 */}
+      <rect x="8" y="10.5" width="8" height="10" rx="0.5" fill="#DBEAFE" stroke="#60A5FA" strokeWidth="0.5" />
+      {/* 门框 */}
+      <line x1="12" y1="10.5" x2="12" y2="20.5" stroke="#60A5FA" strokeWidth="0.5" />
+      {/* 左橱窗 */}
+      <rect x="3" y="10.5" width="4.5" height="6" rx="0.3" fill="#DBEAFE" stroke="#93C5FD" strokeWidth="0.3" />
+      <rect x="3.5" y="12" width="3.5" height="3.5" rx="0.2" fill="#93C5FD" opacity="0.5" />
+      {/* 右橱窗 */}
+      <rect x="16.5" y="10.5" width="4.5" height="6" rx="0.3" fill="#DBEAFE" stroke="#93C5FD" strokeWidth="0.3" />
+      <rect x="17" y="12" width="3.5" height="3.5" rx="0.2" fill="#93C5FD" opacity="0.5" />
+      {/* 地面 */}
+      <rect x="1" y="20.5" width="22" height="1" rx="0.3" fill="#CBD5E1" />
+      {/* 遮阳棚条纹 */}
+      <path d="M2 4L3 5.5L4 4L5 5.5L6 4L7 5.5L8 4L9 5.5L10 4L11 5.5L12 4L13 5.5L14 4L15 5.5L16 4L17 5.5L18 4L19 5.5L20 4L21 5.5L22 4" stroke="white" strokeWidth="0.8" opacity="0.3" />
+    </svg>
+  ),
+
+  // === 5. 直播电商间 — 手机+三脚架+环形灯 ===
+  livestream: () => (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* 三脚架 */}
+      <line x1="12" y1="14" x2="12" y2="22" stroke="#6B7280" strokeWidth="1" />
+      <line x1="12" y1="22" x2="6" y2="20" stroke="#6B7280" strokeWidth="0.8" />
+      <line x1="12" y1="22" x2="18" y2="20" stroke="#6B7280" strokeWidth="0.8" />
+      {/* 环形补光灯 */}
+      <circle cx="12" cy="9" r="5.5" fill="none" stroke="#D1D5DB" strokeWidth="1.2" />
+      <circle cx="12" cy="9" r="5.5" fill="#FDE68A" opacity="0.15" />
+      {/* 灯珠 */}
+      {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => {
+        const rad = (angle * Math.PI) / 180;
+        const x = 12 + Math.cos(rad) * 5.5;
+        const y = 9 + Math.sin(rad) * 5.5;
+        return <circle key={i} cx={x} cy={y} r="0.4" fill="#FDE68A" />;
+      })}
+      {/* 手机 */}
+      <rect x="8.5" y="6" width="7" height="11" rx="0.8" fill="#1F2937" stroke="#111827" strokeWidth="0.5" />
+      <rect x="9" y="6.8" width="6" height="8.8" rx="0.3" fill="#0EA5E9" />
+      {/* 手机屏幕内容：直播画面 */}
+      <rect x="9.3" y="7.2" width="5.4" height="5.5" rx="0.2" fill="#1E3A5F" />
+      {/* 直播主播小人 */}
+      {Head({ cx: 12, cy: 9, r: 1.2 })}
+      <rect x="11" y="10.2" width="2" height="1.5" rx="0.3" fill={C.shirt} />
+      {/* 弹幕 */}
+      <rect x="9.5" y="11" width="2" height="0.5" rx="0.1" fill="white" opacity="0.7" />
+      <rect x="9.8" y="11.7" width="2.5" height="0.5" rx="0.1" fill="#FDE68A" opacity="0.7" />
+      <rect x="10" y="12.4" width="1.8" height="0.5" rx="0.1" fill="#A78BFA" opacity="0.7" />
+      {/* LIVE标签 */}
+      <rect x="9.2" y="14.2" width="2" height="0.8" rx="0.2" fill="#EF4444" />
+      <text x="10.2" y="14.8" textAnchor="middle" fill="white" fontSize="0.6" fontWeight="bold">LIVE</text>
+      {/* 观看人数 */}
+      <rect x="11.5" y="14.2" width="3.2" height="0.8" rx="0.2" fill="#1F2937" opacity="0.7" />
+      <text x="13.1" y="14.8" textAnchor="middle" fill="white" fontSize="0.5">10w</text>
+      {/* 手机home键 */}
+      <circle cx="12" cy="16.3" r="0.35" fill="#374151" />
+    </svg>
+  ),
+
+  // === 6. OEM代工厂 — 工厂+烟囱+传送带 ===
+  factory: () => (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* 主厂房 */}
+      <rect x="2" y="10" width="20" height="11" rx="0.8" fill="#94A3B8" stroke="#64748B" strokeWidth="0.6" />
+      <rect x="2" y="10" width="20" height="2.5" rx="0.5" fill="#64748B" />
+      {/* 烟囱1 */}
+      <rect x="5" y="3" width="2.5" height="7" rx="0.3" fill="#78716C" stroke="#57534E" strokeWidth="0.4" />
+      {/* 烟囱2 */}
+      <rect x="16.5" y="4.5" width="2.5" height="5.5" rx="0.3" fill="#78716C" stroke="#57534E" strokeWidth="0.4" />
+      {/* 烟雾 */}
+      <circle cx="6.25" cy="2.2" r="1" fill="#CBD5E1" opacity="0.6" />
+      <circle cx="5.5" cy="1" r="0.7" fill="#CBD5E1" opacity="0.4" />
+      <circle cx="17.75" cy="3.5" r="0.8" fill="#CBD5E1" opacity="0.5" />
+      {/* 窗户 */}
+      <rect x="4" y="13.5" width="2.5" height="2.5" rx="0.3" fill="#DBEAFE" />
+      <rect x="8" y="13.5" width="2.5" height="2.5" rx="0.3" fill="#DBEAFE" />
+      <rect x="13.5" y="13.5" width="2.5" height="2.5" rx="0.3" fill="#DBEAFE" />
+      <rect x="17.5" y="13.5" width="2.5" height="2.5" rx="0.3" fill="#DBEAFE" />
+      {/* 大门 */}
+      <rect x="10" y="15.5" width="4" height="5.5" rx="0.3" fill="#475569" stroke="#334155" strokeWidth="0.3" />
+      <circle cx="13.2" cy="18.5" r="0.3" fill="#FDE68A" />
+      {/* 传送带 */}
+      <rect x="2" y="20" width="20" height="1.5" rx="0.3" fill="#475569" />
+      <circle cx="5" cy="21.5" r="1" fill="#6B7280" />
+      <circle cx="19" cy="21.5" r="1" fill="#6B7280" />
+      {/* 传送带上的手机膜盒子 */}
+      <rect x="7" y="18.5" width="2" height="1.5" rx="0.2" fill="#60A5FA" />
+      <rect x="11" y="18.5" width="2" height="1.5" rx="0.2" fill="#60A5FA" />
+      <rect x="15" y="18.5" width="2" height="1.5" rx="0.2" fill="#60A5FA" />
+    </svg>
+  ),
+
+  // === 7. 纳米膜研发中心 — 显微镜+实验瓶 ===
+  lab: () => (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* 实验台面 */}
+      <rect x="2" y="17" width="20" height="2.5" rx="0.5" fill="#D97706" stroke="#92400E" strokeWidth="0.4" />
+      <rect x="3" y="19.5" width="2" height="3" rx="0.2" fill="#92400E" />
+      <rect x="19" y="19.5" width="2" height="3" rx="0.2" fill="#92400E" />
+      {/* 显微镜底座 */}
+      <rect x="8" y="15" width="5" height="2" rx="0.4" fill="#374151" stroke="#1F2937" strokeWidth="0.4" />
+      {/* 显微镜支柱 */}
+      <rect x="9.5" y="8" width="2" height="7" rx="0.3" fill="#4B5563" />
+      {/* 显微镜目镜 */}
+      <rect x="8.5" y="6.5" width="4" height="2" rx="0.5" fill="#6B7280" stroke="#4B5563" strokeWidth="0.3" />
+      <rect x="9" y="6" width="3" height="1" rx="0.3" fill="#9CA3AF" />
+      {/* 显微镜镜臂 */}
+      <path d="M11.5 10L15 12.5L15 15L8 15L8 12.5L11.5 10Z" fill="#4B5563" stroke="#374151" strokeWidth="0.3" />
+      {/* 载玻片 */}
+      <rect x="9" y="15.5" width="3.5" height="1" rx="0.2" fill="#67E8F9" opacity="0.7" />
+      {/* 实验瓶1 */}
+      <path d="M16 10L16 15L19 15L19 10Q17.5 8.5 16 10Z" fill="#67E8F9" stroke="#06B6D4" strokeWidth="0.4" opacity="0.8" />
+      <rect x="17" y="8" width="1.5" height="2.5" rx="0.3" fill="#06B6D4" />
+      {/* 实验瓶液体 */}
+      <path d="M16.2 12L16.2 15L18.8 15L18.8 12Q17.5 10.8 16.2 12Z" fill="#22D3EE" opacity="0.6" />
+      {/* 实验瓶2（小瓶） */}
+      <path d="M3.5 12L3.5 15L6" fill="none" />
+      <rect x="3.5" y="11" width="1" height="1.2" rx="0.2" fill="#A78BFA" />
+      <path d="M3.5 12.2L3.5 15L6 15L6 12.2Q4.75 11 3.5 12.2Z" fill="#A78BFA" opacity="0.5" stroke="#7C3AED" strokeWidth="0.3" />
+      {/* 分子结构装饰 */}
+      <circle cx="20" cy="6" r="0.8" fill="#F472B6" />
+      <line x1="20" y1="6.8" x2="20" y2="8.5" stroke="#F472B6" strokeWidth="0.5" />
+      <circle cx="20" cy="8.5" r="0.6" fill="#A78BFA" />
+      <line x1="20.6" y1="8.5" x2="22" y2="7.5" stroke="#A78BFA" strokeWidth="0.5" />
+      <circle cx="22" cy="7.5" r="0.6" fill="#67E8F9" />
+      {/* 公式装饰 */}
+      <text x="3" y="7" fill="#64748B" fontSize="1.8" fontFamily="serif" fontStyle="italic">n</text>
+    </svg>
+  ),
+
+  // === 8. 品牌联名事业部 — 两人握手+品牌标志 ===
+  partnership: () => (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* 左边人 */}
+      {Head({ cx: 6, cy: 7 })}
+      <path d="M3 9.5Q6 11 9 9.5V13H3Z" fill={C.shirt} stroke={C.shirtDark} strokeWidth="0.3" />
+      <circle cx="9.5" cy="11" r="1.2" fill={C.skin} stroke={C.skinDark} strokeWidth="0.3" />
+      {/* 右边人 */}
+      {Head({ cx: 18, cy: 7 })}
+      <path d="M15 9.5Q18 11 21 9.5V13H15Z" fill="#A78BFA" stroke="#7C3AED" strokeWidth="0.3" />
+      <circle cx="14.5" cy="11" r="1.2" fill={C.skin} stroke={C.skinDark} strokeWidth="0.3" />
+      {/* 握手 */}
+      <path d="M9.5 10.5Q12 13 14.5 10.5" stroke={C.skin} strokeWidth="2" strokeLinecap="round" fill="none" />
+      <path d="M10 11.5Q12 13.5 14 11.5" stroke={C.skinDark} strokeWidth="0.5" strokeLinecap="round" fill="none" />
+      {/* 闪光效果 */}
+      <circle cx="12" cy="8" r="0.5" fill="#FDE68A" />
+      <line x1="12" y1="6.5" x2="12" y2="7.2" stroke="#FDE68A" strokeWidth="0.4" />
+      <line x1="10.5" y1="8" x2="11.2" y2="8" stroke="#FDE68A" strokeWidth="0.4" />
+      <line x1="12.8" y1="8" x2="13.5" y2="8" stroke="#FDE68A" strokeWidth="0.4" />
+      {/* 品牌标签 */}
+      <rect x="3" y="15" width="7" height="3.5" rx="0.5" fill="#FEF3C7" stroke="#D97706" strokeWidth="0.4" />
+      <text x="6.5" y="17.2" textAnchor="middle" fill="#92400E" fontSize="1.2" fontWeight="bold">LV</text>
+      <rect x="14" y="15" width="7" height="3.5" rx="0.5" fill="#EDE9FE" stroke="#7C3AED" strokeWidth="0.4" />
+      <text x="17.5" y="17.2" textAnchor="middle" fill="#7C3AED" fontSize="1.2" fontWeight="bold">膜</text>
+      {/* 联名箭头 */}
+      <path d="M10.5 16.5L13.5 16.5" stroke="#F59E0B" strokeWidth="0.8" />
+      <path d="M13 15.8L13.5 16.5L13 17.2" stroke="#F59E0B" strokeWidth="0.6" fill="none" />
+      {/* 底部装饰 */}
+      <rect x="5" y="20" width="14" height="1.5" rx="0.3" fill="#F59E0B" opacity="0.3" />
+      <text x="12" y="21.2" textAnchor="middle" fill="#D97706" fontSize="0.9">CO-BRANDED</text>
+    </svg>
+  ),
+
+  // === 9. 海外分销中心 — 地球+飞机+货物 ===
+  globe: () => (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* 地球 */}
+      <circle cx="10" cy="12" r="7.5" fill="#DBEAFE" stroke="#3B82F6" strokeWidth="0.8" />
+      {/* 大陆 */}
+      <path d="M6 7Q8 6 10 7.5Q11 9 9 10Q7 10 6.5 9Q6 8 6 7Z" fill="#22C55E" />
+      <path d="M10 8Q13 7 14.5 9Q15 11 13.5 12Q11 12.5 10 10.5Z" fill="#22C55E" />
+      <path d="M7 12Q9 11.5 10 13Q10 15 8 15.5Q6 15 7 12Z" fill="#22C55E" />
+      <path d="M12 13Q14 12.5 15 14Q14.5 16 13 16Q12 15.5 12 13Z" fill="#22C55E" />
+      {/* 经纬线 */}
+      <ellipse cx="10" cy="12" rx="7.5" ry="3" fill="none" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
+      <line x1="10" y1="4.5" x2="10" y2="19.5" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
+      <line x1="2.5" y1="12" x2="17.5" y2="12" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
+      {/* 飞机 */}
+      <path d="M15 4L17 5L16.5 6.5L18 7L17 8L14 6.5Z" fill="#F8FAFC" stroke="#64748B" strokeWidth="0.4" />
+      <line x1="13.5" y1="5.5" x2="18.5" y2="5.5" stroke="#64748B" strokeWidth="0.3" strokeDasharray="0.8 0.5" />
+      {/* 货物箱子 */}
+      <rect x="2" y="19" width="2.5" height="2.5" rx="0.3" fill="#D97706" stroke="#92400E" strokeWidth="0.3" />
+      <line x1="3.25" y1="19" x2="3.25" y2="21.5" stroke="#92400E" strokeWidth="0.3" />
+      <line x1="2" y1="20.25" x2="4.5" y2="20.25" stroke="#92400E" strokeWidth="0.3" />
+      <rect x="5.5" y="19.5" width="2" height="2" rx="0.2" fill="#60A5FA" stroke="#2563EB" strokeWidth="0.3" />
+      {/* 定位标记 */}
+      <circle cx="19" cy="5" r="1.5" fill="#EF4444" opacity="0.8" />
+      <circle cx="19" cy="5" r="0.7" fill="white" />
+      <path d="M19 3L19 2" stroke="#EF4444" strokeWidth="0.8" />
+    </svg>
+  ),
+
+  // === 10. 全球屏保集团 — 皇冠+金色光芒 ===
+  crown: () => (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* 光芒 */}
+      {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => {
+        const rad = (angle * Math.PI) / 180;
+        const x1 = 12 + Math.cos(rad) * 8;
+        const y1 = 12 + Math.sin(rad) * 8;
+        const x2 = 12 + Math.cos(rad) * 10;
+        const y2 = 12 + Math.sin(rad) * 10;
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#FDE68A" strokeWidth="0.6" opacity={0.3 + (i % 2) * 0.2} />;
+      })}
+      {/* 底盘 */}
+      <rect x="4" y="16" width="16" height="3" rx="0.8" fill="#F59E0B" stroke="#D97706" strokeWidth="0.6" />
+      <rect x="4" y="16" width="16" height="1" rx="0.3" fill="#FDE68A" opacity="0.5" />
+      {/* 皇冠主体 */}
+      <path d="M4 16L6 8L9 12L12 6L15 12L18 8L20 16Z" fill="#F59E0B" stroke="#D97706" strokeWidth="0.6" />
+      {/* 皇冠高光 */}
+      <path d="M5 16L7 9L10 13L12 7.5L14 13L17 9L19 16Z" fill="#FDE68A" opacity="0.3" />
+      {/* 宝石 */}
+      <circle cx="9" cy="13.5" r="1" fill="#EF4444" stroke="#DC2626" strokeWidth="0.3" />
+      <circle cx="9" cy="13.5" r="0.4" fill="#FCA5A5" opacity="0.6" />
+      <circle cx="12" cy="12" r="1.2" fill="#3B82F6" stroke="#2563EB" strokeWidth="0.3" />
+      <circle cx="12" cy="12" r="0.5" fill="#93C5FD" opacity="0.6" />
+      <circle cx="15" cy="13.5" r="1" fill="#22C55E" stroke="#16A34A" strokeWidth="0.3" />
+      <circle cx="15" cy="13.5" r="0.4" fill="#86EFAC" opacity="0.6" />
+      {/* 顶部装饰球 */}
+      <circle cx="6" cy="8" r="1" fill="#FDE68A" stroke="#D97706" strokeWidth="0.4" />
+      <circle cx="12" cy="6" r="1.2" fill="#FDE68A" stroke="#D97706" strokeWidth="0.4" />
+      <circle cx="18" cy="8" r="1" fill="#FDE68A" stroke="#D97706" strokeWidth="0.4" />
+      {/* 底座文字 */}
+      <text x="12" y="18.5" textAnchor="middle" fill="#92400E" fontSize="1.5" fontWeight="bold">BOSS</text>
     </svg>
   ),
 };
