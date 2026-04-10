@@ -6,7 +6,7 @@ import React from 'react';
 
 const SVG_ICONS: Record<string, () => React.ReactNode> = {
   stall: () => (
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       {/* 棚顶三角 */}
       <path d="M2 6L12 1.5L22 6Z" fill="#EF4444" />
       {/* 棚顶横条 */}
