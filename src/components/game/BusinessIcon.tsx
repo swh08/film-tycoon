@@ -326,7 +326,7 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
     </svg>
   ),
 
-  // === 9. 海外分销中心 — 地球背景+中心飞机 ===
+  // === 9. 海外分销中心 — 地球背景+中心客机 ===
   globe: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       {/* 地球背景（居中放大） */}
@@ -340,30 +340,34 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
       <ellipse cx="12" cy="12" rx="9" ry="3.5" fill="none" stroke="#3B82F6" strokeWidth="0.3" opacity="0.2" />
       <line x1="12" y1="3" x2="12" y2="21" stroke="#3B82F6" strokeWidth="0.3" opacity="0.2" />
       <line x1="3" y1="12" x2="21" y2="12" stroke="#3B82F6" strokeWidth="0.3" opacity="0.2" />
-      {/* 飞机机身（中心，大号） */}
-      <path d="M8 11.5L4 10.5L7.5 12L4 14L8 13.5Q9 13.5 9 12.5Q9 11.5 8 11.5Z" fill="#F1F5F9" stroke="#475569" strokeWidth="0.6" />
-      <path d="M8 11.5L16.5 10L8 12L16.5 14L8 12.5Q7 12.5 7 12Q7 11.5 8 11.5Z" fill="#F8FAFC" stroke="#475569" strokeWidth="0.6" />
-      {/* 左机翼（下） */}
-      <path d="M9 12.5L7 15L8 12.8Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
-      {/* 左机翼（上） */}
-      <path d="M9 11.5L7 9L8 11.2Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
-      {/* 右机翼（下） */}
-      <path d="M14 12.8L16 15.5L14.5 12.8Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
-      {/* 右机翼（上） */}
-      <path d="M14 11.2L16 8.5L14.5 11.2Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
-      {/* 尾翼 */}
-      <path d="M8 11.5L6.5 10L7 11.5Z" fill="#CBD5E1" stroke="#475569" strokeWidth="0.3" />
-      <path d="M8 12.5L6.5 14L7 12.5Z" fill="#CBD5E1" stroke="#475569" strokeWidth="0.3" />
+      {/* 客机机身 */}
+      <path d="M4 12Q4 10.5 5.5 10.5L18 10.5Q19.5 10.5 20 12Q20 13.5 18 13.5L5.5 13.5Q4 13.5 4 12Z" fill="#F1F5F9" stroke="#475569" strokeWidth="0.6" />
+      {/* 机头（圆钝） */}
+      <ellipse cx="4.5" cy="12" rx="1.8" ry="1.5" fill="#F8FAFC" stroke="#475569" strokeWidth="0.5" />
+      {/* 驾驶舱窗 */}
+      <path d="M3.5 11Q4 10.5 5 11L4.8 11.8Q4 11.5 3.5 11Z" fill="#93C5FD" opacity="0.8" />
+      {/* 主机翼（后掠翼） */}
+      <path d="M9 10.5L6.5 6L8 6L11 10.5Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
+      <path d="M9 13.5L6.5 18L8 18L11 13.5Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
+      {/* 发动机（机翼下） */}
+      <ellipse cx="7.8" cy="7.2" rx="1" ry="0.5" fill="#94A3B8" stroke="#64748B" strokeWidth="0.3" />
+      <ellipse cx="7.8" cy="16.8" rx="1" ry="0.5" fill="#94A3B8" stroke="#64748B" strokeWidth="0.3" />
+      {/* 垂直尾翼 */}
+      <path d="M18.5 10.5L17 6.5L19.5 6.5L20 10.5Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
+      {/* 水平尾翼 */}
+      <path d="M18.5 10.5L17.5 8.5L20 10.5Z" fill="#CBD5E1" stroke="#475569" strokeWidth="0.3" />
       {/* 机身高光 */}
-      <line x1="8" y1="11.8" x2="16" y2="11.3" stroke="white" strokeWidth="0.3" opacity="0.6" />
-      {/* 窗户 */}
-      {[10, 11, 12, 13, 14].map((x, i) => (
-        <circle key={i} cx={x} cy="11.65" r="0.3" fill="#93C5FD" opacity="0.7" />
+      <line x1="5" y1="10.8" x2="19" y2="10.8" stroke="white" strokeWidth="0.4" opacity="0.5" />
+      {/* 舷窗 */}
+      {[6, 7, 8, 9.5, 11, 12.5, 14, 15.5, 17].map((x, i) => (
+        <circle key={i} cx={x} cy="11.8" r="0.25" fill="#93C5FD" opacity="0.6" />
       ))}
+      {/* 客舱门线 */}
+      <line x1="16" y1="10.8" x2="16" y2="13.2" stroke="#CBD5E1" strokeWidth="0.3" />
       {/* 航线弧线 */}
-      <path d="M16.5 10Q18 7 20 6" stroke="#EF4444" strokeWidth="0.6" strokeDasharray="1 0.8" fill="none" opacity="0.5" />
-      <circle cx="20" cy="6" r="0.7" fill="#EF4444" opacity="0.6" />
-      <circle cx="20" cy="6" r="0.25" fill="white" />
+      <path d="M20 11Q21.5 8 22 6" stroke="#EF4444" strokeWidth="0.5" strokeDasharray="1 0.8" fill="none" opacity="0.5" />
+      <circle cx="22" cy="5.5" r="0.6" fill="#EF4444" opacity="0.6" />
+      <circle cx="22" cy="5.5" r="0.2" fill="white" />
     </svg>
   ),
 
