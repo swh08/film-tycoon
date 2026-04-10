@@ -59,41 +59,41 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
     </svg>
   ),
 
-  // === 2. 校园快贴车 — 黑色面包车（一体式圆润车身） ===
+  // === 2. 校园快贴车 — 黑色面包车（矮扁造型） ===
   van: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       {/* 地面 */}
       <line x1="1" y1="20" x2="23" y2="20" stroke="#374151" strokeWidth="0.8" strokeDasharray="2 1.5" />
-      {/* 车身 — 面包车一体式圆润造型 */}
-      <path d="M3 7Q3 5.5 4.5 5.5L18 5.5Q19.5 5.5 20.5 7L21.5 10Q22 11.5 22 13L22 18Q22 18.8 21.2 18.8L2.8 18.8Q2 18.8 2 18L2 10Q2 7 3 7Z" fill="#1F2937" stroke="#111827" strokeWidth="0.8" />
+      {/* 车身 — 矮胖面包车，车顶约在y=8 */}
+      <path d="M3.5 9Q3.5 8 5 8L16.5 8Q17.5 8 18.5 9L20 11.5Q20.5 12.5 20.5 13.5L20.5 17.5Q20.5 18.5 19.5 18.5L3.5 18.5Q2.5 18.5 2.5 17.5L2.5 12Q2.5 9 3.5 9Z" fill="#1F2937" stroke="#111827" strokeWidth="0.8" />
       {/* 车身高光条 */}
-      <path d="M3.5 7.5Q4 6.5 5 6.5L18 6.5Q19 6.5 19.5 7.5" stroke="#374151" strokeWidth="0.6" fill="none" />
+      <line x1="3.5" y1="10.5" x2="20" y2="10.5" stroke="#374151" strokeWidth="0.5" opacity="0.6" />
       {/* 车顶行李架 */}
-      <rect x="6" y="5" width="10" height="0.7" rx="0.2" fill="#374151" />
-      <line x1="8" y1="5" x2="8" y2="5.7" stroke="#374151" strokeWidth="0.4" />
-      <line x1="14" y1="5" x2="14" y2="5.7" stroke="#374151" strokeWidth="0.4" />
-      {/* 挡风玻璃（大倾斜一体化） */}
-      <path d="M18.5 7Q19.5 7.5 20 9L21 12L21 14.5L17.5 14.5L17.5 7.5L18.5 7Z" fill="#93C5FD" opacity="0.75" stroke="#374151" strokeWidth="0.3" />
+      <rect x="7" y="7.5" width="9" height="0.6" rx="0.2" fill="#374151" />
+      <line x1="9" y1="7.5" x2="9" y2="8.1" stroke="#374151" strokeWidth="0.3" />
+      <line x1="14" y1="7.5" x2="14" y2="8.1" stroke="#374151" strokeWidth="0.3" />
+      {/* 挡风玻璃（倾斜一体化） */}
+      <path d="M16.8 9Q17.8 9.5 18.5 11L19.5 13.5L19.5 15L15.5 15L15.5 9.5L16.8 9Z" fill="#93C5FD" opacity="0.75" stroke="#374151" strokeWidth="0.3" />
       {/* 侧窗（面包车小方窗） */}
-      <rect x="5" y="7.8" width="3" height="2.5" rx="0.4" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
-      <rect x="9" y="7.8" width="3" height="2.5" rx="0.4" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
-      <rect x="13" y="7.8" width="3" height="2.5" rx="0.4" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
-      {/* 车身招牌贴膜 */}
-      <rect x="3.5" y="12.5" width="13.5" height="3" rx="0.4" fill="#FDE68A" stroke="#D97706" strokeWidth="0.3" />
-      <text x="10.25" y="14.5" textAnchor="middle" fill="#92400E" fontSize="1.5" fontWeight="bold">快张贴膜</text>
+      <rect x="4.5" y="9.5" width="3" height="1.8" rx="0.3" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
+      <rect x="8.5" y="9.5" width="3" height="1.8" rx="0.3" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
+      <rect x="12.5" y="9.5" width="2.5" height="1.8" rx="0.3" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
+      {/* 车身招牌 */}
+      <rect x="3.8" y="13" width="12" height="2.5" rx="0.4" fill="#FDE68A" stroke="#D97706" strokeWidth="0.3" />
+      <text x="9.8" y="14.7" textAnchor="middle" fill="#92400E" fontSize="1.2" fontWeight="bold">快张贴膜</text>
       {/* 车轮 */}
-      <circle cx="6.5" cy="19" r="2" fill="#111827" stroke="#030712" strokeWidth="0.5" />
-      <circle cx="6.5" cy="19" r="0.9" fill="#4B5563" />
-      <circle cx="6.5" cy="19" r="0.35" fill="#6B7280" />
-      <circle cx="17.5" cy="19" r="2" fill="#111827" stroke="#030712" strokeWidth="0.5" />
-      <circle cx="17.5" cy="19" r="0.9" fill="#4B5563" />
-      <circle cx="17.5" cy="19" r="0.35" fill="#6B7280" />
+      <circle cx="6" cy="19" r="1.8" fill="#111827" stroke="#030712" strokeWidth="0.5" />
+      <circle cx="6" cy="19" r="0.8" fill="#4B5563" />
+      <circle cx="6" cy="19" r="0.3" fill="#6B7280" />
+      <circle cx="17" cy="19" r="1.8" fill="#111827" stroke="#030712" strokeWidth="0.5" />
+      <circle cx="17" cy="19" r="0.8" fill="#4B5563" />
+      <circle cx="17" cy="19" r="0.3" fill="#6B7280" />
       {/* 前灯 */}
-      <rect x="20.5" y="13" width="1.3" height="1.5" rx="0.3" fill="#FDE68A" />
+      <rect x="19.5" y="14" width="1" height="1.2" rx="0.2" fill="#FDE68A" />
       {/* 尾灯 */}
-      <rect x="2" y="15" width="1" height="1.5" rx="0.2" fill="#FCA5A5" />
+      <rect x="2.5" y="15" width="0.8" height="1.2" rx="0.15" fill="#FCA5A5" />
       {/* 侧滑门线 */}
-      <line x1="4" y1="7" x2="4" y2="18.8" stroke="#374151" strokeWidth="0.4" strokeDasharray="0" />
+      <line x1="4" y1="9" x2="4" y2="18.5" stroke="#374151" strokeWidth="0.4" />
     </svg>
   ),
 
