@@ -329,25 +329,32 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
   // === 9. 海外分销中心 — 地球 ===
   globe: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      <defs>
+        <clipPath id="globeClip">
+          <circle cx="12" cy="12" r="9.5" />
+        </clipPath>
+      </defs>
       {/* 地球 */}
       <circle cx="12" cy="12" r="9.5" fill="#2563EB" stroke="#1D4ED8" strokeWidth="0.8" />
-      {/* 大陆 — 标准大西洋视角，赤道≈y12，上北下南 */}
-      {/* 北美洲（左上） */}
-      <path d="M4 6L7 4.5L9 6L8.5 7.5L7 8.5L5.5 8L4 7Z" fill="#4ADE80" />
-      {/* 南美洲（左下，赤道以南） */}
-      <path d="M7 10L8.5 10.5L9 12.5L8.5 15L7.5 17L6.5 17L6 15L6.5 12Z" fill="#4ADE80" />
-      {/* 欧洲（中上） */}
-      <path d="M10 4.5L13 4L14.5 5.5L14 7L12 7.5L10 6.5Z" fill="#4ADE80" />
-      {/* 非洲（中部，跨越赤道，上窄下宽） */}
-      <path d="M11 7.5L13 7.5L14 9L14.5 12L14 15L13 17.5L11 18L10 16L10 12L10.5 9Z" fill="#4ADE80" />
-      {/* 亚洲（右上，最大板块） */}
-      <path d="M14.5 4L17 3.5L19.5 5.5L20 8L19 10L17 11L15 10L14.5 8L14.5 5.5Z" fill="#4ADE80" />
-      {/* 澳洲（右下） */}
-      <path d="M17 15L19 14.5L20 15.5L19.5 17L17.5 17.5L16.5 16.5Z" fill="#4ADE80" />
+      {/* 大陆（裁剪到圆形内） */}
+      <g clipPath="url(#globeClip)">
+        {/* 北美洲 — 上宽下窄，右边有凹湾 */}
+        <path d="M3 4L8 3.5L10 5L10 7L9 8L8 9.5L6 9L4 8L3 6Z" fill="#4ADE80" />
+        {/* 南美洲 — 上宽(巴西)下尖(阿根廷) */}
+        <path d="M7.5 11L9 11L9.5 13L9.5 15L9 17L8 19L7 19.5L6.5 18L7 15L7 13Z" fill="#4ADE80" />
+        {/* 欧洲 — 小块，西欧突出 */}
+        <path d="M10.5 4L13.5 3.5L15 5L14.5 7L13 8L11 7.5L10 6L10.5 4Z" fill="#4ADE80" />
+        {/* 非洲 — 赤道北宽南尖 */}
+        <path d="M12 7L15 7L16 9.5L16.5 12L16 15L15 17.5L13.5 19L12 18.5L11.5 16L11.5 12L11.5 9.5Z" fill="#4ADE80" />
+        {/* 亚洲 — 最大板块，右上方 */}
+        <path d="M15 3L20 2.5L21.5 5L21.5 8L20.5 10L19 11.5L17 11L15.5 10L15 8L15 5Z" fill="#4ADE80" />
+        {/* 澳洲 — 右下小圆 */}
+        <path d="M17 15.5L19.5 15L21 16L20.5 17.5L18.5 18L17 17Z" fill="#4ADE80" />
+      </g>
       {/* 经纬线 */}
-      <ellipse cx="12" cy="12" rx="9.5" ry="3.5" fill="none" stroke="white" strokeWidth="0.25" opacity="0.3" />
-      <line x1="12" y1="2.5" x2="12" y2="21.5" stroke="white" strokeWidth="0.25" opacity="0.3" />
-      <line x1="2.5" y1="12" x2="21.5" y2="12" stroke="white" strokeWidth="0.25" opacity="0.3" />
+      <ellipse cx="12" cy="12" rx="9.5" ry="3.5" fill="none" stroke="white" strokeWidth="0.25" opacity="0.25" />
+      <line x1="12" y1="2.5" x2="12" y2="21.5" stroke="white" strokeWidth="0.25" opacity="0.25" />
+      <line x1="2.5" y1="12" x2="21.5" y2="12" stroke="white" strokeWidth="0.25" opacity="0.25" />
       {/* 高光 */}
       <ellipse cx="8" cy="7" rx="4" ry="5" fill="white" opacity="0.08" />
     </svg>
