@@ -9,6 +9,7 @@ import { ANGEL_UPGRADES, ANGEL_UPGRADE_TIERS } from '@/game/config/angel-upgrade
 import { BUSINESSES } from '@/game/config/businesses';
 import { calcAngelUpgradeEffects, formatCash, formatNumber, formatNumberSmart } from '@/game/formulas';
 import { usePopup } from '../PopupLayer';
+import BusinessIcon from '@/components/game/BusinessIcon';
 
 // ============================================================
 // 转生确认弹窗 — 响应式组件，数据实时更新
@@ -143,7 +144,7 @@ function AngelUpgradeCard({ upgrade, onBuy }: { upgrade: typeof ANGEL_UPGRADES[0
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-white">
-              {business ? `${business.icon} ` : ''}{upgrade.name}
+              {business ? <BusinessIcon icon={business.icon} className="inline" /> : null} {upgrade.name}
             </span>
             {isPurchased ? (
               <span className="text-green-400 text-[10px] font-bold">✅ 已购买</span>

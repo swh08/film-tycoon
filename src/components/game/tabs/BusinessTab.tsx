@@ -24,6 +24,7 @@ import {
 } from '@/game/formulas';
 import { usePopup } from '@/components/game/PopupLayer';
 import { playTap, playBuy, playUIClick } from '@/game/sound';
+import BusinessIcon from '@/components/game/BusinessIcon';
 
 
 // ============================================================
@@ -42,7 +43,7 @@ function BusinessUpgradePopupContent({ businessId }: { businessId: number }) {
   return (
     <div className="max-h-[70vh] overflow-y-auto">
       <div className="text-center mb-3">
-        <span className="text-3xl">{businessDef.icon}</span>
+        <BusinessIcon icon={businessDef.icon} className="text-3xl" />
         <h3 className="text-base font-black text-white mt-1">{businessDef.name} 专属升级</h3>
         <p className="text-[10px] text-gray-400">当前等级: ×{quantity}</p>
       </div>
@@ -154,7 +155,7 @@ function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
   return (
     <div className="max-h-[70vh] overflow-y-auto">
       <div className="text-center mb-3">
-        <span className="text-3xl">{businessDef.icon}</span>
+        <BusinessIcon icon={businessDef.icon} className="text-3xl" />
         <h3 className="text-base font-black text-white mt-1">{businessDef.name}</h3>
         <p className="text-[10px] text-gray-400">收益分解详情</p>
       </div>
@@ -284,7 +285,7 @@ export default function BusinessTab() {
           type: 'milestone',
           content: (
             <div className="text-center">
-              <div className="text-4xl mb-2">{def.icon}</div>
+              <div className="text-4xl mb-2"><BusinessIcon icon={def.icon} /></div>
               <h3 className="text-xl font-bold mb-1">🎉 倍率爆发！</h3>
               <p className="text-lg mb-1">{def.name}</p>
               <p className="text-2xl font-black text-yellow-200">{ms.label}</p>
@@ -451,7 +452,7 @@ export default function BusinessTab() {
                         : 'bg-gray-700/50 border-2 border-gray-600/30'
                       }
                     `}>
-                      <span className="-translate-y-2">{def.icon}</span>
+                      <BusinessIcon icon={def.icon} className="text-3xl -translate-y-2" />
                     </div>
                     {/* 数量/里程进度条角标 */}
                     {quantity > 0 && (
