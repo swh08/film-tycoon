@@ -9,7 +9,7 @@ export const BUSINESSES: BusinessDef[] = [
     id: 1,
     name: '路边钢化膜摊',
     order: 1,
-    icon: '🏪',
+    icon: '🏮',
     baseCost: 4,
     costCurve: 'exponential',
     costMultiplier: 1.07,
