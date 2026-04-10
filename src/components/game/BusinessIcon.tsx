@@ -330,35 +330,30 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
   globe: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       <defs>
-        <clipPath id="globeClip">
-          <circle cx="12" cy="12" r="9.5" />
-        </clipPath>
+        <clipPath id="gc"><circle cx="12" cy="12" r="9.5" /></clipPath>
       </defs>
-      {/* 地球 */}
-      <circle cx="12" cy="12" r="9.5" fill="#2563EB" stroke="#1D4ED8" strokeWidth="0.8" />
-      <g clipPath="url(#globeClip)">
-        {/* 北美洲：左边，加拿大宽扁，美国+墨西哥向南收窄 */}
-        <path d="M3 5L6 3.5L9 4L10 5.5L10 7L8.5 8L6 8.5L4.5 8L3 7Z" fill="#4ADE80" />
-        <path d="M5 8.5L8.5 8L9 9L8.5 10.5L6 11L4.5 10L5 8.5Z" fill="#4ADE80" />
-        {/* 南美洲：正下方偏左，上部宽（巴西）底部尖 */}
-        <path d="M7.5 11.5L9.5 11L10 12.5L10 14.5L9.5 16.5L9 18.5L8 20L7 19.5L7 17L7.5 14.5Z" fill="#4ADE80" />
-        {/* 欧洲：中间偏上，不规则小区域 */}
-        <path d="M10 4.5L12 4L13.5 4.5L14.5 6L14 7.5L12.5 7L11 6.5L10 5.5Z" fill="#4ADE80" />
-        {/* 非洲：中间，北边宽（撒哈拉）向南收窄 */}
-        <path d="M11 7.5L14 7L15.5 8.5L16 11L15.5 14L14.5 16.5L13 18L11.5 17.5L11 15L11 12L11 9.5Z" fill="#4ADE80" />
-        {/* 亚洲：右上最大，包括中东、中国、印度 */}
-        <path d="M15 3.5L18 3L20 4.5L21 7L20.5 9.5L19 11L17 11.5L15.5 10.5L15 8.5L14.5 6.5L15 4.5Z" fill="#4ADE80" />
-        {/* 印度半岛 */}
-        <path d="M16 11.5L17.5 11L18 12.5L17 14L16 13L15.5 12Z" fill="#4ADE80" />
-        {/* 澳洲：右下方小块 */}
-        <path d="M17.5 15L19.5 14.5L21 15.5L20.5 17L18.5 17.5L17 16.5Z" fill="#4ADE80" />
+      {/* 海洋 */}
+      <circle cx="12" cy="12" r="9.5" fill="#1E40AF" />
+      <g clipPath="url(#gc)">
+        {/* 北美洲 — 左上方，上宽下窄，东海岸有凹 */}
+        <path d="M3 5Q5 3.5 8 4Q10 4.5 10 6Q10 7.5 9 8.5Q7.5 10 5.5 9.5Q3.5 9 3 7Z" fill="#34D399" />
+        {/* 南美洲 — 北美下方，上宽（巴西）下尖 */}
+        <path d="M7 10.5Q9 10 10 11.5Q10.5 14 10 16.5Q9 19 8 20Q7 19 7 16Q6.5 13 7 10.5Z" fill="#34D399" />
+        {/* 欧洲 — 中上方，小块带起伏 */}
+        <path d="M10.5 4.5Q12.5 3.5 14 5Q14.5 6.5 13 7.5Q11.5 7.5 10.5 6.5Q10 5.5 10.5 4.5Z" fill="#34D399" />
+        {/* 非洲 — 中央偏右，上宽（撒哈拉）下尖，东边有角 */}
+        <path d="M12 7.5Q14.5 7 16 9Q16.5 11.5 16 14.5Q15 17.5 13.5 19Q12 18.5 11.5 16Q11 13 11 10.5Q11 8.5 12 7.5Z" fill="#34D399" />
+        {/* 亚洲 — 右上，最大板块 */}
+        <path d="M15.5 3Q18 2.5 20 4.5Q21 6.5 21 9Q20.5 11 19 11.5Q17 12 15.5 11Q14.5 9 14.5 6.5Q14.5 4 15.5 3Z" fill="#34D399" />
+        {/* 印度 — 亚洲下方的三角 */}
+        <path d="M17 11.5Q18.5 11 19 13Q18.5 15 17 15.5Q16 14 16.5 12.5Q16.5 11.5 17 11.5Z" fill="#34D399" />
+        {/* 澳洲 — 右下小椭圆 */}
+        <path d="M18 15.5Q20 14.5 21 16Q21 17.5 19 18Q17.5 17.5 17.5 16Q17.5 15.5 18 15.5Z" fill="#34D399" />
       </g>
       {/* 经纬线 */}
-      <ellipse cx="12" cy="12" rx="9.5" ry="3.5" fill="none" stroke="white" strokeWidth="0.25" opacity="0.2" />
-      <line x1="12" y1="2.5" x2="12" y2="21.5" stroke="white" strokeWidth="0.25" opacity="0.2" />
-      <line x1="2.5" y1="12" x2="21.5" y2="12" stroke="white" strokeWidth="0.25" opacity="0.2" />
-      {/* 高光 */}
-      <ellipse cx="8" cy="7" rx="4" ry="5" fill="white" opacity="0.08" />
+      <ellipse cx="12" cy="12" rx="9.5" ry="3" fill="none" stroke="white" strokeWidth="0.2" opacity="0.2" />
+      <line x1="12" y1="2.5" x2="12" y2="21.5" stroke="white" strokeWidth="0.2" opacity="0.2" />
+      <line x1="2.5" y1="12" x2="21.5" y2="12" stroke="white" strokeWidth="0.2" opacity="0.2" />
     </svg>
   ),
 
