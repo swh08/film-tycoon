@@ -330,16 +330,16 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
   globe: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       {/* 地球背景（居中放大） */}
-      <circle cx="12" cy="12" r="9" fill="#DBEAFE" stroke="#3B82F6" strokeWidth="0.8" opacity="0.5" />
+      <circle cx="12" cy="12" r="9" fill="#DBEAFE" stroke="#3B82F6" strokeWidth="0.8" />
       {/* 大陆 */}
-      <path d="M6 7Q8 6 10 7.5Q11 9 9 10Q7 10 6.5 9Q6 8 6 7Z" fill="#22C55E" opacity="0.35" />
-      <path d="M10 8Q13 7 14.5 9Q15 11 13.5 12Q11 12.5 10 10.5Z" fill="#22C55E" opacity="0.35" />
-      <path d="M7 12Q9 11.5 10 13Q10 15 8 15.5Q6 15 7 12Z" fill="#22C55E" opacity="0.35" />
-      <path d="M12 13Q14 12.5 15 14Q14.5 16 13 16Q12 15.5 12 13Z" fill="#22C55E" opacity="0.35" />
+      <path d="M6 7Q8 6 10 7.5Q11 9 9 10Q7 10 6.5 9Q6 8 6 7Z" fill="#22C55E" />
+      <path d="M10 8Q13 7 14.5 9Q15 11 13.5 12Q11 12.5 10 10.5Z" fill="#22C55E" />
+      <path d="M7 12Q9 11.5 10 13Q10 15 8 15.5Q6 15 7 12Z" fill="#22C55E" />
+      <path d="M12 13Q14 12.5 15 14Q14.5 16 13 16Q12 15.5 12 13Z" fill="#22C55E" />
       {/* 经纬线 */}
-      <ellipse cx="12" cy="12" rx="9" ry="3.5" fill="none" stroke="#3B82F6" strokeWidth="0.3" opacity="0.2" />
-      <line x1="12" y1="3" x2="12" y2="21" stroke="#3B82F6" strokeWidth="0.3" opacity="0.2" />
-      <line x1="3" y1="12" x2="21" y2="12" stroke="#3B82F6" strokeWidth="0.3" opacity="0.2" />
+      <ellipse cx="12" cy="12" rx="9" ry="3.5" fill="none" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
+      <line x1="12" y1="3" x2="12" y2="21" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
+      <line x1="3" y1="12" x2="21" y2="12" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
       {/* 客机机身 */}
       <path d="M4 12Q4 10.5 5.5 10.5L18 10.5Q19.5 10.5 20 12Q20 13.5 18 13.5L5.5 13.5Q4 13.5 4 12Z" fill="#F1F5F9" stroke="#475569" strokeWidth="0.6" />
       {/* 机头（圆钝） */}
