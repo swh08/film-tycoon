@@ -59,78 +59,82 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
     </svg>
   ),
 
-  // === 2. 校园快贴车 — 黑色面包车+贴膜招牌 ===
+  // === 2. 校园快贴车 — 黑色面包车（一体式圆润车身） ===
   van: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       {/* 地面 */}
       <line x1="1" y1="20" x2="23" y2="20" stroke="#374151" strokeWidth="0.8" strokeDasharray="2 1.5" />
-      {/* 车身 */}
-      <rect x="1.5" y="7" width="15" height="11" rx="1.5" fill="#1F2937" stroke="#111827" strokeWidth="0.8" />
-      {/* 驾驶室 */}
-      <path d="M16.5 10.5L20.5 10.5L21.5 14L21.5 18L16.5 18Z" fill="#374151" stroke="#111827" strokeWidth="0.8" />
-      {/* 车身高光 */}
-      <rect x="2" y="7.5" width="14" height="1.5" rx="0.5" fill="#374151" opacity="0.5" />
-      {/* 挡风玻璃 */}
-      <path d="M17 11L20 11L20.8 13.5L17 13.5Z" fill="#93C5FD" opacity="0.8" />
-      {/* 货箱窗户 */}
-      <rect x="3.5" y="9" width="4.5" height="3.5" rx="0.5" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
-      <rect x="9" y="9" width="4.5" height="3.5" rx="0.5" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
-      {/* 招牌 */}
-      <rect x="3" y="14.5" width="11" height="2.2" rx="0.4" fill="#FDE68A" stroke="#D97706" strokeWidth="0.3" />
-      <text x="8.5" y="16" textAnchor="middle" fill="#92400E" fontSize="1.3" fontWeight="bold">贴膜</text>
+      {/* 车身 — 面包车一体式圆润造型 */}
+      <path d="M3 7Q3 5.5 4.5 5.5L18 5.5Q19.5 5.5 20.5 7L21.5 10Q22 11.5 22 13L22 18Q22 18.8 21.2 18.8L2.8 18.8Q2 18.8 2 18L2 10Q2 7 3 7Z" fill="#1F2937" stroke="#111827" strokeWidth="0.8" />
+      {/* 车身高光条 */}
+      <path d="M3.5 7.5Q4 6.5 5 6.5L18 6.5Q19 6.5 19.5 7.5" stroke="#374151" strokeWidth="0.6" fill="none" />
+      {/* 车顶行李架 */}
+      <rect x="6" y="5" width="10" height="0.7" rx="0.2" fill="#374151" />
+      <line x1="8" y1="5" x2="8" y2="5.7" stroke="#374151" strokeWidth="0.4" />
+      <line x1="14" y1="5" x2="14" y2="5.7" stroke="#374151" strokeWidth="0.4" />
+      {/* 挡风玻璃（大倾斜一体化） */}
+      <path d="M18.5 7Q19.5 7.5 20 9L21 12L21 14.5L17.5 14.5L17.5 7.5L18.5 7Z" fill="#93C5FD" opacity="0.75" stroke="#374151" strokeWidth="0.3" />
+      {/* 侧窗（面包车小方窗） */}
+      <rect x="5" y="7.8" width="3" height="2.5" rx="0.4" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
+      <rect x="9" y="7.8" width="3" height="2.5" rx="0.4" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
+      <rect x="13" y="7.8" width="3" height="2.5" rx="0.4" fill="#1E3A5F" stroke="#374151" strokeWidth="0.3" />
+      {/* 车身招牌贴膜 */}
+      <rect x="3.5" y="12.5" width="13.5" height="3" rx="0.4" fill="#FDE68A" stroke="#D97706" strokeWidth="0.3" />
+      <text x="10.25" y="14.5" textAnchor="middle" fill="#92400E" fontSize="1.5" fontWeight="bold">快张贴膜</text>
       {/* 车轮 */}
-      <circle cx="6" cy="19.5" r="2.2" fill="#111827" stroke="#030712" strokeWidth="0.5" />
-      <circle cx="6" cy="19.5" r="1" fill="#4B5563" />
-      <circle cx="6" cy="19.5" r="0.4" fill="#6B7280" />
-      <circle cx="18.5" cy="19.5" r="2.2" fill="#111827" stroke="#030712" strokeWidth="0.5" />
-      <circle cx="18.5" cy="19.5" r="1" fill="#4B5563" />
-      <circle cx="18.5" cy="19.5" r="0.4" fill="#6B7280" />
-      {/* 车灯 */}
-      <rect x="1.5" y="15.5" width="1.5" height="1.5" rx="0.3" fill="#FDE68A" />
-      <rect x="20.2" y="15" width="1.3" height="1.8" rx="0.3" fill="#FCA5A5" />
-      {/* 车顶装饰 */}
-      <rect x="5" y="6.5" width="8" height="0.8" rx="0.3" fill="#374151" />
+      <circle cx="6.5" cy="19" r="2" fill="#111827" stroke="#030712" strokeWidth="0.5" />
+      <circle cx="6.5" cy="19" r="0.9" fill="#4B5563" />
+      <circle cx="6.5" cy="19" r="0.35" fill="#6B7280" />
+      <circle cx="17.5" cy="19" r="2" fill="#111827" stroke="#030712" strokeWidth="0.5" />
+      <circle cx="17.5" cy="19" r="0.9" fill="#4B5563" />
+      <circle cx="17.5" cy="19" r="0.35" fill="#6B7280" />
+      {/* 前灯 */}
+      <rect x="20.5" y="13" width="1.3" height="1.5" rx="0.3" fill="#FDE68A" />
+      {/* 尾灯 */}
+      <rect x="2" y="15" width="1" height="1.5" rx="0.2" fill="#FCA5A5" />
+      {/* 侧滑门线 */}
+      <line x1="4" y1="7" x2="4" y2="18.8" stroke="#374151" strokeWidth="0.4" strokeDasharray="0" />
     </svg>
   ),
 
-  // === 3. 商场贴膜亭 — 高级精品柜台+玻璃展柜 ===
+  // === 3. 商场贴膜亭 — 高端岛式贴膜专柜+品牌LOGO ===
   mall: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       {/* 大理石地面 */}
-      <rect x="1" y="19" width="22" height="3" rx="0.3" fill="#E2E8F0" />
-      <line x1="3" y1="20" x2="21" y2="20" stroke="#CBD5E1" strokeWidth="0.3" />
-      {/* 精品柜主体 */}
-      <rect x="2" y="10" width="20" height="9" rx="1" fill="#1E293B" stroke="#334155" strokeWidth="0.5" />
-      {/* 柜台台面（大理石感） */}
-      <rect x="1.5" y="9" width="21" height="2" rx="0.5" fill="#F1F5F9" stroke="#CBD5E1" strokeWidth="0.4" />
-      <rect x="1.5" y="9" width="21" height="0.8" rx="0.3" fill="white" opacity="0.5" />
-      {/* 玻璃展柜内背板 */}
-      <rect x="3" y="3" width="18" height="6" rx="0.8" fill="#1E293B" />
-      {/* 玻璃反光 */}
-      <rect x="3" y="3" width="18" height="6" rx="0.8" fill="#3B82F6" opacity="0.08" />
-      <line x1="5" y1="3" x2="4" y2="9" stroke="white" strokeWidth="0.4" opacity="0.15" />
-      {/* LED灯带 */}
-      <rect x="3" y="8.5" width="18" height="0.4" fill="#FDE68A" opacity="0.6" />
-      {/* 展柜内手机展示（3台斜放） */}
-      <rect x="5" y="4.5" width="3" height="3.5" rx="0.4" fill="#111827" stroke="#374151" strokeWidth="0.3" transform="rotate(-5 6.5 6.25)" />
-      <rect x="5.3" y="4.8" width="2.4" height="2.5" rx="0.2" fill="#0EA5E9" opacity="0.8" transform="rotate(-5 6.5 6.25)" />
-      <rect x="10" y="4.2" width="3.5" height="4" rx="0.4" fill="#111827" stroke="#374151" strokeWidth="0.3" transform="rotate(-3 11.75 6.2)" />
-      <rect x="10.4" y="4.5" width="2.8" height="2.8" rx="0.2" fill="#8B5CF6" opacity="0.8" transform="rotate(-3 11.75 6.2)" />
-      <rect x="16" y="4.5" width="3" height="3.5" rx="0.4" fill="#111827" stroke="#374151" strokeWidth="0.3" transform="rotate(-5 17.5 6.25)" />
-      <rect x="16.3" y="4.8" width="2.4" height="2.5" rx="0.2" fill="#22D3EE" opacity="0.8" transform="rotate(-5 17.5 6.25)" />
-      {/* 柜台内抽屉 */}
-      <rect x="3.5" y="12" width="17" height="2.5" rx="0.3" fill="#334155" stroke="#475569" strokeWidth="0.3" />
-      <rect x="10" y="12.8" width="4" height="0.8" rx="0.2" fill="#64748B" />
-      <rect x="3.5" y="15.5" width="17" height="2.5" rx="0.3" fill="#334155" stroke="#475569" strokeWidth="0.3" />
-      <rect x="10" y="16.3" width="4" height="0.8" rx="0.2" fill="#64748B" />
-      {/* 价格标签 */}
-      <rect x="5.5" y="11" width="2.5" height="1.2" rx="0.2" fill="#FDE68A" />
-      <text x="6.75" y="11.8" textAnchor="middle" fill="#92400E" fontSize="0.6" fontWeight="bold">¥99</text>
-      <rect x="11" y="11" width="2.5" height="1.2" rx="0.2" fill="#FDE68A" />
-      <text x="12.25" y="11.8" textAnchor="middle" fill="#92400E" fontSize="0.6" fontWeight="bold">¥199</text>
-      {/* 品牌名 */}
-      <rect x="6" y="7" width="12" height="1.2" rx="0.2" fill="white" opacity="0.15" />
-      <text x="12" y="7.8" textAnchor="middle" fill="white" fontSize="0.8" fontWeight="bold" opacity="0.7">PREMIUM</text>
+      <rect x="1" y="20" width="22" height="2.5" rx="0.3" fill="#E2E8F0" />
+      <line x1="3" y1="21" x2="21" y2="21" stroke="#CBD5E1" strokeWidth="0.3" />
+      {/* 品牌背板（大面积深色+金边） */}
+      <rect x="3" y="2" width="18" height="10" rx="1" fill="#1E293B" stroke="#F59E0B" strokeWidth="0.6" />
+      {/* 品牌名称区域 */}
+      <rect x="5" y="3" width="14" height="3" rx="0.5" fill="#0F172A" />
+      <text x="12" y="5.3" textAnchor="middle" fill="#F59E0B" fontSize="2" fontWeight="bold">SHIELD</text>
+      {/* 品牌Slogan */}
+      <text x="12" y="8" textAnchor="middle" fill="#94A3B8" fontSize="0.7" letterSpacing="0.5">PROTECTION</text>
+      {/* 背板装饰金线 */}
+      <line x1="5" y1="9" x2="19" y2="9" stroke="#F59E0B" strokeWidth="0.3" opacity="0.5" />
+      <line x1="5" y1="9.5" x2="19" y2="9.5" stroke="#F59E0B" strokeWidth="0.3" opacity="0.3" />
+      {/* 展示台面（白色大理石+金边） */}
+      <rect x="2" y="12" width="20" height="2" rx="0.5" fill="#F8FAFC" stroke="#F59E0B" strokeWidth="0.5" />
+      <rect x="2" y="12" width="20" height="0.7" rx="0.3" fill="white" opacity="0.6" />
+      {/* 台面边缘LED灯带效果 */}
+      <rect x="2" y="13.8" width="20" height="0.3" fill="#FDE68A" opacity="0.5" />
+      {/* 柜体主体（深色+玻璃感） */}
+      <rect x="2.5" y="14" width="19" height="5.5" rx="0.6" fill="#1E293B" stroke="#334155" strokeWidth="0.4" />
+      {/* 柜内展示手机（3台竖立展示） */}
+      <rect x="5" y="14.5" width="2.2" height="3.8" rx="0.3" fill="#111827" stroke="#475569" strokeWidth="0.2" />
+      <rect x="5.3" y="14.8" width="1.6" height="3" rx="0.15" fill="#0EA5E9" opacity="0.85" />
+      <rect x="9" y="14.5" width="2.2" height="3.8" rx="0.3" fill="#111827" stroke="#475569" strokeWidth="0.2" />
+      <rect x="9.3" y="14.8" width="1.6" height="3" rx="0.15" fill="#8B5CF6" opacity="0.85" />
+      <rect x="13" y="14.5" width="2.2" height="3.8" rx="0.3" fill="#111827" stroke="#475569" strokeWidth="0.2" />
+      <rect x="13.3" y="14.8" width="1.6" height="3" rx="0.15" fill="#10B981" opacity="0.85" />
+      {/* 玻璃反光效果 */}
+      <rect x="2.5" y="14" width="19" height="5.5" rx="0.6" fill="white" opacity="0.04" />
+      <line x1="4" y1="14" x2="3.5" y2="19.5" stroke="white" strokeWidth="0.3" opacity="0.12" />
+      {/* 两侧柱灯 */}
+      <rect x="1" y="6" width="1.5" height="10" rx="0.3" fill="#F59E0B" opacity="0.7" />
+      <circle cx="1.75" cy="6" r="0.8" fill="#FDE68A" />
+      <rect x="21.5" y="6" width="1.5" height="10" rx="0.3" fill="#F59E0B" opacity="0.7" />
+      <circle cx="22.25" cy="6" r="0.8" fill="#FDE68A" />
     </svg>
   ),
 
