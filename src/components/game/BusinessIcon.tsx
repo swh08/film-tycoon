@@ -243,41 +243,53 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
     </svg>
   ),
 
-  // === 7. 纳米膜研发中心 — 显微镜+实验瓶 ===
+  // === 7. 纳米膜研发中心 — 立体显微镜+纳米观测 ===
   lab: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      {/* 实验台面 */}
-      <rect x="2" y="17" width="20" height="2.5" rx="0.5" fill="#D97706" stroke="#92400E" strokeWidth="0.4" />
-      <rect x="3" y="19.5" width="2" height="3" rx="0.2" fill="#92400E" />
-      <rect x="19" y="19.5" width="2" height="3" rx="0.2" fill="#92400E" />
-      {/* 显微镜底座 */}
-      <rect x="8" y="15" width="5" height="2" rx="0.4" fill="#374151" stroke="#1F2937" strokeWidth="0.4" />
-      {/* 显微镜支柱 */}
-      <rect x="9.5" y="8" width="2" height="7" rx="0.3" fill="#4B5563" />
-      {/* 显微镜目镜 */}
-      <rect x="8.5" y="6.5" width="4" height="2" rx="0.5" fill="#6B7280" stroke="#4B5563" strokeWidth="0.3" />
-      <rect x="9" y="6" width="3" height="1" rx="0.3" fill="#9CA3AF" />
-      {/* 显微镜镜臂 */}
-      <path d="M11.5 10L15 12.5L15 15L8 15L8 12.5L11.5 10Z" fill="#4B5563" stroke="#374151" strokeWidth="0.3" />
+      {/* 底座 */}
+      <rect x="4" y="18" width="16" height="2.5" rx="0.6" fill="#374151" stroke="#1F2937" strokeWidth="0.5" />
+      <rect x="4" y="18" width="16" height="0.8" rx="0.3" fill="#4B5563" opacity="0.5" />
+      {/* 支柱 */}
+      <rect x="11" y="7" width="2" height="11" rx="0.4" fill="#6B7280" stroke="#4B5563" strokeWidth="0.3" />
+      {/* 镜臂（从支柱向左弯曲到目镜） */}
+      <path d="M11 9L11 7.5Q11 6.5 10 6.5L7 6.5Q6 6.5 6 7.5L6 9" fill="none" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" />
+      {/* 目镜（上方倾斜） */}
+      <rect x="4" y="3" width="3.5" height="4.5" rx="0.8" fill="#4B5563" stroke="#374151" strokeWidth="0.5" />
+      <rect x="4.3" y="3.3" width="2.9" height="1.5" rx="0.4" fill="#334155" />
+      {/* 目镜镜片 */}
+      <circle cx="5.75" cy="2.5" r="1.2" fill="#1E3A5F" stroke="#4B5563" strokeWidth="0.4" />
+      <circle cx="5.75" cy="2.5" r="0.5" fill="#93C5FD" opacity="0.5" />
+      {/* 载物台 */}
+      <rect x="7" y="14.5" width="10" height="1.2" rx="0.3" fill="#6B7280" stroke="#4B5563" strokeWidth="0.3" />
       {/* 载玻片 */}
-      <rect x="9" y="15.5" width="3.5" height="1" rx="0.2" fill="#67E8F9" opacity="0.7" />
-      {/* 实验瓶1 */}
-      <path d="M16 10L16 15L19 15L19 10Q17.5 8.5 16 10Z" fill="#67E8F9" stroke="#06B6D4" strokeWidth="0.4" opacity="0.8" />
-      <rect x="17" y="8" width="1.5" height="2.5" rx="0.3" fill="#06B6D4" />
-      {/* 实验瓶液体 */}
-      <path d="M16.2 12L16.2 15L18.8 15L18.8 12Q17.5 10.8 16.2 12Z" fill="#22D3EE" opacity="0.6" />
-      {/* 实验瓶2（小瓶） */}
-      <path d="M3.5 12L3.5 15L6" fill="none" />
-      <rect x="3.5" y="11" width="1" height="1.2" rx="0.2" fill="#A78BFA" />
-      <path d="M3.5 12.2L3.5 15L6 15L6 12.2Q4.75 11 3.5 12.2Z" fill="#A78BFA" opacity="0.5" stroke="#7C3AED" strokeWidth="0.3" />
-      {/* 分子结构装饰 */}
-      <circle cx="20" cy="6" r="0.8" fill="#F472B6" />
-      <line x1="20" y1="6.8" x2="20" y2="8.5" stroke="#F472B6" strokeWidth="0.5" />
-      <circle cx="20" cy="8.5" r="0.6" fill="#A78BFA" />
-      <line x1="20.6" y1="8.5" x2="22" y2="7.5" stroke="#A78BFA" strokeWidth="0.5" />
-      <circle cx="22" cy="7.5" r="0.6" fill="#67E8F9" />
-      {/* 公式装饰 */}
-      <text x="3" y="7" fill="#64748B" fontSize="1.8" fontFamily="serif" fontStyle="italic">n</text>
+      <rect x="9" y="14.8" width="4" height="0.6" rx="0.1" fill="#67E8F9" opacity="0.8" />
+      {/* 物镜（旋转头+镜头） */}
+      <rect x="11" y="12" width="2" height="2.5" rx="0.3" fill="#4B5563" stroke="#374151" strokeWidth="0.3" />
+      <rect x="10.5" y="11.5" width="3" height="1" rx="0.2" fill="#6B7280" />
+      {/* 物镜镜头 */}
+      <circle cx="12" cy="14.8" r="0.6" fill="#374151" />
+      <circle cx="12" cy="14.8" r="0.3" fill="#0EA5E9" opacity="0.6" />
+      {/* 调焦旋钮 */}
+      <circle cx="13.5" cy="10" r="1" fill="#6B7280" stroke="#4B5563" strokeWidth="0.3" />
+      <circle cx="13.5" cy="10" r="0.4" fill="#4B5563" />
+      {/* 观测视野内的纳米结构（放大效果） */}
+      <rect x="16" y="2" width="7" height="5.5" rx="0.5" fill="#0F172A" stroke="#3B82F6" strokeWidth="0.5" opacity="0.9" />
+      {/* 放大镜边框 */}
+      <circle cx="19.5" cy="4.75" r="3" fill="none" stroke="#93C5FD" strokeWidth="0.4" opacity="0.5" />
+      {/* 纳米分子链结构 */}
+      <circle cx="17.5" cy="4" r="0.5" fill="#22C55E" />
+      <line x1="18" y1="4" x2="18.5" y2="3.5" stroke="#22C55E" strokeWidth="0.4" />
+      <circle cx="18.5" cy="3.5" r="0.4" fill="#3B82F6" />
+      <line x1="18.9" y1="3.5" x2="19.5" y2="4" stroke="#3B82F6" strokeWidth="0.4" />
+      <circle cx="19.5" cy="4" r="0.5" fill="#F59E0B" />
+      <line x1="20" y1="4" x2="20.8" y2="4.5" stroke="#F59E0B" strokeWidth="0.4" />
+      <circle cx="20.8" cy="4.5" r="0.4" fill="#EF4444" />
+      <line x1="17.5" y1="4.5" x2="18" y2="5" stroke="#22C55E" strokeWidth="0.4" />
+      <circle cx="18" cy="5" r="0.35" fill="#A78BFA" />
+      <line x1="18.35" y1="5" x2="19" y2="5.3" stroke="#A78BFA" strokeWidth="0.4" />
+      <circle cx="19" cy="5.3" r="0.35" fill="#22D3EE" />
+      {/* nm标注 */}
+      <text x="19.5" y="6.8" textAnchor="middle" fill="#94A3B8" fontSize="0.9" fontFamily="monospace">nm</text>
     </svg>
   ),
 
