@@ -326,32 +326,38 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
     </svg>
   ),
 
-  // === 9. 海外分销中心 — 地球+飞机+货物 ===
+  // === 9. 海外分销中心 — 地球+飞机航线 ===
   globe: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       {/* 地球 */}
-      <circle cx="10" cy="12" r="7.5" fill="#DBEAFE" stroke="#3B82F6" strokeWidth="0.8" />
+      <circle cx="10" cy="13" r="7" fill="#DBEAFE" stroke="#3B82F6" strokeWidth="0.8" />
       {/* 大陆 */}
-      <path d="M6 7Q8 6 10 7.5Q11 9 9 10Q7 10 6.5 9Q6 8 6 7Z" fill="#22C55E" />
-      <path d="M10 8Q13 7 14.5 9Q15 11 13.5 12Q11 12.5 10 10.5Z" fill="#22C55E" />
-      <path d="M7 12Q9 11.5 10 13Q10 15 8 15.5Q6 15 7 12Z" fill="#22C55E" />
-      <path d="M12 13Q14 12.5 15 14Q14.5 16 13 16Q12 15.5 12 13Z" fill="#22C55E" />
+      <path d="M5.5 8.5Q7.5 7.5 9.5 9Q10.5 10.5 8.5 11.5Q6.5 11.5 6 10.5Q5.5 9.5 5.5 8.5Z" fill="#22C55E" />
+      <path d="M9.5 9.5Q12.5 8.5 14 10.5Q14.5 12.5 13 13.5Q10.5 14 9.5 12Z" fill="#22C55E" />
+      <path d="M6.5 13.5Q8.5 13 9.5 14.5Q9.5 16.5 7.5 17Q5.5 16.5 6.5 13.5Z" fill="#22C55E" />
+      <path d="M11.5 14.5Q13.5 14 14.5 15.5Q14 17.5 12.5 17.5Q11.5 17 11.5 14.5Z" fill="#22C55E" />
       {/* 经纬线 */}
-      <ellipse cx="10" cy="12" rx="7.5" ry="3" fill="none" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
-      <line x1="10" y1="4.5" x2="10" y2="19.5" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
-      <line x1="2.5" y1="12" x2="17.5" y2="12" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
-      {/* 飞机 */}
-      <path d="M15 4L17 5L16.5 6.5L18 7L17 8L14 6.5Z" fill="#F8FAFC" stroke="#64748B" strokeWidth="0.4" />
-      <line x1="13.5" y1="5.5" x2="18.5" y2="5.5" stroke="#64748B" strokeWidth="0.3" strokeDasharray="0.8 0.5" />
-      {/* 货物箱子 */}
-      <rect x="2" y="19" width="2.5" height="2.5" rx="0.3" fill="#D97706" stroke="#92400E" strokeWidth="0.3" />
-      <line x1="3.25" y1="19" x2="3.25" y2="21.5" stroke="#92400E" strokeWidth="0.3" />
-      <line x1="2" y1="20.25" x2="4.5" y2="20.25" stroke="#92400E" strokeWidth="0.3" />
-      <rect x="5.5" y="19.5" width="2" height="2" rx="0.2" fill="#60A5FA" stroke="#2563EB" strokeWidth="0.3" />
-      {/* 定位标记 */}
-      <circle cx="19" cy="5" r="1.5" fill="#EF4444" opacity="0.8" />
-      <circle cx="19" cy="5" r="0.7" fill="white" />
-      <path d="M19 3L19 2" stroke="#EF4444" strokeWidth="0.8" />
+      <ellipse cx="10" cy="13" rx="7" ry="2.8" fill="none" stroke="#3B82F6" strokeWidth="0.3" opacity="0.3" />
+      <line x1="10" y1="6" x2="10" y2="20" stroke="#3B82F6" strokeWidth="0.3" opacity="0.3" />
+      <line x1="3" y1="13" x2="17" y2="13" stroke="#3B82F6" strokeWidth="0.3" opacity="0.3" />
+      {/* 地球高光 */}
+      <path d="M5 8Q7 7 10 8Q13 9.5 14 12" stroke="white" strokeWidth="0.8" opacity="0.2" fill="none" strokeLinecap="round" />
+      {/* 飞机机身 */}
+      <path d="M16 6.5L22 5L16.8 7L22 9L16 8.5Q14.5 8.5 14.5 7.5Q14.5 6.5 16 6.5Z" fill="#F1F5F9" stroke="#64748B" strokeWidth="0.5" />
+      {/* 飞机机翼 */}
+      <path d="M16 6.8L13 5.5L13.5 7L16 7.8Z" fill="#E2E8F0" stroke="#64748B" strokeWidth="0.3" />
+      <path d="M16 8.2L13 9.5L13.5 8L16 7.2Z" fill="#E2E8F0" stroke="#64748B" strokeWidth="0.3" />
+      {/* 飞机尾翼 */}
+      <path d="M16 6.5L15 5L15.2 6.5Z" fill="#CBD5E1" stroke="#64748B" strokeWidth="0.2" />
+      {/* 航线虚线 */}
+      <path d="M15 7.5Q13 9 11 8Q9 7 7 8.5" stroke="#EF4444" strokeWidth="0.5" strokeDasharray="1 0.8" fill="none" opacity="0.6" />
+      {/* 航线起点标记 */}
+      <circle cx="7" cy="8.5" r="0.8" fill="#EF4444" opacity="0.7" />
+      <circle cx="7" cy="8.5" r="0.3" fill="white" />
+      {/* 云朵 */}
+      <ellipse cx="4" cy="5" rx="1.8" ry="1" fill="white" opacity="0.7" />
+      <ellipse cx="5.2" cy="4.5" rx="1.2" ry="0.8" fill="white" opacity="0.5" />
+      <ellipse cx="20" cy="3" rx="1.5" ry="0.8" fill="white" opacity="0.5" />
     </svg>
   ),
 
