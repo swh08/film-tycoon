@@ -451,7 +451,7 @@ export default function BusinessTab() {
                         : 'bg-gray-700/50 border-2 border-gray-600/30'
                       }
                     `}>
-                      <span className="-translate-y-1">{def.icon}</span>
+                      <span className="-translate-y-2">{def.icon}</span>
                     </div>
                     {/* 数量/里程进度条角标 */}
                     {quantity > 0 && (
