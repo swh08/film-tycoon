@@ -326,35 +326,44 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
     </svg>
   ),
 
-  // === 9. 海外分销中心 — 地球(中心)+飞机航线 ===
+  // === 9. 海外分销中心 — 地球背景+中心飞机 ===
   globe: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      {/* 地球（居中） */}
-      <circle cx="12" cy="12" r="7" fill="#DBEAFE" stroke="#3B82F6" strokeWidth="0.8" />
+      {/* 地球背景（居中放大） */}
+      <circle cx="12" cy="12" r="9" fill="#DBEAFE" stroke="#3B82F6" strokeWidth="0.8" opacity="0.5" />
       {/* 大陆 */}
-      <path d="M7.5 7.5Q9.5 6.5 11.5 8Q12.5 9.5 10.5 10.5Q8.5 10.5 8 9.5Q7.5 8.5 7.5 7.5Z" fill="#22C55E" />
-      <path d="M11.5 8.5Q14.5 7.5 16 9.5Q16.5 11.5 15 12.5Q12.5 13 11.5 11Z" fill="#22C55E" />
-      <path d="M8.5 12.5Q10.5 12 11.5 13.5Q11.5 15.5 9.5 16Q7.5 15.5 8.5 12.5Z" fill="#22C55E" />
-      <path d="M13.5 13.5Q15.5 13 16.5 14.5Q16 16.5 14.5 16.5Q13.5 16 13.5 13.5Z" fill="#22C55E" />
+      <path d="M6 7Q8 6 10 7.5Q11 9 9 10Q7 10 6.5 9Q6 8 6 7Z" fill="#22C55E" opacity="0.35" />
+      <path d="M10 8Q13 7 14.5 9Q15 11 13.5 12Q11 12.5 10 10.5Z" fill="#22C55E" opacity="0.35" />
+      <path d="M7 12Q9 11.5 10 13Q10 15 8 15.5Q6 15 7 12Z" fill="#22C55E" opacity="0.35" />
+      <path d="M12 13Q14 12.5 15 14Q14.5 16 13 16Q12 15.5 12 13Z" fill="#22C55E" opacity="0.35" />
       {/* 经纬线 */}
-      <ellipse cx="12" cy="12" rx="7" ry="2.8" fill="none" stroke="#3B82F6" strokeWidth="0.3" opacity="0.3" />
-      <line x1="12" y1="5" x2="12" y2="19" stroke="#3B82F6" strokeWidth="0.3" opacity="0.3" />
-      <line x1="5" y1="12" x2="19" y2="12" stroke="#3B82F6" strokeWidth="0.3" opacity="0.3" />
-      {/* 地球高光 */}
-      <path d="M7 7Q9 6 12 7Q15 8.5 16 11" stroke="white" strokeWidth="0.8" opacity="0.2" fill="none" strokeLinecap="round" />
-      {/* 飞机（环绕地球右上角） */}
-      <path d="M17 5.5L22.5 4.5L18 6L22.5 8L17 7.5Q15.8 7.5 15.8 6.5Q15.8 5.5 17 5.5Z" fill="#F1F5F9" stroke="#64748B" strokeWidth="0.5" />
-      {/* 飞机机翼 */}
-      <path d="M17 5.8L14.5 4.5L15 6L17 6.8Z" fill="#E2E8F0" stroke="#64748B" strokeWidth="0.3" />
-      <path d="M17 7.2L14.5 8.5L15 7L17 6.2Z" fill="#E2E8F0" stroke="#64748B" strokeWidth="0.3" />
+      <ellipse cx="12" cy="12" rx="9" ry="3.5" fill="none" stroke="#3B82F6" strokeWidth="0.3" opacity="0.2" />
+      <line x1="12" y1="3" x2="12" y2="21" stroke="#3B82F6" strokeWidth="0.3" opacity="0.2" />
+      <line x1="3" y1="12" x2="21" y2="12" stroke="#3B82F6" strokeWidth="0.3" opacity="0.2" />
+      {/* 飞机机身（中心，大号） */}
+      <path d="M8 11.5L4 10.5L7.5 12L4 14L8 13.5Q9 13.5 9 12.5Q9 11.5 8 11.5Z" fill="#F1F5F9" stroke="#475569" strokeWidth="0.6" />
+      <path d="M8 11.5L16.5 10L8 12L16.5 14L8 12.5Q7 12.5 7 12Q7 11.5 8 11.5Z" fill="#F8FAFC" stroke="#475569" strokeWidth="0.6" />
+      {/* 左机翼（下） */}
+      <path d="M9 12.5L7 15L8 12.8Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
+      {/* 左机翼（上） */}
+      <path d="M9 11.5L7 9L8 11.2Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
+      {/* 右机翼（下） */}
+      <path d="M14 12.8L16 15.5L14.5 12.8Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
+      {/* 右机翼（上） */}
+      <path d="M14 11.2L16 8.5L14.5 11.2Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
+      {/* 尾翼 */}
+      <path d="M8 11.5L6.5 10L7 11.5Z" fill="#CBD5E1" stroke="#475569" strokeWidth="0.3" />
+      <path d="M8 12.5L6.5 14L7 12.5Z" fill="#CBD5E1" stroke="#475569" strokeWidth="0.3" />
+      {/* 机身高光 */}
+      <line x1="8" y1="11.8" x2="16" y2="11.3" stroke="white" strokeWidth="0.3" opacity="0.6" />
+      {/* 窗户 */}
+      {[10, 11, 12, 13, 14].map((x, i) => (
+        <circle key={i} cx={x} cy="11.65" r="0.3" fill="#93C5FD" opacity="0.7" />
+      ))}
       {/* 航线弧线 */}
-      <path d="M16 6.5Q14 4 10 5.5Q7 7 5.5 10" stroke="#EF4444" strokeWidth="0.5" strokeDasharray="1 0.8" fill="none" opacity="0.6" />
-      {/* 航线端点 */}
-      <circle cx="5.5" cy="10" r="0.8" fill="#EF4444" opacity="0.7" />
-      <circle cx="5.5" cy="10" r="0.3" fill="white" />
-      {/* 云朵 */}
-      <ellipse cx="3" cy="4" rx="1.5" ry="0.8" fill="white" opacity="0.6" />
-      <ellipse cx="4" cy="3.5" rx="1" ry="0.6" fill="white" opacity="0.4" />
+      <path d="M16.5 10Q18 7 20 6" stroke="#EF4444" strokeWidth="0.6" strokeDasharray="1 0.8" fill="none" opacity="0.5" />
+      <circle cx="20" cy="6" r="0.7" fill="#EF4444" opacity="0.6" />
+      <circle cx="20" cy="6" r="0.25" fill="white" />
     </svg>
   ),
 
