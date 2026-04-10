@@ -326,7 +326,7 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
     </svg>
   ),
 
-  // === 9. 海外分销中心 — 地球+客机 ===
+  // === 9. 海外分销中心 — 地球 ===
   globe: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       {/* 地球 */}
@@ -340,20 +340,8 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
       <ellipse cx="12" cy="12" rx="9" ry="3.5" fill="none" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
       <line x1="12" y1="3" x2="12" y2="21" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
       <line x1="3" y1="12" x2="21" y2="12" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
-      {/* 客机机身 */}
-      <path d="M4 12Q4 10.5 5.5 10.5L18 10.5Q19.5 10.5 20 12Q20 13.5 18 13.5L5.5 13.5Q4 13.5 4 12Z" fill="#F1F5F9" stroke="#475569" strokeWidth="0.6" />
-      {/* 机头 */}
-      <ellipse cx="4.5" cy="12" rx="1.8" ry="1.5" fill="#F8FAFC" stroke="#475569" strokeWidth="0.5" />
-      {/* 驾驶舱窗 */}
-      <path d="M3.5 11Q4 10.5 5 11L4.8 11.8Q4 11.5 3.5 11Z" fill="#93C5FD" opacity="0.8" />
-      {/* 主机翼 */}
-      <path d="M9 10.5L6.5 6L8 6L11 10.5Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
-      <path d="M9 13.5L6.5 18L8 18L11 13.5Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
-      {/* 发动机 */}
-      <ellipse cx="7.8" cy="7.2" rx="1" ry="0.5" fill="#94A3B8" stroke="#64748B" strokeWidth="0.3" />
-      <ellipse cx="7.8" cy="16.8" rx="1" ry="0.5" fill="#94A3B8" stroke="#64748B" strokeWidth="0.3" />
-      {/* 垂直尾翼 */}
-      <path d="M18.5 10.5L17 6.5L19.5 6.5L20 10.5Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.4" />
+      {/* 高光 */}
+      <path d="M7 7Q9 6 12 7Q15 8.5 16 11" stroke="white" strokeWidth="0.8" opacity="0.25" fill="none" strokeLinecap="round" />
     </svg>
   ),
 
