@@ -330,18 +330,22 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
   globe: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       {/* 地球 */}
-      <circle cx="12" cy="12" r="9" fill="#DBEAFE" stroke="#3B82F6" strokeWidth="0.8" />
-      {/* 大陆 */}
-      <path d="M6 7Q8 6 10 7.5Q11 9 9 10Q7 10 6.5 9Q6 8 6 7Z" fill="#22C55E" />
-      <path d="M10 8Q13 7 14.5 9Q15 11 13.5 12Q11 12.5 10 10.5Z" fill="#22C55E" />
-      <path d="M7 12Q9 11.5 10 13Q10 15 8 15.5Q6 15 7 12Z" fill="#22C55E" />
-      <path d="M12 13Q14 12.5 15 14Q14.5 16 13 16Q12 15.5 12 13Z" fill="#22C55E" />
+      <circle cx="12" cy="12" r="9.5" fill="#2563EB" stroke="#1D4ED8" strokeWidth="0.8" />
+      {/* 大陆 — 更写实的形状 */}
+      {/* 欧亚大陆 */}
+      <path d="M6 5.5Q8 4.5 11 5Q14 5.5 16 7.5Q17 9 15.5 10Q13.5 10.5 11 9.5Q9 8.5 7.5 9Q6 9.5 6 8Q6 6.5 6 5.5Z" fill="#4ADE80" />
+      {/* 非洲 */}
+      <path d="M9 9.5Q10.5 9 11 10.5Q11.5 12 11 14Q10.5 16 9.5 16.5Q8.5 16 8 14.5Q7.5 12 8 10.5Z" fill="#4ADE80" />
+      {/* 美洲 */}
+      <path d="M4 6.5Q5 5.5 6 7Q6.5 8.5 5.5 10Q4.5 11 4 13Q3.5 15 4 17Q4.5 18 5 17.5Q5.5 16 5 14.5" fill="none" stroke="#4ADE80" strokeWidth="1.8" strokeLinecap="round" opacity="0.9" />
+      {/* 澳洲 */}
+      <path d="M16 13.5Q18 13 19 14.5Q19.5 16 18 16.5Q16.5 16.5 16 15Q15.5 14 16 13.5Z" fill="#4ADE80" />
       {/* 经纬线 */}
-      <ellipse cx="12" cy="12" rx="9" ry="3.5" fill="none" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
-      <line x1="12" y1="3" x2="12" y2="21" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
-      <line x1="3" y1="12" x2="21" y2="12" stroke="#3B82F6" strokeWidth="0.3" opacity="0.4" />
+      <ellipse cx="12" cy="12" rx="9.5" ry="3.5" fill="none" stroke="white" strokeWidth="0.25" opacity="0.3" />
+      <line x1="12" y1="2.5" x2="12" y2="21.5" stroke="white" strokeWidth="0.25" opacity="0.3" />
+      <line x1="2.5" y1="12" x2="21.5" y2="12" stroke="white" strokeWidth="0.25" opacity="0.3" />
       {/* 高光 */}
-      <path d="M7 7Q9 6 12 7Q15 8.5 16 11" stroke="white" strokeWidth="0.8" opacity="0.25" fill="none" strokeLinecap="round" />
+      <ellipse cx="8" cy="7" rx="4" ry="5" fill="white" opacity="0.08" />
     </svg>
   ),
 
