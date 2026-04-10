@@ -326,34 +326,48 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
     </svg>
   ),
 
-  // === 9. 海外分销中心 — 地球 ===
+  // === 9. 海外分销中心 — 地球（大西洋视角） ===
   globe: () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      <defs><clipPath id="gc"><circle cx="12" cy="12" r="9.5" /></clipPath></defs>
-      <circle cx="12" cy="12" r="9.5" fill="#1E40AF" />
+      <defs>
+        <clipPath id="gc"><circle cx="12" cy="12" r="9.5" /></clipPath>
+        <radialGradient id="oceanG" cx="38%" cy="32%">
+          <stop offset="0%" stopColor="#2563EB" />
+          <stop offset="100%" stopColor="#1E3A8A" />
+        </radialGradient>
+        <radialGradient id="globeHL" cx="35%" cy="30%">
+          <stop offset="0%" stopColor="white" stopOpacity="0.2" />
+          <stop offset="100%" stopColor="white" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      {/* 深蓝海洋（渐变球体感） */}
+      <circle cx="12" cy="12" r="9.5" fill="url(#oceanG)" />
       <g clipPath="url(#gc)">
-        {/* 北美洲：左上，加拿大横跨上方，美国向东收窄到佛罗里达/墨西哥 */}
-        <path d="M2.5 5L5 3.5L9 3.5L10 5L9.5 6.5L8.5 7.5L7 8.5L5 9L3.5 8L2.5 6.5Z" fill="#34D399" />
-        {/* 中美洲连接 */}
-        <path d="M5 9L6.5 8.5L7 9.5L6 10.5L5 10Z" fill="#34D399" />
-        {/* 南美洲：北美洲下方，巴西凸出向东，向南收窄 */}
-        <path d="M6.5 10.5L9 10L10 11L10.5 13L10 15.5L9.5 17.5L9 19.5L8 20.5L7 20L6.5 18L6.5 15L6.5 13Z" fill="#34D399" />
-        {/* 欧洲：北非上方，小块 */}
-        <path d="M10 4L12 3.5L13.5 4L14.5 5.5L14 7L12.5 7.5L11 7L10 6L10 4Z" fill="#34D399" />
-        {/* 非洲：欧洲下方，撒哈拉宽，好望角尖 */}
-        <path d="M11 7.5L14 7L15.5 8.5L16 11L16 14L15.5 16.5L14.5 18L13 19L11.5 18L11 15.5L11 13L11 10Z" fill="#34D399" />
-        {/* 亚洲：右上最大，从俄罗斯到东南亚 */}
-        <path d="M15 3L18 2.5L20.5 4L21.5 6.5L21 9L20 10.5L18 11L16 10.5L15 9L14.5 7L15 5Z" fill="#34D399" />
-        {/* 印度半岛：亚洲下方三角形 */}
-        <path d="M16.5 10.5L18 10L19 11.5L18.5 13.5L17 14L16 13L16 11.5Z" fill="#34D399" />
-        {/* 东南亚岛屿 */}
-        <path d="M19 12L20 11.5L21 12.5L20 13.5Z" fill="#34D399" />
-        {/* 澳洲：右下 */}
-        <path d="M18 15L20 14.5L21 15.5L20.5 17L19 17.5L18 17Z" fill="#34D399" />
+        {/* 北美洲 — 左上，上宽下窄倒三角，加拿大横跨上方 */}
+        <path d="M3 5.5 Q3.5 3.5, 5.5 3 Q7 2.5, 8 3.5 Q8.5 4.5, 8 5.5 Q7.5 6.5, 7 7.5 Q6 8.5, 5 9 Q4.5 9, 4 8.5 Q3 7.5, 3 5.5Z" fill="#34D399" />
+        {/* 格陵兰 — 北美东北，大西洋中 */}
+        <ellipse cx="9.5" cy="2.8" rx="1.2" ry="0.7" fill="#34D399" />
+        {/* 中美洲 — 窄条连接北美和南美 */}
+        <path d="M5 9 Q5.5 9.5, 5.5 10.5 Q5 10.5, 5 9Z" fill="#34D399" />
+        {/* 南美洲 — 左下，巴西东海岸大幅凸出 */}
+        <path d="M5.5 10.5 Q7 10, 8.5 10.5 Q9.8 11.5, 9.8 13 Q9.5 15, 8.5 17 Q8 18.5, 7.5 19.5 Q7 19, 6.5 17 Q6 14.5, 5.5 12.5 Q5.5 11, 5.5 10.5Z" fill="#34D399" />
+        {/* 欧洲 — 中上偏右，小块紧凑 */}
+        <path d="M11 5.5 Q11.5 4, 12.5 3.5 Q13.5 3.5, 14 4.5 Q14 6, 13 7 Q12 7.5, 11.5 7 Q11 6.5, 11 5.5Z" fill="#34D399" />
+        {/* 非洲 — 中右大块，上宽下窄，西非凸出 */}
+        <path d="M11 8 Q12.5 7.5, 14 8 Q15.5 9, 16 10.5 Q16 12, 15.5 14 Q15 16, 14 17 Q13 18, 12 17.5 Q10.5 16, 10.5 14 Q10.5 12, 10.5 10 Q10.5 9, 11 8Z" fill="#34D399" />
+        {/* 中东/西亚 — 欧洲右下方 */}
+        <path d="M14.5 5.5 Q16 4.5, 17.5 5 Q18.5 5.5, 19 7 Q18.5 8, 17 8.5 Q16 8.5, 15 8 Q14.5 7, 14.5 5.5Z" fill="#34D399" />
+        {/* 印度 — 中东下方三角 */}
+        <path d="M17 9 Q18 8.5, 19 9.5 Q19 11, 18 12 Q17 12, 16.5 11 Q16.5 10, 17 9Z" fill="#34D399" />
+        {/* 澳洲 — 右下 */}
+        <path d="M18 15 Q19 14, 20 14.5 Q20.5 15.5, 20 16.5 Q19 17, 18.5 16.5 Q18 15.5, 18 15Z" fill="#34D399" />
       </g>
-      <ellipse cx="12" cy="12" rx="9.5" ry="3" fill="none" stroke="white" strokeWidth="0.2" opacity="0.2" />
-      <line x1="12" y1="2.5" x2="12" y2="21.5" stroke="white" strokeWidth="0.2" opacity="0.2" />
-      <line x1="2.5" y1="12" x2="21.5" y2="12" stroke="white" strokeWidth="0.2" opacity="0.2" />
+      {/* 球体高光 */}
+      <circle cx="12" cy="12" r="9.5" fill="url(#globeHL)" opacity="0.12" />
+      {/* 经纬网格 */}
+      <ellipse cx="12" cy="12" rx="9.5" ry="3" fill="none" stroke="white" strokeWidth="0.2" opacity="0.12" />
+      <line x1="12" y1="2.5" x2="12" y2="21.5" stroke="white" strokeWidth="0.2" opacity="0.12" />
+      <line x1="2.5" y1="12" x2="21.5" y2="12" stroke="white" strokeWidth="0.2" opacity="0.12" />
     </svg>
   ),
 
