@@ -445,13 +445,13 @@ export default function BusinessTab() {
                 <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
                   <div className="relative">
                     <div className={`
-                      w-14 h-14 rounded-full flex items-center justify-center text-3xl -translate-y-0.5
+                      w-14 h-14 rounded-full flex items-center justify-center text-3xl
                       ${quantity > 0
                         ? 'bg-gradient-to-br from-yellow-500/30 to-amber-600/30 border-2 border-yellow-500/50'
                         : 'bg-gray-700/50 border-2 border-gray-600/30'
                       }
                     `}>
-                      {def.icon}
+                      <span className="-translate-y-0.5">{def.icon}</span>
                     </div>
                     {/* 数量/里程进度条角标 */}
                     {quantity > 0 && (
