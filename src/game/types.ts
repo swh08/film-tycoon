@@ -203,6 +203,7 @@ export interface ActiveGameEvent {
   remainingSec: number;          // 剩余秒数
   boostType: EventBoostType;
   boostValue: number;
+  reward?: GameEventDef['reward'];
 }
 
 // ============================================================

@@ -168,7 +168,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                       const qty = bs?.quantity ?? 0;
                       const hasMgr = bs?.hasManager ?? false;
                       const ips = qty > 0 && hasMgr
-                        ? calcRevenuePerSecond(biz, qty, state, adBuffs)
+                        ? calcRevenuePerSecond(biz, qty, useGameStore.getState(), adBuffs)
                         : 0;
                       return (
                         <div key={biz.id} className="flex items-center gap-2">

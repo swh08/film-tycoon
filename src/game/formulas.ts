@@ -850,6 +850,7 @@ export function tryTriggerEvent(state: GameState): ActiveGameEvent | null {
     remainingSec: selected.durationSec,
     boostType: selected.boostType,
     boostValue: selected.boostValue,
+    reward: selected.reward,
   };
 
   return activeEvent;

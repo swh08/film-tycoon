@@ -654,7 +654,7 @@ const EMOJI_TO_NAME: Record<string, string> = {
   '⚙️': 'gear', '🔊': 'volume', '🔉': 'volume-low', '💾': 'save', '📤': 'upload', '📥': 'download', '🗑️': 'trash', '🔢': 'number',
   // 商业
   '🏪': 'store', '🚲': 'bike', '🏬': 'mall', '📱': 'phone', '🏭': 'factory', '🔬': 'microscope', '🌍': 'globe', '🌐': 'web',
-  '👑': 'crown', '🤖': 'robot', '🏢': 'building', '🏢': 'building', '🛍️': 'cart',
+  '👑': 'crown', '🤖': 'robot', '🏢': 'building', '🛍️': 'cart',
   // 其他
   '🎁': 'gift', '🎉': 'confetti', '🎊': 'party', '✨': 'sparkle-star', '📺': 'tv', '😴': 'sleep', '💡': 'idea', '💥': 'boom',
   '🔄': 'cycle', '♻️': 'recycle', '👆': 'pointer', '🖱️': 'pointer', '👤': 'person', '📦': 'box', '🏷️': 'tag',

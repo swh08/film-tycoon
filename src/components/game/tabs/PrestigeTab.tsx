@@ -420,7 +420,7 @@ export default function PrestigeTab() {
                 <div className="rounded-xl p-4 bg-gray-900/40 text-center">
                   <span className="text-2xl">🔒</span>
                   <p className="text-xs text-gray-600 mt-1">
-                    转生{tier.minPrestigeCount}次后解锁 {tier.upgrades?.length ?? tierUpgrades.length} 个人脉升级
+                    转生{tier.minPrestigeCount}次后解锁 {tierUpgrades.length} 个人脉升级
                   </p>
                   {totalPrestigeCount < tier.minPrestigeCount && (
                     <div className="mt-2">

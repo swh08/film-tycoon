@@ -24,7 +24,27 @@ export default function EventNotification() {
   const queueRef = useRef<QueuedEvent[]>([]);
   const [currentEvent, setCurrentEvent] = useState<QueuedEvent | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [queueCount, setQueueCount] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function showNext() {
+    if (queueRef.current.length === 0) return;
+    const evt = queueRef.current.shift()!;
+    setQueueCount(queueRef.current.length);
+    setCurrentEvent(evt);
+    setIsVisible(true);
+    playEventStart();
+
+    timerRef.current = setTimeout(() => {
+      setIsVisible(false);
+      timerRef.current = setTimeout(() => {
+        setCurrentEvent(null);
+        timerRef.current = null;
+        // Continue with the next queued event after the exit animation.
+        showNext();
+      }, 300);
+    }, 3000);
+  }
 
   useEffect(() => {
     if (!activeEvents) return;
@@ -51,30 +71,13 @@ export default function EventNotification() {
 
     if (newEvents.length > 0) {
       queueRef.current = [...queueRef.current, ...newEvents];
+      setQueueCount(queueRef.current.length);
       // 如果当前没有在展示，立即显示下一个
       if (!isVisible && !timerRef.current) {
         showNext();
       }
     }
   }, [activeEvents]);
-
-  function showNext() {
-    if (queueRef.current.length === 0) return;
-    const evt = queueRef.current.shift()!;
-    setCurrentEvent(evt);
-    setIsVisible(true);
-    playEventStart();
-
-    timerRef.current = setTimeout(() => {
-      setIsVisible(false);
-      timerRef.current = setTimeout(() => {
-        setCurrentEvent(null);
-        timerRef.current = null;
-        // 继续显示队列中的下一个
-        showNext();
-      }, 300);
-    }, 3000);
-  }
 
   // 清理
   useEffect(() => {
@@ -104,8 +107,6 @@ export default function EventNotification() {
       default: return 'text-white';
     }
   })();
-
-  const queueCount = queueRef.current.length;
 
   return (
     <AnimatePresence>

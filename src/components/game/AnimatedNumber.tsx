@@ -32,6 +32,7 @@ export default function AnimatedNumber({
   const startValue = useRef(value);
   const targetValue = useRef(value);
   const rafActive = useRef(false);
+  const tickRef = useRef<() => void>(() => {});
 
   const format = useCallback(
     (n: number) => (formatFn ? formatFn(n) : n.toString()),
@@ -55,11 +56,15 @@ export default function AnimatedNumber({
     currentDisplayValue.current = currentValue;
 
     if (progress < 1) {
-      animFrameId.current = requestAnimationFrame(tick);
+      animFrameId.current = requestAnimationFrame(tickRef.current);
     } else {
       rafActive.current = false;
     }
   }, [duration, format]);
+
+  useEffect(() => {
+    tickRef.current = tick;
+  }, [tick]);
 
   // Start or jump animation when value changes
   useEffect(() => {
@@ -76,7 +81,7 @@ export default function AnimatedNumber({
     startTime.current = performance.now();
     rafActive.current = true;
 
-    animFrameId.current = requestAnimationFrame(tick);
+    animFrameId.current = requestAnimationFrame(tickRef.current);
 
     return () => {
       if (rafActive.current) {
@@ -84,15 +89,13 @@ export default function AnimatedNumber({
         rafActive.current = false;
       }
     };
-  }, [value, tick]);
+  }, [value]);
 
   // Initialize display text on mount
   useEffect(() => {
     if (displayRef.current) {
       displayRef.current.textContent = format(value);
     }
-    // Only on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

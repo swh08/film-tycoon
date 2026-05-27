@@ -165,7 +165,7 @@ export default function ShopTab() {
     if (adCooldown === null && pendingRewardRef.current) {
       const { offerId, type, value } = pendingRewardRef.current;
       pendingRewardRef.current = null;
-      setActiveCooldownOfferId(null);
+      queueMicrotask(() => setActiveCooldownOfferId(null));
       handleAdReward(offerId, type, value);
     }
   }, [adCooldown, handleAdReward]);
