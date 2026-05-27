@@ -5,61 +5,86 @@
 
 import { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
-import { formatCash, formatNumberSmart, getMarketTrendText } from '@/game/formulas';
+import { formatNumberSmart, getMarketTrendText } from '@/game/formulas';
 import { BUSINESSES } from '@/game/config/businesses';
 import AnimatedNumber from './AnimatedNumber';
+import AssetIcon, { resolveSharedAssetId, type SharedAssetId } from './AssetIcon';
 
 export interface TopHUDProps {
   onSettingsOpen?: () => void;
 }
 
+interface TimerChip {
+  icon: SharedAssetId;
+  text: string;
+  color: string;
+}
+
+interface EventChip {
+  icon: SharedAssetId;
+  text: string;
+  remaining: number;
+}
+
 export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
   const cash = useGameStore(s => s.cash);
   const diamonds = useGameStore(s => s.diamonds);
-  const adBuffs = useGameStore(s => s.adBuffs);
   const businesses = useGameStore(s => s.businesses);
   const prestigePoints = useGameStore(s => s.prestigePoints);
   const marketMultipliers = useGameStore(s => s.marketMultipliers);
-  const activeEvents = useGameStore(s => s.activeEvents);
 
-  const [buffTimers, setBuffTimers] = useState<{icon: string; text: string; color: string}[]>([]);
-  const [eventTimers, setEventTimers] = useState<{icon: string; text: string; remaining: number}[]>([]);
+  const [buffTimers, setBuffTimers] = useState<TimerChip[]>([]);
+  const [eventTimers, setEventTimers] = useState<EventChip[]>([]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       const state = useGameStore.getState();
+      const buffs: TimerChip[] = [];
 
-      // 构建所有活跃buff的倒计时标签
-      const buffs: {icon: string; text: string; color: string}[] = [];
       for (const buff of state.adBuffs) {
         switch (buff.type) {
           case 'double_revenue': {
             const m = Math.floor(buff.remainingSec / 60);
             const s = Math.floor(buff.remainingSec % 60);
-            buffs.push({ icon: '🔥', text: `双倍 ${m}:${s.toString().padStart(2, '0')}`, color: 'from-red-500/80 to-orange-500/80 shadow-red-500/40' });
+            buffs.push({
+              icon: 'boost/fire',
+              text: `双倍 ${m}:${s.toString().padStart(2, '0')}`,
+              color: 'from-red-500/80 to-orange-500/80 shadow-red-500/40',
+            });
             break;
           }
           case 'rush_order':
-            buffs.push({ icon: '🚀', text: `爆单 ${Math.ceil(buff.remainingSec)}s`, color: 'from-orange-500/80 to-yellow-500/80 shadow-orange-500/40' });
+            buffs.push({
+              icon: 'boost/rocket',
+              text: `爆单 ${Math.ceil(buff.remainingSec)}s`,
+              color: 'from-orange-500/80 to-yellow-500/80 shadow-orange-500/40',
+            });
             break;
           case 'speed_boost':
-            buffs.push({ icon: '⚡', text: `加速 ${Math.ceil(buff.remainingSec)}s`, color: 'from-cyan-500/80 to-blue-500/80 shadow-cyan-500/40' });
+            buffs.push({
+              icon: 'boost/lightning',
+              text: `加速 ${Math.ceil(buff.remainingSec)}s`,
+              color: 'from-cyan-500/80 to-blue-500/80 shadow-cyan-500/40',
+            });
             break;
           case 'extra_offline': {
             const m = Math.floor(buff.remainingSec / 60);
             const s = Math.floor(buff.remainingSec % 60);
-            buffs.push({ icon: '⏰', text: `离线加成 ${m}:${s.toString().padStart(2, '0')}`, color: 'from-green-500/80 to-emerald-500/80 shadow-green-500/40' });
+            buffs.push({
+              icon: 'boost/timer',
+              text: `离线加成 ${m}:${s.toString().padStart(2, '0')}`,
+              color: 'from-green-500/80 to-emerald-500/80 shadow-green-500/40',
+            });
             break;
           }
         }
       }
       setBuffTimers(buffs);
 
-      // 事件计时器
       const events = state.activeEvents || [];
       if (events.length > 0) {
         setEventTimers(events.map(e => ({
-          icon: e.icon,
+          icon: resolveSharedAssetId(e.icon) ?? 'boost/lightning',
           text: e.name,
           remaining: Math.ceil(e.remainingSec),
         })));
@@ -70,7 +95,6 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
     return () => clearInterval(timer);
   }, []);
 
-  // 市场趋势汇总
   const activeMarkets = BUSINESSES
     .filter(b => {
       const bs = businesses.find(bs => bs.businessId === b.id);
@@ -81,28 +105,25 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
     ? activeMarkets.reduce((a, b) => a + b, 0) / activeMarkets.length
     : 1;
   const marketTrend = getMarketTrendText(avgMarket);
+  const marketIcon = resolveSharedAssetId(marketTrend.icon) ?? 'boost/lightning';
   const hasMarketEvent = avgMarket < 0.85 || avgMarket > 1.15;
-
-  // 第二行是否有内容
   const hasSecondRow = eventTimers.length > 0 || buffTimers.length > 0 || hasMarketEvent;
 
   return (
     <div className="sticky top-0 z-40 bg-gradient-to-r from-amber-900 via-yellow-800 to-amber-900 
                     border-b-2 border-yellow-500/50 shadow-lg shadow-amber-900/30">
-      {/* === 第一行：资源（左） + 设置（右） === */}
       <div className="flex items-center justify-between px-3 py-1.5">
-        {/* 金币 + 钻石 + 人脉 */}
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
           <div className="flex items-center gap-1 min-w-0">
-            <span className="text-sm">🪙</span>
+            <AssetIcon id="currency/coin" size={18} className="flex-shrink-0" />
             <AnimatedNumber
               value={cash}
-              formatFn={formatCash}
+              formatFn={formatNumberSmart}
               className="text-sm font-bold text-yellow-200 truncate tabular-nums"
             />
           </div>
           <div className="flex items-center gap-0.5">
-            <span className="text-xs">💎</span>
+            <AssetIcon id="currency/diamond" size={16} className="flex-shrink-0" />
             <AnimatedNumber
               value={diamonds}
               className="text-xs font-bold text-cyan-300 tabular-nums"
@@ -111,7 +132,7 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
           </div>
           {prestigePoints > 0 && (
             <div className="flex items-center gap-0.5">
-              <span className="text-xs">🤝</span>
+              <AssetIcon id="currency/connection" size={16} className="flex-shrink-0" />
               <AnimatedNumber
                 value={prestigePoints}
                 className="text-xs font-bold text-orange-300 tabular-nums"
@@ -121,7 +142,6 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
           )}
         </div>
 
-        {/* 设置 */}
         <div className="flex items-center flex-shrink-0">
           {onSettingsOpen && (
             <button
@@ -131,14 +151,14 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
                          hover:from-gray-300 hover:to-gray-500
                          active:shadow-[0_1px_0_0_#374151,0_2px_4px_rgba(0,0,0,0.2)] active:translate-y-[2px]
                          transition-all duration-150"
+              aria-label="打开设置"
             >
-              <span className="text-xs">⚙️</span>
+              <AssetIcon id="system/settings" size={18} />
             </button>
           )}
         </div>
       </div>
 
-      {/* === 第二行：动态buff/事件/市场（无内容时自动隐藏） === */}
       {hasSecondRow && (
         <div className="flex items-center gap-1.5 px-3 pb-1.5 overflow-x-auto">
           {eventTimers.map((evt) => (
@@ -147,7 +167,8 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
               className="flex-shrink-0 px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-600/80 to-pink-600/80
                              text-white text-[10px] font-bold animate-pulse shadow-md shadow-purple-500/40"
             >
-              {evt.icon} {evt.remaining}s
+              <AssetIcon id={evt.icon} size={13} className="mr-1 align-[-2px]" />
+              {evt.remaining}s
             </div>
           ))}
           {buffTimers.map((buff, idx) => (
@@ -156,13 +177,15 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
               className={`flex-shrink-0 px-2 py-0.5 rounded-full bg-gradient-to-r ${buff.color}
                              text-white text-[10px] font-bold animate-pulse shadow-md`}
             >
-              {buff.icon} {buff.text}
+              <AssetIcon id={buff.icon} size={13} className="mr-1 align-[-2px]" />
+              {buff.text}
             </div>
           ))}
           {hasMarketEvent && (
             <div className={`flex-shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ${
               avgMarket > 1.15 ? 'bg-green-600/80 text-green-100' : 'bg-red-600/80 text-red-100'
             }`}>
+              <AssetIcon id={marketIcon} size={13} className="mr-1 align-[-2px]" />
               {marketTrend.text}
             </div>
           )}

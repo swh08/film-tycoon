@@ -25,6 +25,7 @@ import {
 import { usePopup } from '@/components/game/PopupLayer';
 import { playTap, playBuy, playUIClick } from '@/game/sound';
 import BusinessIcon from '@/components/game/BusinessIcon';
+import AssetIcon, { resolveSharedAssetId } from '@/components/game/AssetIcon';
 
 
 // ============================================================
@@ -67,7 +68,13 @@ function BusinessUpgradePopupContent({ businessId }: { businessId: number }) {
               <div className="flex items-center gap-2.5">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0
                   ${isPurchased ? 'bg-green-500/20' : 'bg-gray-700'}`}>
-                  {isPurchased ? '✅' : canSee ? upgrade.icon : '🔒'}
+                  {isPurchased ? (
+                    <AssetIcon id="status/check" size={22} />
+                  ) : canSee && resolveSharedAssetId(upgrade.icon) ? (
+                    <AssetIcon id={resolveSharedAssetId(upgrade.icon)!} size={22} />
+                  ) : (
+                    <AssetIcon id="status/lock" size={22} />
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
@@ -340,7 +347,10 @@ export default function BusinessTab() {
     <div className="flex flex-col gap-3 px-3 py-3 pb-4">
       {/* 标题区 */}
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold text-yellow-400">🏪 我的生意</h2>
+        <h2 className="flex items-center gap-1.5 text-sm font-bold text-yellow-400">
+          <AssetIcon id="nav/business" size={18} />
+          我的生意
+        </h2>
         <div className="flex items-center gap-2">
           {/* 全局购买模式切换 */}
           <div className="flex rounded-lg overflow-hidden">
@@ -433,7 +443,7 @@ export default function BusinessTab() {
             {!isUnlocked && (
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-950/80">
                 <div className="text-center">
-                  <span className="text-2xl">🔒</span>
+                  <AssetIcon id="status/lock" size={28} />
                   <p className="text-xs text-gray-400 mt-1">累计收入达{formatCash(getUnlockTarget(def.id))}解锁</p>
                 </div>
               </div>

@@ -9,6 +9,7 @@ import { useGameStore } from '@/store/gameStore';
 import { formatCash, formatNumberSmart, calcTotalIncomePerSecond, calcRevenuePerSecond } from '@/game/formulas';
 import { BUSINESSES } from '@/game/config/businesses';
 import { ACHIEVEMENTS } from '@/game/config/achievements';
+import AssetIcon, { type SharedAssetId } from './AssetIcon';
 
 interface StatsPanelProps {
   isOpen: boolean;
@@ -31,7 +32,7 @@ function formatPlayTime(startTime: number): string {
 
 /** 统计区块卡片 */
 function StatCard({ icon, label, value, subValue, color = 'text-yellow-300' }: {
-  icon: string;
+  icon: SharedAssetId;
   label: string;
   value: string;
   subValue?: string;
@@ -40,7 +41,7 @@ function StatCard({ icon, label, value, subValue, color = 'text-yellow-300' }: {
   return (
     <div className="bg-gray-800/60 rounded-xl p-3">
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-sm">{icon}</span>
+        <AssetIcon id={icon} size={18} />
         <span className="text-[10px] text-gray-400 font-medium">{label}</span>
       </div>
       <p className={`text-sm font-bold tabular-nums ${color}`}>{value}</p>
@@ -96,7 +97,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
             <div className="flex-shrink-0 px-4 pt-4 pb-3 bg-gradient-to-r from-blue-900/40 to-indigo-900/30 border-b border-blue-600/20">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">📊</span>
+                  <AssetIcon id="nav/achievement" size={28} />
                   <div>
                     <h2 className="text-base font-black text-blue-400">游戏统计</h2>
                     <p className="text-[10px] text-gray-400">查看你的贴膜帝国数据</p>
@@ -115,22 +116,22 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
               {/* 💰 资源统计 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-2">💰 资源统计</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-2">资源统计</h3>
                 <div className="grid grid-cols-3 gap-2">
                   <StatCard
-                    icon="💵"
+                    icon="currency/coin"
                     label="当前现金"
                     value={formatCash(cash)}
                     color="text-yellow-300"
                   />
                   <StatCard
-                    icon="💎"
+                    icon="currency/diamond"
                     label="钻石数量"
                     value={formatNumberSmart(diamonds)}
                     color="text-cyan-300"
                   />
                   <StatCard
-                    icon="🤝"
+                    icon="currency/connection"
                     label="人脉点数"
                     value={formatNumberSmart(prestigePoints)}
                     color="text-orange-300"
@@ -140,16 +141,16 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
 
               {/* 📈 收入统计 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-2">📈 收入统计</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-2">收入统计</h3>
                 <div className="grid grid-cols-1 gap-2">
                   <StatCard
-                    icon="🏦"
+                    icon="currency/coin"
                     label="历史总收入"
                     value={formatCash(totalEarned)}
                     color="text-green-300"
                   />
                   <StatCard
-                    icon="⚡"
+                    icon="boost/lightning"
                     label="当前每秒收入"
                     value={formatCash(incomePerSec) + '/秒'}
                     subValue={incomePerSec > 0 ? formatCash(incomePerSec * 3600) + '/时' : '无被动收入'}
@@ -160,7 +161,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
 
               {/* 🎯 产线统计 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-2">🎯 产线统计</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-2">产线统计</h3>
                 <div className="bg-gray-800/60 rounded-xl p-3">
                   <div className="grid grid-cols-2 gap-x-3 gap-y-2">
                     {BUSINESSES.map(biz => {
@@ -176,7 +177,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] text-gray-300 truncate">{biz.name}</span>
-                              {hasMgr && <span className="text-[8px] text-green-400">👤</span>}
+                              {hasMgr && <AssetIcon id="nav/manager" size={12} />}
                             </div>
                             <span className="text-xs font-bold text-yellow-300 tabular-nums">
                               ×{formatNumberSmart(qty)}
@@ -196,28 +197,28 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
 
               {/* ⏱️ 游戏时长 & 👆 操作统计 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-2">⏱️ & 👆 游戏数据</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-2">游戏数据</h3>
                 <div className="grid grid-cols-2 gap-2">
                   <StatCard
-                    icon="⏱️"
+                    icon="boost/timer"
                     label="游戏时长"
                     value={formatPlayTime(startTime)}
                     color="text-blue-300"
                   />
                   <StatCard
-                    icon="👆"
+                    icon="nav/business"
                     label="手动点击次数"
                     value={formatNumberSmart(totalManualTaps)}
                     color="text-pink-300"
                   />
                   <StatCard
-                    icon="🛒"
+                    icon="nav/shop"
                     label="总购买次数"
                     value={formatNumberSmart(totalPurchases)}
                     color="text-purple-300"
                   />
                   <StatCard
-                    icon="👤"
+                    icon="nav/manager"
                     label="雇佣店长数"
                     value={`${hiredManagers.length}/${BUSINESSES.length}`}
                     color="text-green-300"
@@ -227,22 +228,22 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
 
               {/* 🔄 转生统计 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-2">🔄 转生统计</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-2">转生统计</h3>
                 <div className="grid grid-cols-3 gap-2">
                   <StatCard
-                    icon="♻️"
+                    icon="nav/prestige"
                     label="转生次数"
                     value={totalPrestigeCount.toString()}
                     color="text-orange-300"
                   />
                   <StatCard
-                    icon="🤝"
+                    icon="currency/connection"
                     label="人脉升级数"
                     value={purchasedAngelUpgrades.length.toString()}
                     color="text-orange-400"
                   />
                   <StatCard
-                    icon="🔧"
+                    icon="nav/upgrade"
                     label="产线升级数"
                     value={purchasedBusinessUpgrades.length.toString()}
                     color="text-indigo-300"
@@ -252,7 +253,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
 
               {/* 🏆 成就进度 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-2">🏆 成就进度</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-2">成就进度</h3>
                 <div className="bg-gray-800/60 rounded-xl p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-gray-300">已解锁成就</span>

@@ -551,12 +551,12 @@ export function generateMarketMultipliers(): Record<number, number> {
 
 /** 获取市场趋势文字 */
 export function getMarketTrendText(multiplier: number): { text: string; color: string; icon: string } {
-  if (multiplier >= 2.0) return { text: '🔥 爆发', color: 'text-yellow-300', icon: '🔥' };
-  if (multiplier >= 1.5) return { text: '📈 繁荣', color: 'text-green-400', icon: '📈' };
-  if (multiplier >= 1.1) return { text: '↗ 上涨', color: 'text-green-300', icon: '↗' };
-  if (multiplier >= 0.9) return { text: '→ 平稳', color: 'text-gray-400', icon: '→' };
-  if (multiplier >= 0.7) return { text: '↘ 下跌', color: 'text-orange-400', icon: '↘' };
-  return { text: '📉 暴跌', color: 'text-red-400', icon: '📉' };
+  if (multiplier >= 2.0) return { text: '爆发', color: 'text-yellow-300', icon: 'boost/fire' };
+  if (multiplier >= 1.5) return { text: '繁荣', color: 'text-green-400', icon: 'boost/lightning' };
+  if (multiplier >= 1.1) return { text: '上涨', color: 'text-green-300', icon: 'boost/lightning' };
+  if (multiplier >= 0.9) return { text: '平稳', color: 'text-gray-400', icon: 'boost/timer' };
+  if (multiplier >= 0.7) return { text: '下跌', color: 'text-orange-400', icon: 'status/cross' };
+  return { text: '暴跌', color: 'text-red-400', icon: 'status/cross' };
 }
 
 // === 每日登录 ===
@@ -661,7 +661,7 @@ export function formatNumberSmart(n: number): string {
 }
 
 export function formatCash(n: number): string {
-  return '🪙' + formatNumberSmart(n);
+  return formatNumberSmart(n);
 }
 
 export function formatTime(seconds: number): string {
