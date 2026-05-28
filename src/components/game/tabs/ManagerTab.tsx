@@ -9,6 +9,8 @@ import { BUSINESSES } from '@/game/config/businesses';
 import { calcManagerUpgradeCost, formatCash } from '@/game/formulas';
 import type { Rarity } from '@/game/types';
 import { playHire, playUpgrade, playUIClick } from '@/game/sound';
+import AssetIcon from '@/components/game/AssetIcon';
+import ManagerIcon from '@/components/game/ManagerIcon';
 
 const RARITY_CONFIG: Record<Rarity, { label: string; color: string; bg: string }> = {
   common: { label: '普通', color: 'text-gray-300', bg: 'bg-gray-700' },
@@ -24,7 +26,10 @@ export default function ManagerTab() {
     <div className="flex flex-col gap-3 px-3 py-3 pb-4">
       {/* 标题区 */}
       <div className="flex items-center justify-between mb-1">
-        <h2 className="text-sm font-bold text-yellow-400">👥 店长管理</h2>
+        <h2 className="flex items-center gap-1.5 text-sm font-bold text-yellow-400">
+          <AssetIcon id="nav/manager" size={18} />
+          店长管理
+        </h2>
         <span className="text-[10px] text-gray-400">
           已雇佣 {hiredManagers.length}/{MANAGERS.length}
         </span>
@@ -32,7 +37,10 @@ export default function ManagerTab() {
 
       {/* 产线店长 */}
       <div>
-        <h3 className="text-xs font-medium text-gray-400 mb-2 px-1">🏪 产线店长（自动化+可升级）</h3>
+        <h3 className="flex items-center gap-1.5 text-xs font-medium text-gray-400 mb-2 px-1">
+          <AssetIcon id="nav/business" size={15} />
+          产线店长（自动化+可升级）
+        </h3>
         <div className="flex flex-col gap-2">
           {MANAGERS.filter(m => m.businessId > 0).map(manager => {
             const isHired = hiredManagers.includes(manager.id);
@@ -75,9 +83,9 @@ export default function ManagerTab() {
               >
                 <div className="flex items-start gap-3">
                   {/* 头像 */}
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden
                     ${isHired ? 'bg-yellow-500/20 ring-2 ring-yellow-500/50' : 'bg-gray-700'}`}>
-                    {manager.icon}
+                    <ManagerIcon managerId={manager.id} alt={manager.name} size={46} />
                   </div>
 
                   {/* 信息 */}
@@ -191,7 +199,10 @@ export default function ManagerTab() {
 
       {/* 专家顾问 */}
       <div className="mt-2">
-        <h3 className="text-xs font-medium text-gray-400 mb-2 px-1">🌟 专家顾问（全局加成+可升级）</h3>
+        <h3 className="flex items-center gap-1.5 text-xs font-medium text-gray-400 mb-2 px-1">
+          <AssetIcon id="boost/lightning" size={15} />
+          专家顾问（全局加成+可升级）
+        </h3>
         <div className="flex flex-col gap-2">
           {MANAGERS.filter(m => m.businessId === 0).map(manager => {
             const isHired = hiredManagers.includes(manager.id);
@@ -237,9 +248,9 @@ export default function ManagerTab() {
                 `}
               >
                 <div className="flex items-start gap-3">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden
                     ${isHired ? 'bg-yellow-500/20' : 'bg-gray-700'}`}>
-                    {manager.icon}
+                    <ManagerIcon managerId={manager.id} alt={manager.name} size={46} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-0.5">
