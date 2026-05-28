@@ -10,6 +10,8 @@ import { BUSINESSES } from '@/game/config/businesses';
 import { calcAngelUpgradeEffects, formatCash, formatNumber, formatNumberSmart } from '@/game/formulas';
 import { usePopup } from '../PopupLayer';
 import BusinessIcon from '@/components/game/BusinessIcon';
+import AssetIcon, { type SharedAssetId } from '@/components/game/AssetIcon';
+import AngelUpgradeIcon from '@/components/game/AngelUpgradeIcon';
 
 // ============================================================
 // 转生确认弹窗 — 响应式组件，数据实时更新
@@ -33,7 +35,7 @@ function PrestigeConfirmPopup() {
       <div className="text-5xl mb-3">🔄</div>
       <h3 className="text-xl font-black mb-2">确认转生？</h3>
       <p className="text-sm text-white/80 mb-3">
-        你将卖掉当前所有商业版图，换取{PRESTIGE_RULE.currencyIcon}渠道人脉
+        你将卖掉当前所有商业版图，换取渠道人脉
       </p>
 
       <div className="bg-white/10 rounded-xl p-3 mb-4 text-left space-y-2">
@@ -43,7 +45,10 @@ function PrestigeConfirmPopup() {
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-white/70">本次获得:</span>
-          <span className="text-green-400 font-bold">+{formatNumberSmart(gain)} 🤝</span>
+          <span className="flex items-center gap-1 text-green-400 font-bold">
+            +{formatNumberSmart(gain)}
+            <AssetIcon id="currency/connection" size={16} />
+          </span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-white/70">转生后总加成:</span>
@@ -91,13 +96,19 @@ function AngelUpgradePopup({ upgradeId }: { upgradeId: number }) {
 
   return (
     <div className="text-center">
-      <div className="text-4xl mb-2">{def.icon}</div>
+      <div className="mb-2 flex justify-center">
+        <AngelUpgradeIcon upgradeId={def.id} alt={def.name} size={48} />
+      </div>
       <h3 className="text-lg font-black mb-1">{def.name}</h3>
       <p className="text-xs text-gray-400 mb-3">{def.description}</p>
 
       <div className="bg-red-900/30 rounded-xl p-3 mb-4">
         <p className="text-sm font-bold text-red-400">
-          消耗 {def.cost} 🤝 {PRESTIGE_RULE.currencyName}
+          <span className="inline-flex items-center justify-center gap-1">
+            消耗 {def.cost}
+            <AssetIcon id="currency/connection" size={16} />
+            {PRESTIGE_RULE.currencyName}
+          </span>
         </p>
         <p className="text-[10px] text-red-300/60 mt-1">
           消耗后利润加成将从 ×{formatNumber(currentMultiplier)} 降至 ×{formatNumber(nextMultiplier)}
@@ -137,9 +148,9 @@ function AngelUpgradeCard({ upgrade, onBuy }: { upgrade: typeof ANGEL_UPGRADES[0
         }`}
     >
       <div className="flex items-center gap-2">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg flex-shrink-0
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0
           ${isPurchased ? 'bg-green-500/20' : 'bg-gray-700'}`}>
-          {upgrade.icon}
+          <AngelUpgradeIcon upgradeId={upgrade.id} alt={upgrade.name} size={30} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
@@ -149,7 +160,10 @@ function AngelUpgradeCard({ upgrade, onBuy }: { upgrade: typeof ANGEL_UPGRADES[0
             {isPurchased ? (
               <span className="text-green-400 text-[10px] font-bold">✅ 已购买</span>
             ) : (
-              <span className="text-yellow-400 text-[10px] font-bold">{upgrade.cost} 🤝</span>
+              <span className="inline-flex items-center gap-0.5 text-yellow-400 text-[10px] font-bold">
+                {upgrade.cost}
+                <AssetIcon id="currency/connection" size={12} />
+              </span>
             )}
           </div>
           <p className="text-[10px] text-gray-500">{upgrade.description}</p>
@@ -232,7 +246,7 @@ export default function PrestigeTab() {
       {/* 转生状态卡片 */}
       <div className="rounded-2xl p-4 bg-gradient-to-br from-amber-900/50 to-yellow-900/30">
         <div className="text-center mb-4">
-          <div className="text-4xl mb-2">{PRESTIGE_RULE.currencyIcon}</div>
+          <AssetIcon id="currency/connection" size={44} className="mb-2" />
           <h2 className="text-lg font-black text-yellow-400">{PRESTIGE_RULE.currencyName}</h2>
           <p className="text-xs text-gray-400">转生后获得的永久加成货币</p>
         </div>
@@ -301,7 +315,10 @@ export default function PrestigeTab() {
             <div className="bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-xl p-3 mb-3">
               <p className="text-xs text-gray-400 mb-1">本次转生预计获得</p>
               <div className="text-2xl font-black text-orange-400">
-                +{formatNumberSmart(gain)} 🤝
+                <span className="inline-flex items-center justify-center gap-1">
+                  +{formatNumberSmart(gain)}
+                  <AssetIcon id="currency/connection" size={22} />
+                </span>
               </div>
               <p className="text-[10px] text-gray-500 mt-1">
                 转生后加成: ×{formatNumber(currentMultiplier)} → ×{formatNumber(nextMultiplier)}
@@ -343,7 +360,10 @@ export default function PrestigeTab() {
       {/* 人脉升级商店 — 按分层显示 */}
       <div className="rounded-2xl p-4 bg-gray-800">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-bold text-white">🏪 人脉升级商店</h3>
+          <h3 className="flex items-center gap-1.5 text-sm font-bold text-white">
+            <AssetIcon id="currency/connection" size={18} />
+            人脉升级商店
+          </h3>
           <span className="text-[10px] text-yellow-400 font-bold">
             已购买 {purchasedAngelUpgrades.length}/{ANGEL_UPGRADES.length}
           </span>
@@ -446,20 +466,20 @@ export default function PrestigeTab() {
       <div className="rounded-2xl p-4 bg-gray-800">
         <h3 className="text-sm font-bold text-white mb-3">📊 商业版图统计</h3>
         <div className="grid grid-cols-2 gap-2">
-          <StatCard label="历史总收入" value={formatCash(totalEarned)} icon="💰" />
-          <StatCard label="当前现金" value={formatCash(useGameStore.getState().cash)} icon="💵" />
-          <StatCard label="转生次数" value={`${totalPrestigeCount}次`} icon="🔄" />
-          <StatCard label="人脉加成" value={`×${formatNumber(currentMultiplier)}`} icon="📈" />
+          <StatCard label="历史总收入" value={formatCash(totalEarned)} icon="currency/coin" />
+          <StatCard label="当前现金" value={formatCash(useGameStore.getState().cash)} icon="currency/coin" />
+          <StatCard label="转生次数" value={`${totalPrestigeCount}次`} icon="nav/prestige" />
+          <StatCard label="人脉加成" value={`×${formatNumber(currentMultiplier)}`} icon="currency/connection" />
         </div>
       </div>
     </div>
   );
 }
 
-function StatCard({ label, value, icon }: { label: string; value: string; icon: string }) {
+function StatCard({ label, value, icon }: { label: string; value: string; icon: SharedAssetId }) {
   return (
     <div className="bg-gray-700/50 rounded-lg p-2.5 text-center">
-      <div className="text-lg mb-0.5">{icon}</div>
+      <AssetIcon id={icon} size={20} className="mb-0.5" />
       <div className="text-xs font-bold text-white tabular-nums">{value}</div>
       <div className="text-[10px] text-gray-500">{label}</div>
     </div>

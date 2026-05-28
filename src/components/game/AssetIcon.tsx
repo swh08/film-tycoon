@@ -77,6 +77,7 @@ export function sharedAssetPath(id: SharedAssetId): string {
 const GENERATED_ASSETS = new Set<SharedAssetId>([
   'currency/coin',
   'currency/diamond',
+  'currency/connection',
   'nav/business',
   'nav/upgrade',
   'nav/manager',
