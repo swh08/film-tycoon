@@ -95,7 +95,7 @@ export const SHOP_OFFERS: OfferDef[] = [
   {
     id: 10,
     name: '精准投放',
-    description: '观看广告获得即时现金奖励（总收入1%或🪙1000，取较高值）',
+    description: '观看广告获得即时现金奖励（总收入1%或1000现金，取较高值）',
     cost: 0,
     currency: 'cash',
     icon: '🎯',

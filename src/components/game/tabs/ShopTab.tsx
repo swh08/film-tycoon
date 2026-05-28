@@ -10,6 +10,8 @@ import { SHOP_OFFERS } from '@/game/config/shop';
 import { GAME_EVENTS } from '@/game/config/events';
 import { formatCash } from '@/game/formulas';
 import { usePopup } from '../PopupLayer';
+import AssetIcon from '@/components/game/AssetIcon';
+import { ShopEventIcon, ShopOfferIcon } from '@/components/game/ShopIcon';
 
 export default function ShopTab() {
   const {
@@ -47,7 +49,7 @@ export default function ShopTab() {
           type: 'reward',
           content: (
             <div className="text-center">
-              <div className="text-4xl mb-2">🔥</div>
+              <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
               <h3 className="text-xl font-black mb-1">双倍收益已激活！</h3>
               <p className="text-sm text-white/80">4小时内所有产线收益翻倍！</p>
             </div>
@@ -63,7 +65,7 @@ export default function ShopTab() {
           type: 'reward',
           content: (
             <div className="text-center">
-              <div className="text-4xl mb-2">⏰</div>
+              <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
               <h3 className="text-xl font-black mb-1">额外离线收益！</h3>
               <p className="text-lg text-yellow-200 font-bold">+{formatCash(bonus)}</p>
             </div>
@@ -79,7 +81,7 @@ export default function ShopTab() {
           type: 'reward',
           content: (
             <div className="text-center">
-              <div className="text-4xl mb-2">🚀</div>
+              <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
               <h3 className="text-xl font-black mb-1">爆单潮来了！</h3>
               <p className="text-sm text-white/80">30秒极速生产，所有产线全开！</p>
             </div>
@@ -96,10 +98,10 @@ export default function ShopTab() {
           type: 'reward',
           content: (
             <div className="text-center">
-              <div className="text-4xl mb-2">🎯</div>
+              <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
               <h3 className="text-xl font-black mb-1">精准投放成功！</h3>
               <p className="text-lg text-yellow-200 font-bold">+{formatCash(instantCash)}</p>
-              <p className="text-[10px] text-gray-400 mt-1">总收入1%或🪙1,000，取较高值</p>
+              <p className="text-[10px] text-gray-400 mt-1">总收入1%或 1,000 现金，取较高值</p>
             </div>
           ),
         });
@@ -113,9 +115,12 @@ export default function ShopTab() {
           type: 'reward',
           content: (
             <div className="text-center">
-              <div className="text-4xl mb-2">💎</div>
+              <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
               <h3 className="text-xl font-black mb-1">获得钻石！</h3>
-              <p className="text-lg text-cyan-200 font-bold">+{value} 💎</p>
+              <p className="text-lg text-cyan-200 font-bold inline-flex items-center justify-center gap-1">
+                +{value}
+                <AssetIcon id="currency/diamond" size={18} />
+              </p>
             </div>
           ),
         });
@@ -128,7 +133,7 @@ export default function ShopTab() {
           type: 'reward',
           content: (
             <div className="text-center">
-              <div className="text-4xl mb-2">⚡</div>
+              <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
               <h3 className="text-xl font-black mb-1">极速生产激活！</h3>
               <p className="text-sm text-white/80">60秒内所有产线速度×3！</p>
             </div>
@@ -182,7 +187,7 @@ export default function ShopTab() {
       type: 'reward',
       content: (
         <div className="text-center">
-          <div className="text-4xl mb-2">🎁</div>
+          <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
           <h3 className="text-xl font-black mb-2">领取成功！</h3>
           {rewards.map((r, i) => (
             <p key={i} className="text-lg text-yellow-200 font-bold">+{r.label}</p>
@@ -202,7 +207,10 @@ export default function ShopTab() {
       {/* 广告增益区 */}
       <div>
         <div className="flex items-center justify-between mb-2 px-1">
-          <h2 className="text-sm font-bold text-yellow-400">📺 免费增益（观看广告）</h2>
+          <h2 className="text-sm font-bold text-yellow-400 inline-flex items-center gap-1.5">
+            <ShopOfferIcon offerId={1} size={18} />
+            免费增益（观看广告）
+          </h2>
           <span className={`text-[10px] font-bold ${adsAvailable ? 'text-green-400' : 'text-red-400'}`}>
             今日剩余: {remainingAds}/{dailyAdLimit} 次
           </span>
@@ -226,8 +234,8 @@ export default function ShopTab() {
                 className="rounded-xl p-3 bg-gradient-to-r from-gray-800 to-gray-900 shadow-md shadow-green-900/10"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-green-900/30 flex items-center justify-center text-xl flex-shrink-0">
-                    {offer.icon}
+                  <div className="w-10 h-10 rounded-lg bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                    <ShopOfferIcon offerId={offer.id} alt={offer.name} size={34} />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-sm font-bold text-white">{offer.name}</h3>
@@ -242,27 +250,30 @@ export default function ShopTab() {
                             transition={{ duration: 1, ease: 'linear' }}
                           />
                         </div>
-                        <p className="text-[9px] text-green-400 mt-0.5">
-                          📺 观看中... {adCooldown}s
+                        <p className="text-[9px] text-green-400 mt-0.5 inline-flex items-center gap-1">
+                          <ShopOfferIcon offerId={offer.id} size={12} />
+                          观看中... {adCooldown}s
                         </p>
                       </div>
                     )}
                   </div>
                   {isCountingDown ? (
-                    <div className="px-3 py-2 rounded-lg bg-green-800/40 text-green-300 text-xs font-bold animate-pulse flex-shrink-0">
-                      📺 ...
+                    <div className="px-3 py-2 rounded-lg bg-green-800/40 text-green-300 text-xs font-bold animate-pulse flex-shrink-0 inline-flex items-center gap-1">
+                      <ShopOfferIcon offerId={offer.id} size={14} />
+                      ...
                     </div>
                   ) : (
                     <button
                       onClick={() => handleAdWatch(offer.id, offer.rewards[0].type, offer.rewards[0].value)}
                       disabled={!adsAvailable || isOtherCountingDown}
-                      className={`px-3 py-3 rounded-xl text-xs font-bold transition-all duration-150
+                      className={`px-3 py-3 rounded-xl text-xs font-bold transition-all duration-150 inline-flex items-center gap-1.5
                         ${!adsAvailable || isOtherCountingDown
                           ? 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.3)]'
                           : 'bg-gradient-to-b from-green-400 to-green-600 text-white shadow-[0_3px_0_0_#166534,0_4px_8px_rgba(21,128,61,0.3)] active:shadow-[0_1px_0_0_#166534,0_2px_4px_rgba(21,128,61,0.2)] active:translate-y-[2px]'
                         }`}
                     >
-                      📺 免费领取
+                      <ShopOfferIcon offerId={offer.id} size={14} />
+                      免费领取
                     </button>
                   )}
                 </div>
@@ -274,7 +285,10 @@ export default function ShopTab() {
 
       {/* 免费礼包 */}
       <div>
-        <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1">🎁 免费礼包</h2>
+        <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1 inline-flex items-center gap-1.5">
+          <ShopOfferIcon offerId={8} size={18} />
+          免费礼包
+        </h2>
         <div className="flex flex-col gap-2">
           {SHOP_OFFERS.filter(o => o.id === 8).map(offer => {
             const purchased = isPurchased(offer.id);
@@ -288,8 +302,8 @@ export default function ShopTab() {
                   }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-900/30 flex items-center justify-center text-xl flex-shrink-0">
-                    {offer.icon}
+                  <div className="w-10 h-10 rounded-lg bg-amber-900/30 flex items-center justify-center flex-shrink-0">
+                    <ShopOfferIcon offerId={offer.id} alt={offer.name} size={34} />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-sm font-bold text-white">{offer.name}</h3>
@@ -323,7 +337,10 @@ export default function ShopTab() {
 
       {/* 钻石内购区 */}
       <div>
-        <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1">💎 钻石商店</h2>
+        <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1 inline-flex items-center gap-1.5">
+          <ShopOfferIcon offerId={5} size={18} />
+          钻石商店
+        </h2>
         <div className="flex flex-col gap-2">
           {SHOP_OFFERS.filter(o => o.id >= 4 && o.id <= 7).map(offer => {
             const purchased = isPurchased(offer.id);
@@ -337,8 +354,8 @@ export default function ShopTab() {
                   }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-cyan-900/30 flex items-center justify-center text-xl flex-shrink-0">
-                    {offer.icon}
+                  <div className="w-10 h-10 rounded-lg bg-cyan-900/30 flex items-center justify-center flex-shrink-0">
+                    <ShopOfferIcon offerId={offer.id} alt={offer.name} size={34} />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
@@ -367,7 +384,8 @@ export default function ShopTab() {
                       className="px-3 py-3 rounded-xl bg-gradient-to-b from-cyan-300 to-blue-600 
                                  text-white text-xs font-bold transition-all duration-150 shadow-[0_3px_0_0_#1e3a5f,0_4px_8px_rgba(30,58,95,0.3)] active:shadow-[0_1px_0_0_#1e3a5f,0_2px_4px_rgba(30,58,95,0.2)] active:translate-y-[2px]"
                     >
-                      🪙{offer.cost}
+                      <AssetIcon id="currency/coin" size={14} className="mr-1 align-[-2px]" />
+                      {offer.cost}
                     </button>
                   ) : (
                     <span className="text-xs text-gray-500">已购买</span>
@@ -382,7 +400,10 @@ export default function ShopTab() {
       {/* 限时活动 — 当前激活事件 */}
       {activeEvents && activeEvents.length > 0 && (
         <div>
-          <h2 className="text-sm font-bold text-purple-400 mb-2 px-1">⚡ 当前激活事件</h2>
+          <h2 className="text-sm font-bold text-purple-400 mb-2 px-1 inline-flex items-center gap-1.5">
+            <ShopEventIcon eventId={activeEvents[0]?.eventDefId ?? 1} size={18} />
+            当前激活事件
+          </h2>
           <div className="flex flex-col gap-2">
             {activeEvents.map(evt => {
               const boostText = evt.boostType === 'profit_mult' ? `利润×${evt.boostValue}` :
@@ -395,8 +416,8 @@ export default function ShopTab() {
                   className="rounded-xl p-3 bg-gradient-to-r from-purple-900/50 to-pink-900/30 animate-pulse"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-purple-900/50 flex items-center justify-center text-xl flex-shrink-0">
-                      {evt.icon}
+                    <div className="w-10 h-10 rounded-lg bg-purple-900/50 flex items-center justify-center flex-shrink-0">
+                      <ShopEventIcon eventId={evt.eventDefId} alt={evt.name} size={34} />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
@@ -408,7 +429,9 @@ export default function ShopTab() {
                         <span className="text-[9px] text-purple-300">⏱ {Math.ceil(evt.remainingSec)}秒</span>
                         {evt.reward && (
                           <span className="text-[9px] text-green-400">
-                            🎁 {evt.reward.type === 'cash' ? formatCash(evt.reward.value) : `${evt.reward.value}💎`}
+                            <ShopOfferIcon offerId={8} size={12} className="mr-1 align-[-2px]" />
+                            {evt.reward.type === 'cash' ? formatCash(evt.reward.value) : evt.reward.value}
+                            {evt.reward.type === 'diamond' && <AssetIcon id="currency/diamond" size={11} className="ml-0.5 align-[-1px]" />}
                           </span>
                         )}
                       </div>
@@ -423,7 +446,10 @@ export default function ShopTab() {
 
       {/* 随机事件目录 */}
       <div>
-        <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1">🎊 随机事件系统</h2>
+        <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1 inline-flex items-center gap-1.5">
+          <ShopEventIcon eventId={8} size={18} />
+          随机事件系统
+        </h2>
         <p className="text-[10px] text-gray-500 mb-2 px-1">随机事件会自动触发，为你带来临时增益！</p>
         <div className="flex flex-col gap-2">
           {GAME_EVENTS.map(event => {
@@ -442,8 +468,8 @@ export default function ShopTab() {
                   }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-purple-900/30 flex items-center justify-center text-xl flex-shrink-0">
-                    {event.icon}
+                  <div className="w-10 h-10 rounded-lg bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+                    <ShopEventIcon eventId={event.id} alt={event.name} size={34} />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
@@ -468,7 +494,9 @@ export default function ShopTab() {
                       <span className="text-[9px] text-gray-500">⏱ {event.durationSec}秒</span>
                       {event.reward && (
                         <span className="text-[9px] text-green-400">
-                          🎁 {event.reward.type === 'cash' ? formatCash(event.reward.value) : `${event.reward.value}💎`}
+                          <ShopOfferIcon offerId={8} size={12} className="mr-1 align-[-2px]" />
+                          {event.reward.type === 'cash' ? formatCash(event.reward.value) : event.reward.value}
+                          {event.reward.type === 'diamond' && <AssetIcon id="currency/diamond" size={11} className="ml-0.5 align-[-1px]" />}
                         </span>
                       )}
                     </div>
