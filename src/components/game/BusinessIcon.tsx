@@ -407,7 +407,37 @@ const SVG_ICONS: Record<string, () => React.ReactNode> = {
   ),
 };
 
+const GENERATED_BUSINESS_ICONS = new Set([
+  'stall',
+  'van',
+  'mall',
+  'store',
+  'livestream',
+  'factory',
+  'lab',
+  'partnership',
+  'globe',
+  'crown',
+]);
+
+function businessAssetPath(icon: string) {
+  return `/assets/game/businesses/${icon}.png`;
+}
+
 export default function BusinessIcon({ icon, className = '' }: { icon: string; className?: string }) {
+  if (GENERATED_BUSINESS_ICONS.has(icon)) {
+    return (
+      <span className={`inline-block ${className}`}>
+        <img
+          src={businessAssetPath(icon)}
+          alt=""
+          draggable={false}
+          className="inline-block h-[1em] w-[1em] object-contain select-none align-middle"
+        />
+      </span>
+    );
+  }
+
   const svgFn = SVG_ICONS[icon];
   if (svgFn) {
     return <span className={className}>{svgFn()}</span>;
