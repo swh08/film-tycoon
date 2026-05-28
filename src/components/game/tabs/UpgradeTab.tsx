@@ -7,6 +7,8 @@ import { useGameStore } from '@/store/gameStore';
 import { GLOBAL_UPGRADES, UPGRADE_GROUP_INFO } from '@/game/config/upgrades';
 import { calcUpgradeCostBulk, calcMaxUpgradeLevels, formatCash, formatNumber } from '@/game/formulas';
 import type { UpgradeGroup } from '@/game/types';
+import AssetIcon from '@/components/game/AssetIcon';
+import UpgradeIcon, { GLOBAL_UPGRADE_ASSETS, UPGRADE_GROUP_ASSETS } from '@/components/game/UpgradeIcon';
 
 const GROUP_ORDER: UpgradeGroup[] = ['equipment', 'channel', 'brand'];
 
@@ -24,7 +26,10 @@ export default function UpgradeTab() {
     <div className="flex flex-col gap-4 px-3 py-3 pb-4">
       {/* 标题区 */}
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold text-yellow-400">⚡ 全局升级</h2>
+        <h2 className="flex items-center gap-1.5 text-sm font-bold text-yellow-400">
+          <AssetIcon id="nav/upgrade" size={18} />
+          全局升级
+        </h2>
         <div className="flex items-center gap-2">
           {/* 全局购买模式切换 */}
           <div className="flex rounded-lg overflow-hidden">
@@ -53,7 +58,7 @@ export default function UpgradeTab() {
           <div key={group}>
             {/* 分组标题 */}
             <div className="flex items-center gap-2 mb-2 px-1">
-              <span className="text-lg">{groupInfo.icon}</span>
+              <UpgradeIcon id={UPGRADE_GROUP_ASSETS[group]} size={24} />
               <h2 className="text-sm font-bold text-yellow-400">{groupInfo.name}</h2>
               <span className="text-[10px] text-gray-500 flex-1">{groupInfo.description}</span>
             </div>
@@ -96,8 +101,8 @@ export default function UpgradeTab() {
                   >
                     <div className="flex items-start gap-3">
                       {/* 图标 */}
-                      <div className="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center text-xl flex-shrink-0">
-                        {def.icon}
+                      <div className="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center flex-shrink-0">
+                        <UpgradeIcon id={GLOBAL_UPGRADE_ASSETS[def.id]} size={34} />
                       </div>
 
                       {/* 信息 */}
