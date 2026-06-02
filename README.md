@@ -60,7 +60,6 @@ bun run lint
 - `bun run build` builds the app and copies standalone assets.
 - `bun run start` runs the standalone production server.
 - `bun run lint` runs ESLint.
-- `bun run db:push`, `db:generate`, `db:migrate`, and `db:reset` are available for Prisma workflows.
 
 ## Project Structure
 
@@ -156,7 +155,6 @@ bun run lint
 - `bun run build` 构建应用并复制 standalone 资源。
 - `bun run start` 启动 standalone 生产服务。
 - `bun run lint` 运行 ESLint 检查。
-- `bun run db:push`、`db:generate`、`db:migrate`、`db:reset` 用于 Prisma 工作流。
 
 ## 目录结构
 
