@@ -218,7 +218,7 @@ export default function ShopTab() {
 
         {!adsAvailable && (
           <div className="rounded-xl p-3 bg-gray-800/50 mb-2 text-center">
-            <span className="text-2xl">😴</span>
+            <ShopOfferIcon offerId={6} size={40} />
             <p className="text-xs text-red-400 font-bold mt-1">今日次数已用完，明天再来！</p>
           </div>
         )}
@@ -426,7 +426,10 @@ export default function ShopTab() {
                       </div>
                       <p className="text-[10px] text-gray-400 mt-0.5">{evt.description}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[9px] text-purple-300">⏱ {Math.ceil(evt.remainingSec)}秒</span>
+                        <span className="text-[9px] text-purple-300 inline-flex items-center gap-0.5">
+                          <AssetIcon id="boost/timer" size={10} />
+                          {Math.ceil(evt.remainingSec)}秒
+                        </span>
                         {evt.reward && (
                           <span className="text-[9px] text-green-400">
                             <ShopOfferIcon offerId={8} size={12} className="mr-1 align-[-2px]" />
@@ -491,7 +494,10 @@ export default function ShopTab() {
                     </div>
                     <p className="text-[10px] text-gray-400 mt-0.5">{event.description}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[9px] text-gray-500">⏱ {event.durationSec}秒</span>
+                      <span className="text-[9px] text-gray-500 inline-flex items-center gap-0.5">
+                        <AssetIcon id="boost/timer" size={10} />
+                        {event.durationSec}秒
+                      </span>
                       {event.reward && (
                         <span className="text-[9px] text-green-400">
                           <ShopOfferIcon offerId={8} size={12} className="mr-1 align-[-2px]" />

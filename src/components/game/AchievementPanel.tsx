@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { ACHIEVEMENTS } from '@/game/config/achievements';
 import { formatCash } from '@/game/formulas';
+import AchievementIcon from './AchievementIcon';
 
 interface AchievementPanelProps {
   isOpen: boolean;
@@ -112,10 +113,20 @@ export default function AchievementPanel({ isOpen, onClose }: AchievementPanelPr
                           >
                             <div className="flex items-center gap-2.5">
                               <div className={`
-                                w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0
+                                relative w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden
                                 ${isUnlocked ? 'bg-yellow-500/20' : 'bg-gray-700/50'}
                               `}>
-                                {isUnlocked ? ach.icon : '🔒'}
+                                <AchievementIcon
+                                  achievementId={ach.id}
+                                  alt={ach.name}
+                                  size={36}
+                                  className={isUnlocked ? '' : 'grayscale opacity-45'}
+                                />
+                                {!isUnlocked && (
+                                  <span className="absolute inset-0 flex items-center justify-center bg-gray-900/35 text-sm">
+                                    🔒
+                                  </span>
+                                )}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between">
