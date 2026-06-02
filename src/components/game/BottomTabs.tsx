@@ -4,6 +4,7 @@
 'use client';
 
 import { useGameStore } from '@/store/gameStore';
+import { useTranslation } from '@/i18n/useTranslation';
 import AssetIcon, { type SharedAssetId } from '@/components/game/AssetIcon';
 
 export type TabId = 'business' | 'upgrade' | 'manager' | 'prestige' | 'shop' | 'achievement';
@@ -30,6 +31,7 @@ interface BottomTabsProps {
 
 export default function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
   const tutorialStep = useGameStore(s => s.tutorialStep);
+  const { t } = useTranslation();
 
   return (
     <nav className="sticky bottom-0 z-40 flex items-stretch bg-gradient-to-t from-gray-950 via-gray-900 to-gray-800 
@@ -67,7 +69,7 @@ export default function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) 
             />
 
             <span className={`text-[10px] font-medium ${isActive ? 'text-yellow-400' : ''}`}>
-              {tab.label}
+              {t(tab.label)}
             </span>
 
             {showBadge && (

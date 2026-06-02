@@ -169,6 +169,7 @@ export interface AdBuff {
 
 /** 产线经营模式 */
 export type BusinessMode = 'profit' | 'speed';
+export type LanguagePreference = 'system' | 'zh-CN' | 'en';
 
 /** 事件增益类型 */
 export type EventBoostType = 'profit_mult' | 'speed_mult' | 'all_mult' | 'cost_reduce';
@@ -305,6 +306,7 @@ export interface GameState {
 
   // 显示偏好
   numberFormat: 'abbreviation' | 'scientific'; // 数字显示格式
+  languagePreference: LanguagePreference;       // 语言偏好：跟随系统/中文/英文
   musicVolume: number;                   // 背景音乐音量 0-1
   sfxVolume: number;                     // 音效音量 0-1
 

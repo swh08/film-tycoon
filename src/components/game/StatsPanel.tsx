@@ -9,6 +9,8 @@ import { useGameStore } from '@/store/gameStore';
 import { formatCash, formatNumberSmart, calcTotalIncomePerSecond, calcRevenuePerSecond } from '@/game/formulas';
 import { BUSINESSES } from '@/game/config/businesses';
 import { ACHIEVEMENTS } from '@/game/config/achievements';
+import { translateText } from '@/i18n';
+import { useTranslation } from '@/i18n/useTranslation';
 import AssetIcon, { type SharedAssetId } from './AssetIcon';
 import BusinessIcon from './BusinessIcon';
 
@@ -25,9 +27,9 @@ function formatPlayTime(startTime: number): string {
   const hours = Math.floor((totalSec % 86400) / 3600);
   const mins = Math.floor((totalSec % 3600) / 60);
   const parts: string[] = [];
-  if (days > 0) parts.push(`${days}天`);
-  if (hours > 0) parts.push(`${hours}小时`);
-  parts.push(`${mins}分`);
+  if (days > 0) parts.push(`${days}${translateText('天')}`);
+  if (hours > 0) parts.push(`${hours}${translateText('小时')}`);
+  parts.push(`${mins}${translateText('分')}`);
   return parts.join('');
 }
 
@@ -52,6 +54,7 @@ function StatCard({ icon, label, value, subValue, color = 'text-yellow-300' }: {
 }
 
 export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
+  const { t } = useTranslation();
   const cash = useGameStore(s => s.cash);
   const diamonds = useGameStore(s => s.diamonds);
   const prestigePoints = useGameStore(s => s.prestigePoints);
@@ -100,8 +103,8 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                 <div className="flex items-center gap-2">
                   <AssetIcon id="nav/achievement" size={28} />
                   <div>
-                    <h2 className="text-base font-black text-blue-400">游戏统计</h2>
-                    <p className="text-[10px] text-gray-400">查看你的贴膜帝国数据</p>
+                    <h2 className="text-base font-black text-blue-400">{t('游戏统计')}</h2>
+                    <p className="text-[10px] text-gray-400">{t('查看你的贴膜帝国数据')}</p>
                   </div>
                 </div>
                 <button
@@ -117,23 +120,23 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
               {/* 资源统计 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-2">资源统计</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-2">{t('资源统计')}</h3>
                 <div className="grid grid-cols-3 gap-2">
                   <StatCard
                     icon="currency/coin"
-                    label="当前现金"
+                    label={t('当前现金')}
                     value={formatCash(cash)}
                     color="text-yellow-300"
                   />
                   <StatCard
                     icon="currency/diamond"
-                    label="钻石数量"
+                    label={t('钻石数量')}
                     value={formatNumberSmart(diamonds)}
                     color="text-cyan-300"
                   />
                   <StatCard
                     icon="currency/connection"
-                    label="人脉点数"
+                    label={t('人脉点数')}
                     value={formatNumberSmart(prestigePoints)}
                     color="text-orange-300"
                   />
@@ -142,19 +145,19 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
 
               {/* 收入统计 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-2">收入统计</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-2">{t('收入统计')}</h3>
                 <div className="grid grid-cols-1 gap-2">
                   <StatCard
                     icon="currency/coin"
-                    label="历史总收入"
+                    label={t('历史总收入')}
                     value={formatCash(totalEarned)}
                     color="text-green-300"
                   />
                   <StatCard
                     icon="boost/lightning"
-                    label="当前每秒收入"
-                    value={formatCash(incomePerSec) + '/秒'}
-                    subValue={incomePerSec > 0 ? formatCash(incomePerSec * 3600) + '/时' : '无被动收入'}
+                    label={t('当前每秒收入')}
+                    value={formatCash(incomePerSec) + `/${t('秒')}`}
+                    subValue={incomePerSec > 0 ? formatCash(incomePerSec * 3600) + `/${t('时')}` : t('无被动收入')}
                     color="text-green-400"
                   />
                 </div>
@@ -162,7 +165,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
 
               {/* 产线统计 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-2">产线统计</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-2">{t('产线统计')}</h3>
                 <div className="bg-gray-800/60 rounded-xl p-3">
                   <div className="grid grid-cols-2 gap-x-3 gap-y-2">
                     {BUSINESSES.map(biz => {
@@ -177,7 +180,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                           <BusinessIcon icon={biz.icon} className="text-base flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] text-gray-300 truncate">{biz.name}</span>
+                              <span className="text-[10px] text-gray-300 truncate">{t(biz.name)}</span>
                               {hasMgr && <AssetIcon id="nav/manager" size={12} />}
                             </div>
                             <span className="text-xs font-bold text-yellow-300 tabular-nums">
@@ -198,29 +201,29 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
 
               {/* 游戏时长 & 操作统计 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-2">游戏数据</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-2">{t('游戏数据')}</h3>
                 <div className="grid grid-cols-2 gap-2">
                   <StatCard
                     icon="boost/timer"
-                    label="游戏时长"
+                    label={t('游戏时长')}
                     value={formatPlayTime(startTime)}
                     color="text-blue-300"
                   />
                   <StatCard
                     icon="nav/business"
-                    label="手动点击次数"
+                    label={t('手动点击次数')}
                     value={formatNumberSmart(totalManualTaps)}
                     color="text-pink-300"
                   />
                   <StatCard
                     icon="nav/shop"
-                    label="总购买次数"
+                    label={t('总购买次数')}
                     value={formatNumberSmart(totalPurchases)}
                     color="text-purple-300"
                   />
                   <StatCard
                     icon="nav/manager"
-                    label="雇佣店长数"
+                    label={t('雇佣店长数')}
                     value={`${hiredManagers.length}/${BUSINESSES.length}`}
                     color="text-green-300"
                   />
@@ -229,23 +232,23 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
 
               {/* 转生统计 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-2">转生统计</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-2">{t('转生统计')}</h3>
                 <div className="grid grid-cols-3 gap-2">
                   <StatCard
                     icon="nav/prestige"
-                    label="转生次数"
+                    label={t('转生次数')}
                     value={totalPrestigeCount.toString()}
                     color="text-orange-300"
                   />
                   <StatCard
                     icon="currency/connection"
-                    label="人脉升级数"
+                    label={t('人脉升级数')}
                     value={purchasedAngelUpgrades.length.toString()}
                     color="text-orange-400"
                   />
                   <StatCard
                     icon="nav/upgrade"
-                    label="产线升级数"
+                    label={t('产线升级数')}
                     value={purchasedBusinessUpgrades.length.toString()}
                     color="text-indigo-300"
                   />
@@ -254,10 +257,10 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
 
               {/* 成就进度 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-2">成就进度</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-2">{t('成就进度')}</h3>
                 <div className="bg-gray-800/60 rounded-xl p-3">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-gray-300">已解锁成就</span>
+                    <span className="text-xs text-gray-300">{t('已解锁成就')}</span>
                     <span className="text-sm font-bold text-yellow-400 tabular-nums">
                       {unlockedAchievements.length}/{ACHIEVEMENTS.length}
                     </span>
@@ -269,7 +272,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                     />
                   </div>
                   <p className="text-[10px] text-gray-500 mt-1">
-                    完成率 {((unlockedAchievements.length / ACHIEVEMENTS.length) * 100).toFixed(1)}%
+                    {t('完成率')} {((unlockedAchievements.length / ACHIEVEMENTS.length) * 100).toFixed(1)}%
                   </p>
                 </div>
               </section>

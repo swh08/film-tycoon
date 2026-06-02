@@ -11,6 +11,7 @@ import { MANAGERS } from './config/managers';
 import { calcPrestigeMultiplier } from './config/prestige';
 import { GAME_EVENTS } from './config/events';
 import type { BusinessState, UpgradeState, GameState } from './types';
+import { translateText } from '@/i18n';
 
 // === 成本计算 ===
 
@@ -665,12 +666,14 @@ export function formatCash(n: number): string {
 }
 
 export function formatTime(seconds: number): string {
-  if (seconds < 10) return seconds.toFixed(1) + '秒';
-  if (seconds < 60) return Math.ceil(seconds) + '秒';
-  if (seconds < 3600) return Math.floor(seconds / 60) + '分钟';
+  if (seconds < 10) return translateText('{value}秒').replace('{value}', seconds.toFixed(1));
+  if (seconds < 60) return translateText('{value}秒').replace('{value}', String(Math.ceil(seconds)));
+  if (seconds < 3600) return translateText('{value}分钟').replace('{value}', String(Math.floor(seconds / 60)));
   const hours = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
-  return mins > 0 ? `${hours}小时${mins}分` : `${hours}小时`;
+  return mins > 0
+    ? translateText('{hours}小时{mins}分').replace('{hours}', String(hours)).replace('{mins}', String(mins))
+    : translateText('{hours}小时').replace('{hours}', String(hours));
 }
 
 // ============================================================
@@ -711,68 +714,68 @@ export function calcDetailedBreakdown(
   // 2. 里程碑倍率
   const milestoneMult = calcMilestoneMultiplier(businessDef, quantity);
   if (milestoneMult > 1) {
-    items.push({ label: '里程碑倍率', value: milestoneMult, displayValue: `×${formatNumber(milestoneMult)}`, color: 'text-pink-400' });
+    items.push({ label: translateText('里程碑倍率'), value: milestoneMult, displayValue: `×${formatNumber(milestoneMult)}`, color: 'text-pink-400' });
   }
 
   // 3. 全局升级利润
   const globalEffects = calcGlobalEffects(state.upgrades);
   if (globalEffects.profitMultiplier > 1) {
-    items.push({ label: '全局升级', value: globalEffects.profitMultiplier, displayValue: `×${formatNumber(globalEffects.profitMultiplier)}`, color: 'text-blue-400' });
+    items.push({ label: translateText('全局升级'), value: globalEffects.profitMultiplier, displayValue: `×${formatNumber(globalEffects.profitMultiplier)}`, color: 'text-blue-400' });
   }
 
   // 4. 产线专属升级利润
   const bizUpgradeMult = calcBusinessUpgradeProfitMult(businessDef.id, state.purchasedBusinessUpgrades || []);
   if (bizUpgradeMult > 1) {
-    items.push({ label: '产线升级', value: bizUpgradeMult, displayValue: `×${formatNumber(bizUpgradeMult)}`, color: 'text-indigo-400' });
+    items.push({ label: translateText('产线升级'), value: bizUpgradeMult, displayValue: `×${formatNumber(bizUpgradeMult)}`, color: 'text-indigo-400' });
   }
 
   // 5. 人脉升级（单产线）
   const angelBizMult = calcAngelBusinessProfitMult(businessDef.id, state.purchasedAngelUpgrades || []);
   if (angelBizMult > 1) {
-    items.push({ label: '人脉·产线', value: angelBizMult, displayValue: `×${formatNumber(angelBizMult)}`, color: 'text-orange-400' });
+    items.push({ label: translateText('人脉·产线'), value: angelBizMult, displayValue: `×${formatNumber(angelBizMult)}`, color: 'text-orange-400' });
   }
 
   // 6. 人脉升级（全局）
   const angelEffects = calcAngelUpgradeEffects(state.purchasedAngelUpgrades || []);
   if (angelEffects.globalProfitMult > 1) {
-    items.push({ label: '人脉·全局', value: angelEffects.globalProfitMult, displayValue: `×${formatNumber(angelEffects.globalProfitMult)}`, color: 'text-orange-400' });
+    items.push({ label: translateText('人脉·全局'), value: angelEffects.globalProfitMult, displayValue: `×${formatNumber(angelEffects.globalProfitMult)}`, color: 'text-orange-400' });
   }
 
   // 7. 转生永久加成
   const prestigeMult = calcPrestigeMultiplier(state.prestigePoints);
   if (prestigeMult > 1) {
-    items.push({ label: '转生加成', value: prestigeMult, displayValue: `×${formatNumber(prestigeMult)}`, color: 'text-yellow-400' });
+    items.push({ label: translateText('转生加成'), value: prestigeMult, displayValue: `×${formatNumber(prestigeMult)}`, color: 'text-yellow-400' });
   }
 
   // 8. 广告增益
   const hasDoubleRevenue = adBuffs.some(b => b.type === 'double_revenue');
   if (hasDoubleRevenue) {
-    items.push({ label: '广告·双倍', value: 2, displayValue: '×2', color: 'text-red-400' });
+    items.push({ label: translateText('广告·双倍'), value: 2, displayValue: '×2', color: 'text-red-400' });
   }
   const rushBuff = adBuffs.find(b => b.type === 'rush_order');
   if (rushBuff) {
-    items.push({ label: '爆单潮', value: 3, displayValue: '×3', color: 'text-red-300' });
+    items.push({ label: translateText('爆单潮'), value: 3, displayValue: '×3', color: 'text-red-300' });
   }
 
   // 9. 市场波动
   const marketMult = state.marketMultipliers?.[businessDef.id] ?? 1;
   if (Math.abs(marketMult - 1) > 0.01) {
     const trendColor = marketMult >= 1 ? 'text-green-400' : 'text-red-400';
-    items.push({ label: '市场波动', value: marketMult, displayValue: `×${marketMult.toFixed(2)}`, color: trendColor });
+    items.push({ label: translateText('市场波动'), value: marketMult, displayValue: `×${marketMult.toFixed(2)}`, color: trendColor });
   }
 
   // 10. 店长等级利润
   const mgrProfitMult = calcManagerLevelProfitMult(businessDef.id, state.managerLevels ?? {}, state.hiredManagers ?? []);
   if (mgrProfitMult > 1) {
-    items.push({ label: '店长等级', value: mgrProfitMult, displayValue: `×${formatNumber(mgrProfitMult)}`, color: 'text-cyan-400' });
+    items.push({ label: translateText('店长等级'), value: mgrProfitMult, displayValue: `×${formatNumber(mgrProfitMult)}`, color: 'text-cyan-400' });
   }
 
   // 11. 利润/速度模式
   const businessMode = state.businessModes?.[businessDef.id] as BusinessMode | undefined;
   if (businessMode === 'profit') {
-    items.push({ label: '利润模式', value: 1.5, displayValue: '×1.5', color: 'text-yellow-300' });
+    items.push({ label: translateText('利润模式'), value: 1.5, displayValue: '×1.5', color: 'text-yellow-300' });
   } else if (businessMode === 'speed') {
-    items.push({ label: '速度模式', value: 0.8, displayValue: '×0.8', color: 'text-blue-300' });
+    items.push({ label: translateText('速度模式'), value: 0.8, displayValue: '×0.8', color: 'text-blue-300' });
   }
 
   // 12. 事件增益

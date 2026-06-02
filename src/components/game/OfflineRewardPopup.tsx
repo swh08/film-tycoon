@@ -7,9 +7,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { calcOfflineEarnings, formatCash, formatTime } from '@/game/formulas';
+import { useTranslation } from '@/i18n/useTranslation';
 import AssetIcon from './AssetIcon';
 
 export default function OfflineRewardPopup() {
+  const { t } = useTranslation();
   const lastOnlineTimestamp = useGameStore(s => s.lastOnlineTimestamp);
   const claimOfflineEarnings = useGameStore(s => s.claimOfflineEarnings);
   const tutorialStep = useGameStore(s => s.tutorialStep);
@@ -68,16 +70,16 @@ export default function OfflineRewardPopup() {
               >
                 <AssetIcon id="currency/coin" size={72} />
               </motion.div>
-              <h2 className="text-xl font-black mb-1">离线收益</h2>
-              <p className="text-sm text-white/70 mb-4">你离开期间，店铺自动营业中...</p>
+              <h2 className="text-xl font-black mb-1">{t('离线收益')}</h2>
+              <p className="text-sm text-white/70 mb-4">{t('你离开期间，店铺自动营业中...')}</p>
 
               <div className="bg-black/20 rounded-xl p-4 mb-4">
                 <p className="text-3xl font-black text-yellow-200 mb-2">
                   +{formatCash(offlineData.earnings)}
                 </p>
                 <p className="text-xs text-white/60">
-                  离线时长: {formatTime(offlineData.duration)}
-                  {offlineData.capped && ' (已达上限)'}
+                  {t('离线时长')}: {formatTime(offlineData.duration)}
+                  {offlineData.capped && ` (${t('已达上限')})`}
                 </p>
               </div>
 
@@ -90,7 +92,7 @@ export default function OfflineRewardPopup() {
               >
                 <span className="inline-flex items-center justify-center gap-2">
                   <AssetIcon id="boost/gift" size={22} />
-                  一键领取！
+                  {t('一键领取！')}
                 </span>
               </button>
             </div>

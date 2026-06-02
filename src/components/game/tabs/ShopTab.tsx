@@ -9,11 +9,13 @@ import { useGameStore } from '@/store/gameStore';
 import { SHOP_OFFERS } from '@/game/config/shop';
 import { GAME_EVENTS } from '@/game/config/events';
 import { formatCash } from '@/game/formulas';
+import { useTranslation } from '@/i18n/useTranslation';
 import { usePopup } from '../PopupLayer';
 import AssetIcon from '@/components/game/AssetIcon';
 import { ShopEventIcon, ShopOfferIcon } from '@/components/game/ShopIcon';
 
 export default function ShopTab() {
+  const { t } = useTranslation();
   const {
     cash,
     diamonds,
@@ -50,8 +52,8 @@ export default function ShopTab() {
           content: (
             <div className="text-center">
               <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-              <h3 className="text-xl font-black mb-1">双倍收益已激活！</h3>
-              <p className="text-sm text-white/80">4小时内所有产线收益翻倍！</p>
+              <h3 className="text-xl font-black mb-1">{t('双倍收益已激活！')}</h3>
+              <p className="text-sm text-white/80">{t('4小时内所有产线收益翻倍！')}</p>
             </div>
           ),
         });
@@ -66,7 +68,7 @@ export default function ShopTab() {
           content: (
             <div className="text-center">
               <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-              <h3 className="text-xl font-black mb-1">额外离线收益！</h3>
+              <h3 className="text-xl font-black mb-1">{t('额外离线收益！')}</h3>
               <p className="text-lg text-yellow-200 font-bold">+{formatCash(bonus)}</p>
             </div>
           ),
@@ -82,8 +84,8 @@ export default function ShopTab() {
           content: (
             <div className="text-center">
               <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-              <h3 className="text-xl font-black mb-1">爆单潮来了！</h3>
-              <p className="text-sm text-white/80">30秒极速生产，所有产线全开！</p>
+              <h3 className="text-xl font-black mb-1">{t('爆单潮来了！')}</h3>
+              <p className="text-sm text-white/80">{t('30秒极速生产，所有产线全开！')}</p>
             </div>
           ),
         });
@@ -99,9 +101,9 @@ export default function ShopTab() {
           content: (
             <div className="text-center">
               <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-              <h3 className="text-xl font-black mb-1">精准投放成功！</h3>
+              <h3 className="text-xl font-black mb-1">{t('精准投放成功！')}</h3>
               <p className="text-lg text-yellow-200 font-bold">+{formatCash(instantCash)}</p>
-              <p className="text-[10px] text-gray-400 mt-1">总收入1%或 1,000 现金，取较高值</p>
+              <p className="text-[10px] text-gray-400 mt-1">{t('总收入1%或 1,000 现金，取较高值')}</p>
             </div>
           ),
         });
@@ -116,7 +118,7 @@ export default function ShopTab() {
           content: (
             <div className="text-center">
               <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-              <h3 className="text-xl font-black mb-1">获得钻石！</h3>
+              <h3 className="text-xl font-black mb-1">{t('获得钻石！')}</h3>
               <p className="text-lg text-cyan-200 font-bold inline-flex items-center justify-center gap-1">
                 +{value}
                 <AssetIcon id="currency/diamond" size={18} />
@@ -134,15 +136,15 @@ export default function ShopTab() {
           content: (
             <div className="text-center">
               <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-              <h3 className="text-xl font-black mb-1">极速生产激活！</h3>
-              <p className="text-sm text-white/80">60秒内所有产线速度×3！</p>
+              <h3 className="text-xl font-black mb-1">{t('极速生产激活！')}</h3>
+              <p className="text-sm text-white/80">{t('60秒内所有产线速度×3！')}</p>
             </div>
           ),
         });
         break;
     }
     }, 0);
-  }, [addAdBuff, addCash, addDiamonds, cash, totalEarned, showPopup]);
+  }, [addAdBuff, addCash, addDiamonds, cash, totalEarned, showPopup, t]);
 
   const handleAdWatch = useCallback((offerId: number, rewardType: string, rewardValue: number) => {
     if (cooldownTimerRef.current) return;
@@ -188,9 +190,9 @@ export default function ShopTab() {
       content: (
         <div className="text-center">
           <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-          <h3 className="text-xl font-black mb-2">领取成功！</h3>
+          <h3 className="text-xl font-black mb-2">{t('领取成功！')}</h3>
           {rewards.map((r, i) => (
-            <p key={i} className="text-lg text-yellow-200 font-bold">+{r.label}</p>
+            <p key={i} className="text-lg text-yellow-200 font-bold">+{t(r.label)}</p>
           ))}
         </div>
       ),
@@ -209,17 +211,17 @@ export default function ShopTab() {
         <div className="flex items-center justify-between mb-2 px-1">
           <h2 className="text-sm font-bold text-yellow-400 inline-flex items-center gap-1.5">
             <ShopOfferIcon offerId={1} size={18} />
-            免费增益（观看广告）
+            {t('免费增益（观看广告）')}
           </h2>
           <span className={`text-[10px] font-bold ${adsAvailable ? 'text-green-400' : 'text-red-400'}`}>
-            今日剩余: {remainingAds}/{dailyAdLimit} 次
+            {t('今日剩余')}: {remainingAds}/{dailyAdLimit} {t('次')}
           </span>
         </div>
 
         {!adsAvailable && (
           <div className="rounded-xl p-3 bg-gray-800/50 mb-2 text-center">
             <ShopOfferIcon offerId={6} size={40} />
-            <p className="text-xs text-red-400 font-bold mt-1">今日次数已用完，明天再来！</p>
+            <p className="text-xs text-red-400 font-bold mt-1">{t('今日次数已用完，明天再来！')}</p>
           </div>
         )}
 
@@ -235,11 +237,11 @@ export default function ShopTab() {
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-green-900/30 flex items-center justify-center flex-shrink-0">
-                    <ShopOfferIcon offerId={offer.id} alt={offer.name} size={34} />
+                    <ShopOfferIcon offerId={offer.id} alt={t(offer.name)} size={34} />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-bold text-white">{offer.name}</h3>
-                    <p className="text-[10px] text-gray-400">{offer.description}</p>
+                    <h3 className="text-sm font-bold text-white">{t(offer.name)}</h3>
+                    <p className="text-[10px] text-gray-400">{t(offer.description)}</p>
                     {isCountingDown && (
                       <div className="mt-1.5">
                         <div className="h-1.5 rounded-full bg-gray-700 overflow-hidden">
@@ -252,7 +254,7 @@ export default function ShopTab() {
                         </div>
                         <p className="text-[9px] text-green-400 mt-0.5 inline-flex items-center gap-1">
                           <ShopOfferIcon offerId={offer.id} size={12} />
-                          观看中... {adCooldown}s
+                          {t('观看中...')} {adCooldown}s
                         </p>
                       </div>
                     )}
@@ -273,7 +275,7 @@ export default function ShopTab() {
                         }`}
                     >
                       <ShopOfferIcon offerId={offer.id} size={14} />
-                      免费领取
+                      {t('免费领取')}
                     </button>
                   )}
                 </div>
@@ -287,7 +289,7 @@ export default function ShopTab() {
       <div>
         <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1 inline-flex items-center gap-1.5">
           <ShopOfferIcon offerId={8} size={18} />
-          免费礼包
+          {t('免费礼包')}
         </h2>
         <div className="flex flex-col gap-2">
           {SHOP_OFFERS.filter(o => o.id === 8).map(offer => {
@@ -303,15 +305,15 @@ export default function ShopTab() {
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-amber-900/30 flex items-center justify-center flex-shrink-0">
-                    <ShopOfferIcon offerId={offer.id} alt={offer.name} size={34} />
+                    <ShopOfferIcon offerId={offer.id} alt={t(offer.name)} size={34} />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-bold text-white">{offer.name}</h3>
-                    <p className="text-[10px] text-gray-400">{offer.description}</p>
+                    <h3 className="text-sm font-bold text-white">{t(offer.name)}</h3>
+                    <p className="text-[10px] text-gray-400">{t(offer.description)}</p>
                     <div className="flex gap-1 mt-1">
                       {offer.rewards.map((r, i) => (
                         <span key={i} className="text-[10px] text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded">
-                          {r.label}
+                          {t(r.label)}
                         </span>
                       ))}
                     </div>
@@ -322,11 +324,11 @@ export default function ShopTab() {
                       className="px-3 py-3 rounded-xl bg-gradient-to-b from-yellow-300 to-amber-600 
                                  text-white text-xs font-bold transition-all duration-150 shadow-[0_3px_0_0_#92400e,0_4px_8px_rgba(120,53,15,0.3)] active:shadow-[0_1px_0_0_#92400e,0_2px_4px_rgba(120,53,15,0.2)] active:translate-y-[2px]"
                     >
-                      免费领取
+                      {t('免费领取')}
                     </button>
                   )}
                   {purchased && (
-                    <span className="text-xs text-gray-500">已领取</span>
+                    <span className="text-xs text-gray-500">{t('已领取')}</span>
                   )}
                 </div>
               </div>
@@ -339,7 +341,7 @@ export default function ShopTab() {
       <div>
         <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1 inline-flex items-center gap-1.5">
           <ShopOfferIcon offerId={5} size={18} />
-          钻石商店
+          {t('钻石商店')}
         </h2>
         <div className="flex flex-col gap-2">
           {SHOP_OFFERS.filter(o => o.id >= 4 && o.id <= 7).map(offer => {
@@ -355,22 +357,22 @@ export default function ShopTab() {
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-cyan-900/30 flex items-center justify-center flex-shrink-0">
-                    <ShopOfferIcon offerId={offer.id} alt={offer.name} size={34} />
+                    <ShopOfferIcon offerId={offer.id} alt={t(offer.name)} size={34} />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-white">{offer.name}</h3>
+                      <h3 className="text-sm font-bold text-white">{t(offer.name)}</h3>
                       {offer.oneTime && (
                         <span className="text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded">
-                          限时
+                          {t('限时')}
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] text-gray-400">{offer.description}</p>
+                    <p className="text-[10px] text-gray-400">{t(offer.description)}</p>
                     <div className="flex gap-1 mt-1">
                       {offer.rewards.map((r, i) => (
                         <span key={i} className="text-[10px] text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded">
-                          {r.label}
+                          {t(r.label)}
                         </span>
                       ))}
                     </div>
@@ -388,7 +390,7 @@ export default function ShopTab() {
                       {offer.cost}
                     </button>
                   ) : (
-                    <span className="text-xs text-gray-500">已购买</span>
+                    <span className="text-xs text-gray-500">{t('已购买')}</span>
                   )}
                 </div>
               </div>
@@ -402,14 +404,15 @@ export default function ShopTab() {
         <div>
           <h2 className="text-sm font-bold text-purple-400 mb-2 px-1 inline-flex items-center gap-1.5">
             <ShopEventIcon eventId={activeEvents[0]?.eventDefId ?? 1} size={18} />
-            当前激活事件
+            {t('当前激活事件')}
           </h2>
           <div className="flex flex-col gap-2">
             {activeEvents.map(evt => {
-              const boostText = evt.boostType === 'profit_mult' ? `利润×${evt.boostValue}` :
-                evt.boostType === 'speed_mult' ? `速度×${evt.boostValue}` :
-                evt.boostType === 'all_mult' ? `全属性×${evt.boostValue}` :
-                `成本${Math.round(evt.boostValue * 100)}%`;
+              const eventDef = GAME_EVENTS.find(event => event.id === evt.eventDefId);
+              const boostText = evt.boostType === 'profit_mult' ? `${t('利润')}×${evt.boostValue}` :
+                evt.boostType === 'speed_mult' ? `${t('速度')}×${evt.boostValue}` :
+                evt.boostType === 'all_mult' ? `${t('全属性')}×${evt.boostValue}` :
+                `${t('成本')}${Math.round(evt.boostValue * 100)}%`;
               return (
                 <div
                   key={evt.id}
@@ -417,18 +420,18 @@ export default function ShopTab() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-purple-900/50 flex items-center justify-center flex-shrink-0">
-                      <ShopEventIcon eventId={evt.eventDefId} alt={evt.name} size={34} />
+                      <ShopEventIcon eventId={evt.eventDefId} alt={t(eventDef?.name ?? evt.name)} size={34} />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-bold text-white">{evt.name}</h3>
+                        <h3 className="text-sm font-bold text-white">{t(eventDef?.name ?? evt.name)}</h3>
                         <span className="text-[10px] font-bold text-purple-300">{boostText}</span>
                       </div>
-                      <p className="text-[10px] text-gray-400 mt-0.5">{evt.description}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">{t(eventDef?.description ?? evt.description)}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-[9px] text-purple-300 inline-flex items-center gap-0.5">
                           <AssetIcon id="boost/timer" size={10} />
-                          {Math.ceil(evt.remainingSec)}秒
+                          {Math.ceil(evt.remainingSec)}{t('秒')}
                         </span>
                         {evt.reward && (
                           <span className="text-[9px] text-green-400">
@@ -451,9 +454,9 @@ export default function ShopTab() {
       <div>
         <h2 className="text-sm font-bold text-yellow-400 mb-2 px-1 inline-flex items-center gap-1.5">
           <ShopEventIcon eventId={8} size={18} />
-          随机事件系统
+          {t('随机事件系统')}
         </h2>
-        <p className="text-[10px] text-gray-500 mb-2 px-1">随机事件会自动触发，为你带来临时增益！</p>
+        <p className="text-[10px] text-gray-500 mb-2 px-1">{t('随机事件会自动触发，为你带来临时增益！')}</p>
         <div className="flex flex-col gap-2">
           {GAME_EVENTS.map(event => {
             const unlocked = totalEarned >= event.minTotalEarned;
@@ -472,31 +475,31 @@ export default function ShopTab() {
               >
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-purple-900/30 flex items-center justify-center flex-shrink-0">
-                    <ShopEventIcon eventId={event.id} alt={event.name} size={34} />
+                    <ShopEventIcon eventId={event.id} alt={t(event.name)} size={34} />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-white">{event.name}</h3>
+                      <h3 className="text-sm font-bold text-white">{t(event.name)}</h3>
                       <div className="flex items-center gap-1">
                         {isActive && (
-                          <span className="text-[9px] bg-purple-500/30 text-purple-300 px-1.5 py-0.5 rounded font-bold">进行中</span>
+                          <span className="text-[9px] bg-purple-500/30 text-purple-300 px-1.5 py-0.5 rounded font-bold">{t('进行中')}</span>
                         )}
                         <span className={`text-[10px] font-bold ${
                           event.boostType === 'profit_mult' || event.boostType === 'all_mult'
                             ? 'text-yellow-400' : event.boostType === 'speed_mult' ? 'text-cyan-400' : 'text-green-400'
                         }`}>{
-                          event.boostType === 'profit_mult' ? `利润×${event.boostValue}` :
-                          event.boostType === 'speed_mult' ? `速度×${event.boostValue}` :
-                          event.boostType === 'all_mult' ? `全属性×${event.boostValue}` :
-                          `成本${Math.round(event.boostValue*100)}%`
+                          event.boostType === 'profit_mult' ? `${t('利润')}×${event.boostValue}` :
+                          event.boostType === 'speed_mult' ? `${t('速度')}×${event.boostValue}` :
+                          event.boostType === 'all_mult' ? `${t('全属性')}×${event.boostValue}` :
+                          `${t('成本')}${Math.round(event.boostValue*100)}%`
                         }</span>
                       </div>
                     </div>
-                    <p className="text-[10px] text-gray-400 mt-0.5">{event.description}</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5">{t(event.description)}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-[9px] text-gray-500 inline-flex items-center gap-0.5">
                         <AssetIcon id="boost/timer" size={10} />
-                        {event.durationSec}秒
+                        {event.durationSec}{t('秒')}
                       </span>
                       {event.reward && (
                         <span className="text-[9px] text-green-400">

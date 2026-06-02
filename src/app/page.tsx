@@ -14,6 +14,7 @@ import SettingsPanel from '@/components/game/SettingsPanel';
 import DailyRewardPopup from '@/components/game/DailyRewardPopup';
 import EventNotification from '@/components/game/EventNotification';
 import BusinessIcon from '@/components/game/BusinessIcon';
+import { useTranslation } from '@/i18n/useTranslation';
 
 import BusinessTab from '@/components/game/tabs/BusinessTab';
 import UpgradeTab from '@/components/game/tabs/UpgradeTab';
@@ -31,6 +32,7 @@ const TAB_INDEX: Record<TabId, number> = {
 export default function GamePage() {
   const activeTab = useGameStore(s => s.activeTab) as TabId;
   const setActiveTab = useGameStore(s => s.setActiveTab);
+  const { t } = useTranslation();
   const [isReady, setIsReady] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showDailyReward, setShowDailyReward] = useState(false);
@@ -95,8 +97,8 @@ export default function GamePage() {
           >
             <BusinessIcon icon="stall" />
           </motion.div>
-          <p className="text-yellow-400 font-bold text-lg">贴膜大亨</p>
-          <p className="text-gray-500 text-sm">加载中...</p>
+          <p className="text-yellow-400 font-bold text-lg">{t('贴膜大亨')}</p>
+          <p className="text-gray-500 text-sm">{t('加载中...')}</p>
         </div>
       </div>
     );

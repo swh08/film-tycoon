@@ -24,6 +24,7 @@ import {
 } from '@/game/formulas';
 import { usePopup } from '@/components/game/PopupLayer';
 import { playTap, playBuy, playUIClick } from '@/game/sound';
+import { useTranslation } from '@/i18n/useTranslation';
 import BusinessIcon from '@/components/game/BusinessIcon';
 import AssetIcon, { resolveSharedAssetId } from '@/components/game/AssetIcon';
 
@@ -32,6 +33,7 @@ import AssetIcon, { resolveSharedAssetId } from '@/components/game/AssetIcon';
 // 产线专属升级弹窗内容 — 独立组件，实时订阅 store
 // ============================================================
 function BusinessUpgradePopupContent({ businessId }: { businessId: number }) {
+  const { t } = useTranslation();
   const cash = useGameStore(s => s.cash);
   const businesses = useGameStore(s => s.businesses);
   const purchasedBusinessUpgrades = useGameStore(s => s.purchasedBusinessUpgrades);
@@ -45,8 +47,8 @@ function BusinessUpgradePopupContent({ businessId }: { businessId: number }) {
     <div className="max-h-[70vh] overflow-y-auto">
       <div className="text-center mb-3">
         <BusinessIcon icon={businessDef.icon} className="text-3xl" />
-        <h3 className="text-base font-black text-white mt-1">{businessDef.name} 专属升级</h3>
-        <p className="text-[10px] text-gray-400">当前等级: ×{quantity}</p>
+        <h3 className="text-base font-black text-white mt-1">{t(businessDef.name)} {t('产线升级')}</h3>
+        <p className="text-[10px] text-gray-400">{t('当前等级')}: ×{quantity}</p>
       </div>
       <div className="flex flex-col gap-2">
         {upgrades.map(upgrade => {
@@ -78,20 +80,20 @@ function BusinessUpgradePopupContent({ businessId }: { businessId: number }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white">{upgrade.name}</span>
+                    <span className="text-xs font-bold text-white">{t(upgrade.name)}</span>
                     {isPurchased ? (
-                      <span className="text-green-400 text-[10px] font-bold">已购买</span>
+                      <span className="text-green-400 text-[10px] font-bold">{t('已购买')}</span>
                     ) : canSee ? (
                       <span className={`text-[10px] font-bold ${canAfford ? 'text-yellow-400' : 'text-gray-500'}`}>
                         {formatCash(upgrade.cost)}
                       </span>
                     ) : (
-                      <span className="text-gray-600 text-[10px]">×{upgrade.unlockQuantity}解锁</span>
+                      <span className="text-gray-600 text-[10px]">×{upgrade.unlockQuantity} {t('解锁')}</span>
                     )}
                   </div>
-                  <p className="text-[10px] text-gray-400 mt-0.5">{upgrade.description}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{t(upgrade.description)}</p>
                   {!canSee && (
-                    <p className="text-[10px] text-gray-600">拥有{upgrade.unlockQuantity}级后解锁</p>
+                    <p className="text-[10px] text-gray-600">{t('拥有')} {upgrade.unlockQuantity} {t('级后解锁')}</p>
                   )}
                 </div>
               </div>
@@ -107,7 +109,7 @@ function BusinessUpgradePopupContent({ businessId }: { businessId: number }) {
                       : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 cursor-not-allowed shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.2)]'
                     }`}
                 >
-                  购买 · {formatCash(upgrade.cost)}
+                  {t('购买')} · {formatCash(upgrade.cost)}
                 </button>
               )}
             </div>
@@ -122,6 +124,7 @@ function BusinessUpgradePopupContent({ businessId }: { businessId: number }) {
 // 收益分解详情弹窗 — 独立组件，实时订阅 store
 // ============================================================
 function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
+  const { t } = useTranslation();
   const businesses = useGameStore(s => s.businesses);
   const upgrades = useGameStore(s => s.upgrades);
   const prestigePoints = useGameStore(s => s.prestigePoints);
@@ -163,8 +166,8 @@ function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
     <div className="max-h-[70vh] overflow-y-auto">
       <div className="text-center mb-3">
         <BusinessIcon icon={businessDef.icon} className="text-3xl" />
-        <h3 className="text-base font-black text-white mt-1">{businessDef.name}</h3>
-        <p className="text-[10px] text-gray-400">收益分解详情</p>
+        <h3 className="text-base font-black text-white mt-1">{t(businessDef.name)}</h3>
+        <p className="text-[10px] text-gray-400">{t('收益分解详情')}</p>
       </div>
 
       {breakdown ? (
@@ -172,16 +175,16 @@ function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
           {/* 基础信息 */}
           <div className="bg-gray-700/50 rounded-xl p-3">
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-400">基础单价</span>
+              <span className="text-gray-400">{t('基础单价')}</span>
               <span className="text-white font-bold">{formatCash(breakdown.baseRevenue)}</span>
             </div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-400">数量</span>
+              <span className="text-gray-400">{t('数量')}</span>
               <span className="text-white font-bold">×{breakdown.quantity}</span>
             </div>
             <div className="border-t border-gray-600/50 my-1.5" />
             <div className="flex justify-between text-xs">
-              <span className="text-gray-400">基础总价</span>
+              <span className="text-gray-400">{t('基础总价')}</span>
               <span className="text-white font-bold">{formatCash(breakdown.baseTotal)}</span>
             </div>
           </div>
@@ -191,7 +194,7 @@ function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
             <div className="bg-gray-700/50 rounded-xl p-3">
               <h4 className="text-[10px] text-gray-500 font-bold mb-2 inline-flex items-center gap-1">
                 <AssetIcon id="boost/lightning" size={12} />
-                加成倍率
+                {t('加成倍率')}
               </h4>
               <div className="space-y-1.5">
                 {breakdown.items.map((item, idx) => (
@@ -204,30 +207,30 @@ function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
             </div>
           ) : (
             <div className="text-center py-3 text-xs text-gray-500">
-              暂无加成效果
+              {t('暂无加成效果')}
             </div>
           )}
 
           {/* 最终结果 */}
           <div className="bg-gradient-to-r from-yellow-900/30 to-amber-900/20 rounded-xl p-3">
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-400">最终收益/次</span>
+              <span className="text-gray-400">{t('最终收益/次')}</span>
               <span className="text-yellow-400 font-black">{formatCash(breakdown.finalRevenue)}</span>
             </div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-400">最终周期</span>
+              <span className="text-gray-400">{t('最终周期')}</span>
               <span className="text-cyan-400 font-bold">{formatTime(breakdown.finalCycle)}</span>
             </div>
             <div className="border-t border-yellow-500/20 my-1.5" />
             <div className="flex justify-between text-sm">
-              <span className="text-yellow-300 font-bold">收益/秒</span>
+              <span className="text-yellow-300 font-bold">{t('收益/秒')}</span>
               <span className="text-yellow-200 font-black">{formatCash(breakdown.revenuePerSec)}/s</span>
             </div>
           </div>
         </div>
       ) : (
         <div className="text-center py-6 text-gray-500 text-xs">
-          购买该产线后查看收益分解
+          {t('购买该产线后查看收益分解')}
         </div>
       )}
     </div>
@@ -235,6 +238,7 @@ function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
 }
 
 export default function BusinessTab() {
+  const { t } = useTranslation();
   const {
     cash,
     businesses,
@@ -298,12 +302,12 @@ export default function BusinessTab() {
               <div className="text-4xl mb-2"><BusinessIcon icon={def.icon} /></div>
               <h3 className="text-xl font-bold mb-1 inline-flex items-center justify-center gap-1">
                 <AssetIcon id="boost/fire" size={24} />
-                倍率爆发！
+                {t('倍率爆发！')}
               </h3>
-              <p className="text-lg mb-1">{def.name}</p>
-              <p className="text-2xl font-black text-yellow-200">{ms.label}</p>
+              <p className="text-lg mb-1">{t(def.name)}</p>
+              <p className="text-2xl font-black text-yellow-200">{t(ms.label)}</p>
               <p className="text-sm text-white/80 mt-2">
-                达到 {ms.at} 级 → 收益 ×{ms.multiplier}
+                {t('达到')} {ms.at} {t('级')} → {t('收益')} ×{ms.multiplier}
               </p>
             </div>
           ),
@@ -346,7 +350,7 @@ export default function BusinessTab() {
     { value: 1, label: '×1' },
     { value: 10, label: '×10' },
     { value: 100, label: '×100' },
-    { value: 0, label: '最大' },
+    { value: 0, label: t('最大') },
   ];
 
   return (
@@ -355,7 +359,7 @@ export default function BusinessTab() {
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-1.5 text-sm font-bold text-yellow-400">
           <AssetIcon id="nav/business" size={18} />
-          我的生意
+          {t('我的生意')}
         </h2>
         <div className="flex items-center gap-2">
           {/* 全局购买模式切换 */}
@@ -389,9 +393,9 @@ export default function BusinessTab() {
         >
           <p className="font-bold inline-flex items-center gap-1">
             <AssetIcon id="nav/business" size={16} />
-            点击第一个产线开始贴膜！
+            {t('点击第一个产线开始贴膜！')}
           </p>
-          <p className="text-xs text-white/70 mt-1">赚到第一笔钱后，开始购买更多产线</p>
+          <p className="text-xs text-white/70 mt-1">{t('赚到第一笔钱后，开始购买更多产线')}</p>
         </motion.div>
       )}
 
@@ -403,7 +407,7 @@ export default function BusinessTab() {
         >
           <p className="font-bold inline-flex items-center gap-1">
             <AssetIcon id="boost/lightning" size={16} />
-            继续购买产线，达到10级触发倍率爆发！
+            {t('继续购买产线，达到10级触发倍率爆发！')}
           </p>
         </motion.div>
       )}
@@ -456,7 +460,7 @@ export default function BusinessTab() {
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-950/80">
                 <div className="text-center">
                   <AssetIcon id="status/lock" size={28} />
-                  <p className="text-xs text-gray-400 mt-1">累计收入达{formatCash(getUnlockTarget(def.id))}解锁</p>
+                  <p className="text-xs text-gray-400 mt-1">{t('累计收入达')}{formatCash(getUnlockTarget(def.id))}{t('解锁')}</p>
                 </div>
               </div>
             )}
@@ -509,17 +513,17 @@ export default function BusinessTab() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <div className="min-w-0">
-                      <h3 className="text-sm font-bold text-white truncate">{def.name}</h3>
-                      <p className="text-[10px] text-gray-400">{def.flavorText}</p>
+                      <h3 className="text-sm font-bold text-white truncate">{t(def.name)}</h3>
+                      <p className="text-[10px] text-gray-400">{t(def.flavorText)}</p>
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0">
                       {quantity > 0 && (
                         <button
                           onClick={() => showDetailPopup(def.id)}
                           className="w-5 h-5 rounded-full bg-gray-700/80 hover:bg-gray-600/80 flex items-center justify-center text-[9px] text-gray-400 transition-colors active:scale-90"
-                          title="收益分解详情"
+                          title={t('收益分解详情')}
                         >
-                          <span className="text-white text-[9px] font-bold">详</span>
+                          <span className="text-white text-[9px] font-bold">{t('详')}</span>
                         </button>
                       )}
                       {milestoneMult > 1 && (
@@ -529,8 +533,8 @@ export default function BusinessTab() {
                   </div>
                   {quantity > 0 && (
                     <div className="flex items-center justify-between text-[10px] mt-1">
-                      <span className="text-gray-400">{formatCash(revenue)}/次</span>
-                      <span className="text-gray-400">{formatTime(cycleTime)}/次</span>
+                      <span className="text-gray-400">{formatCash(revenue)}/{t('次')}</span>
+                      <span className="text-gray-400">{formatTime(cycleTime)}/{t('次')}</span>
                     </div>
                   )}
                 </div>
@@ -564,11 +568,11 @@ export default function BusinessTab() {
                         <path d="M3 22v-6h6" />
                         <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
                       </svg>
-                      自动
+                      {t('自动')}
                     </div>
                   ) : bs.progress > 0 ? (
                     <div className="px-2 py-1.5 rounded-lg bg-yellow-600/30 text-yellow-400 text-[10px] font-bold flex-shrink-0">
-                      生产中…
+                      {t('生产中…')}
                     </div>
                   ) : (
                     <button
@@ -586,7 +590,7 @@ export default function BusinessTab() {
                                  active:shadow-[0_1px_0_0_#166534,0_2px_4px_rgba(21,128,61,0.2)] active:translate-y-[2px]
                                  transition-all duration-150"
                     >
-                      贴膜！
+                      {t('贴膜！')}
                     </button>
                   )}
 
@@ -611,9 +615,9 @@ export default function BusinessTab() {
                                shadow-[0_3px_0_0_#374151]
                                cursor-pointer [&>option]:bg-gray-800 [&>option]:text-gray-100 [&>option]:py-1"
                   >
-                    <option value="">默认</option>
-                    <option value="profit">利润</option>
-                    <option value="speed">速度</option>
+                    <option value="">{t('默认')}</option>
+                    <option value="profit">{t('利润')}</option>
+                    <option value="speed">{t('速度')}</option>
                   </select>
 
                   {/* 3. 专属升级 */}
@@ -657,7 +661,7 @@ export default function BusinessTab() {
                       }
                     `}
                   >
-                    购买×{actualBuyCount} {formatCash(cost)}
+                    {t('购买')}×{actualBuyCount} {formatCash(cost)}
                   </button>
                 </div>
               )}
@@ -680,7 +684,7 @@ export default function BusinessTab() {
                       }
                     `}
                   >
-                    购买 {formatCash(cost)}
+                    {t('购买')} {formatCash(cost)}
                   </button>
                 </div>
               )}

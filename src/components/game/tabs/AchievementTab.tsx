@@ -7,10 +7,12 @@ import { motion } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { ACHIEVEMENTS } from '@/game/config/achievements';
 import { formatCash } from '@/game/formulas';
+import { useTranslation } from '@/i18n/useTranslation';
 import AssetIcon, { type SharedAssetId } from '../AssetIcon';
 import AchievementIcon from '../AchievementIcon';
 
 export default function AchievementTab() {
+  const { t } = useTranslation();
   const unlockedAchievements = useGameStore(s => s.unlockedAchievements);
 
   const unlockedCount = unlockedAchievements.length;
@@ -35,7 +37,7 @@ export default function AchievementTab() {
         <AssetIcon id="nav/achievement" size={28} />
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1">
-            <h2 className="text-sm font-black text-yellow-400">成就殿堂</h2>
+            <h2 className="text-sm font-black text-yellow-400">{t('成就殿堂')}</h2>
             <span className="text-xs font-bold text-yellow-400 tabular-nums">
               {unlockedCount}/{totalCount}
             </span>
@@ -61,7 +63,7 @@ export default function AchievementTab() {
             <div key={cat.name}>
               <h3 className="text-xs font-bold text-gray-400 mb-2 px-1 inline-flex items-center gap-1">
                 <AssetIcon id={cat.icon} size={14} />
-                {cat.name}
+                {t(cat.name)}
               </h3>
               <div className="grid grid-cols-1 gap-1.5">
                 {achievements.map(ach => {
@@ -85,7 +87,7 @@ export default function AchievementTab() {
                         `}>
                           <AchievementIcon
                             achievementId={ach.id}
-                            alt={ach.name}
+                            alt={t(ach.name)}
                             size={36}
                             className={isUnlocked ? '' : 'grayscale opacity-45'}
                           />
@@ -98,7 +100,7 @@ export default function AchievementTab() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
                             <span className={`text-xs font-bold ${isUnlocked ? 'text-yellow-300' : 'text-gray-400'}`}>
-                              {ach.name}
+                              {t(ach.name)}
                             </span>
                             {isUnlocked && ach.reward && (
                               <span className="text-[10px] font-bold text-green-400 inline-flex items-center gap-0.5">
@@ -108,7 +110,7 @@ export default function AchievementTab() {
                             )}
                           </div>
                           <p className={`text-[10px] ${isUnlocked ? 'text-gray-300' : 'text-gray-600'}`}>
-                            {ach.description}
+                            {t(ach.description)}
                           </p>
                         </div>
                         {isUnlocked && (

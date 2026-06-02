@@ -2,7 +2,7 @@
 // 游戏状态管理 — Zustand Store + localStorage 持久化
 // ============================================================
 import { create } from 'zustand';
-import { BusinessState, UpgradeState, AdBuff, TutorialStep, GameState, BusinessMode, ActiveGameEvent } from '../game/types';
+import { BusinessState, UpgradeState, AdBuff, TutorialStep, GameState, BusinessMode, ActiveGameEvent, LanguagePreference } from '../game/types';
 import { BUSINESSES } from '../game/config/businesses';
 import { MANAGERS } from '../game/config/managers';
 import { GLOBAL_UPGRADES } from '../game/config/upgrades';
@@ -63,6 +63,7 @@ function createInitialState(): GameState {
     lastEventCheck: Date.now(),
     eventCooldownUntil: 0,
     numberFormat: 'abbreviation' as const,
+    languagePreference: 'system',
     musicVolume: 0.5,
     sfxVolume: 0.8,
     musicEnabled: false,
@@ -162,6 +163,9 @@ interface GameActions {
   // 数字格式
   setNumberFormat: (format: 'abbreviation' | 'scientific') => void;
 
+  // 语言偏好
+  setLanguagePreference: (language: LanguagePreference) => void;
+
   // 音量
   setMusicVolume: (v: number) => void;
   setSfxVolume: (v: number) => void;
@@ -238,6 +242,7 @@ export const useGameStore = create<GameStore>((set, get) => {
     lastEventCheck: initial.lastEventCheck ?? Date.now(),
     eventCooldownUntil: initial.eventCooldownUntil ?? 0,
     numberFormat: initial.numberFormat ?? 'abbreviation',
+    languagePreference: initial.languagePreference ?? 'system',
     musicVolume: initial.musicVolume ?? 0.5,
     sfxVolume: initial.sfxVolume ?? 0.8,
     musicEnabled: initial.musicEnabled ?? false,
@@ -270,6 +275,11 @@ export const useGameStore = create<GameStore>((set, get) => {
     setNumberFormat: (format: 'abbreviation' | 'scientific') => {
       set({ numberFormat: format });
       syncNumberFormat(format);
+      get().save();
+    },
+
+    setLanguagePreference: (language: LanguagePreference) => {
+      set({ languagePreference: language });
       get().save();
     },
 

@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { formatNumberSmart, getMarketTrendText } from '@/game/formulas';
 import { BUSINESSES } from '@/game/config/businesses';
+import { GAME_EVENTS } from '@/game/config/events';
+import { useTranslation } from '@/i18n/useTranslation';
 import AnimatedNumber from './AnimatedNumber';
 import AssetIcon, { resolveSharedAssetId, type SharedAssetId } from './AssetIcon';
 
@@ -27,6 +29,7 @@ interface EventChip {
 }
 
 export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
+  const { t } = useTranslation();
   const cash = useGameStore(s => s.cash);
   const diamonds = useGameStore(s => s.diamonds);
   const businesses = useGameStore(s => s.businesses);
@@ -48,7 +51,7 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
             const s = Math.floor(buff.remainingSec % 60);
             buffs.push({
               icon: 'boost/fire',
-              text: `双倍 ${m}:${s.toString().padStart(2, '0')}`,
+              text: `${t('双倍收益')} ${m}:${s.toString().padStart(2, '0')}`,
               color: 'from-red-500/80 to-orange-500/80 shadow-red-500/40',
             });
             break;
@@ -56,14 +59,14 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
           case 'rush_order':
             buffs.push({
               icon: 'boost/rocket',
-              text: `爆单 ${Math.ceil(buff.remainingSec)}s`,
+              text: `${t('爆单潮')} ${Math.ceil(buff.remainingSec)}s`,
               color: 'from-orange-500/80 to-yellow-500/80 shadow-orange-500/40',
             });
             break;
           case 'speed_boost':
             buffs.push({
               icon: 'boost/lightning',
-              text: `加速 ${Math.ceil(buff.remainingSec)}s`,
+              text: `${t('极速生产')} ${Math.ceil(buff.remainingSec)}s`,
               color: 'from-cyan-500/80 to-blue-500/80 shadow-cyan-500/40',
             });
             break;
@@ -72,7 +75,7 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
             const s = Math.floor(buff.remainingSec % 60);
             buffs.push({
               icon: 'boost/timer',
-              text: `离线加成 ${m}:${s.toString().padStart(2, '0')}`,
+              text: `${t('额外离线收益')} ${m}:${s.toString().padStart(2, '0')}`,
               color: 'from-green-500/80 to-emerald-500/80 shadow-green-500/40',
             });
             break;
@@ -85,7 +88,7 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
       if (events.length > 0) {
         setEventTimers(events.map(e => ({
           icon: resolveSharedAssetId(e.icon) ?? 'boost/lightning',
-          text: e.name,
+          text: t(GAME_EVENTS.find(eventDef => eventDef.id === e.eventDefId)?.name ?? e.name),
           remaining: Math.ceil(e.remainingSec),
         })));
       } else {
@@ -93,7 +96,7 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
       }
     }, 200);
     return () => clearInterval(timer);
-  }, []);
+  }, [t]);
 
   const activeMarkets = BUSINESSES
     .filter(b => {
@@ -151,7 +154,7 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
                          hover:from-gray-300 hover:to-gray-500
                          active:shadow-[0_1px_0_0_#374151,0_2px_4px_rgba(0,0,0,0.2)] active:translate-y-[2px]
                          transition-all duration-150"
-              aria-label="打开设置"
+              aria-label={t('打开设置')}
             >
               <AssetIcon id="system/settings" size={18} />
             </button>
@@ -186,7 +189,7 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
               avgMarket > 1.15 ? 'bg-green-600/80 text-green-100' : 'bg-red-600/80 text-red-100'
             }`}>
               <AssetIcon id={marketIcon} size={13} className="mr-1 align-[-2px]" />
-              {marketTrend.text}
+              {t(marketTrend.text)}
             </div>
           )}
         </div>

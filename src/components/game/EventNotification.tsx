@@ -6,7 +6,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
+import { GAME_EVENTS } from '@/game/config/events';
 import { playEventStart } from '@/game/sound';
+import { useTranslation } from '@/i18n/useTranslation';
 import AssetIcon from './AssetIcon';
 import { ShopEventIcon } from './ShopIcon';
 
@@ -20,6 +22,7 @@ interface QueuedEvent {
 }
 
 export default function EventNotification() {
+  const { t } = useTranslation();
   const activeEvents = useGameStore(s => s.activeEvents);
   const prevEventIdsRef = useRef<Set<string>>(new Set());
   const queueRef = useRef<QueuedEvent[]>([]);
@@ -91,10 +94,10 @@ export default function EventNotification() {
 
   const boostText = (() => {
     switch (currentEvent.boostType) {
-      case 'profit_mult': return `利润 ×${currentEvent.boostValue}`;
-      case 'speed_mult': return `速度 ×${currentEvent.boostValue}`;
-      case 'all_mult': return `全属性 ×${currentEvent.boostValue}`;
-      case 'cost_reduce': return `成本 ${Math.round(currentEvent.boostValue * 100)}%`;
+      case 'profit_mult': return `${t('利润')} ×${currentEvent.boostValue}`;
+      case 'speed_mult': return `${t('速度')} ×${currentEvent.boostValue}`;
+      case 'all_mult': return `${t('全属性')} ×${currentEvent.boostValue}`;
+      case 'cost_reduce': return `${t('成本')} ${Math.round(currentEvent.boostValue * 100)}%`;
       default: return '';
     }
   })();
@@ -127,11 +130,11 @@ export default function EventNotification() {
                 transition={{ repeat: Infinity, duration: 1.5 }}
                 className="flex-shrink-0"
               >
-                <ShopEventIcon eventId={currentEvent.eventDefId} alt={currentEvent.name} size={48} />
+                <ShopEventIcon eventId={currentEvent.eventDefId} alt={t(GAME_EVENTS.find(e => e.id === currentEvent.eventDefId)?.name ?? currentEvent.name)} size={48} />
               </motion.div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-black text-white truncate">{currentEvent.name}</h3>
+                  <h3 className="text-sm font-black text-white truncate">{t(GAME_EVENTS.find(e => e.id === currentEvent.eventDefId)?.name ?? currentEvent.name)}</h3>
                   <span className={`text-[10px] font-bold ${boostColor}`}>
                     {boostText}
                   </span>
@@ -141,10 +144,10 @@ export default function EventNotification() {
                     </span>
                   )}
                 </div>
-                <p className="text-[10px] text-white/70 truncate">{currentEvent.description}</p>
+                <p className="text-[10px] text-white/70 truncate">{t(GAME_EVENTS.find(e => e.id === currentEvent.eventDefId)?.description ?? currentEvent.description)}</p>
                 <p className="text-[10px] text-purple-300 mt-0.5 inline-flex items-center gap-1">
                   <AssetIcon id="boost/timer" size={12} />
-                  {Math.ceil(currentEvent.remainingSec)}秒
+                  {Math.ceil(currentEvent.remainingSec)}{t('秒')}
                 </p>
               </div>
             </div>

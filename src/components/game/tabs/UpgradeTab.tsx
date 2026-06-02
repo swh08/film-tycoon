@@ -7,6 +7,8 @@ import { useGameStore } from '@/store/gameStore';
 import { GLOBAL_UPGRADES, UPGRADE_GROUP_INFO } from '@/game/config/upgrades';
 import { calcUpgradeCostBulk, calcMaxUpgradeLevels, formatCash, formatNumber } from '@/game/formulas';
 import type { UpgradeGroup } from '@/game/types';
+import { useTranslation } from '@/i18n/useTranslation';
+import { translateText } from '@/i18n';
 import AssetIcon from '@/components/game/AssetIcon';
 import UpgradeIcon, { GLOBAL_UPGRADE_ASSETS, UPGRADE_GROUP_ASSETS } from '@/components/game/UpgradeIcon';
 
@@ -21,6 +23,7 @@ const BUY_MODES = [
 
 export default function UpgradeTab() {
   const { cash, diamonds, upgrades, buyUpgrade, buyMode, setBuyMode } = useGameStore();
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col gap-4 px-3 py-3 pb-4">
@@ -28,7 +31,7 @@ export default function UpgradeTab() {
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-1.5 text-sm font-bold text-yellow-400">
           <AssetIcon id="nav/upgrade" size={18} />
-          全局升级
+          {t('全局升级')}
         </h2>
         <div className="flex items-center gap-2">
           {/* 全局购买模式切换 */}
@@ -43,7 +46,7 @@ export default function UpgradeTab() {
                     : 'bg-gradient-to-b from-gray-400 to-gray-600 text-gray-200 shadow-[0_3px_0_0_#374151] active:shadow-[0_1px_0_0_#374151] active:translate-y-[2px]'
                   }`}
               >
-                {m.label}
+                {t(m.label)}
               </button>
             ))}
           </div>
@@ -59,8 +62,8 @@ export default function UpgradeTab() {
             {/* 分组标题 */}
             <div className="flex items-center gap-2 mb-2 px-1">
               <UpgradeIcon id={UPGRADE_GROUP_ASSETS[group]} size={24} />
-              <h2 className="text-sm font-bold text-yellow-400">{groupInfo.name}</h2>
-              <span className="text-[10px] text-gray-500 flex-1">{groupInfo.description}</span>
+              <h2 className="text-sm font-bold text-yellow-400">{t(groupInfo.name)}</h2>
+              <span className="text-[10px] text-gray-500 flex-1">{t(groupInfo.description)}</span>
             </div>
 
             {/* 升级卡片 */}
@@ -106,18 +109,18 @@ export default function UpgradeTab() {
                       {/* 信息 */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className="text-sm font-bold text-white truncate">{def.name}</h3>
+                          <h3 className="text-sm font-bold text-white truncate">{t(def.name)}</h3>
                           <span className={`text-xs font-bold px-1.5 py-0.5 rounded
                             ${isMaxed ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-700 text-gray-300'}`}>
                             Lv.{level}/{def.maxLevel}
                           </span>
                         </div>
 
-                        <p className="text-[10px] text-gray-400 mb-2">{def.description}</p>
+                        <p className="text-[10px] text-gray-400 mb-2">{t(def.description)}</p>
 
                         {/* 当前效果 */}
                         <div className="text-[10px] text-green-400 mb-2">
-                          当前效果: {effectLabel}
+                          {t('当前效果')}: {effectLabel}
                         </div>
 
                         {/* 等级进度条 */}
@@ -142,7 +145,7 @@ export default function UpgradeTab() {
                             `}
                           >
                             <span className="inline-flex items-center justify-center gap-1">
-                              升级 ×{actualCount} → {costLabel}
+                              {t('升级')} ×{actualCount} → {costLabel}
                               {def.currency === 'diamond' && <AssetIcon id="currency/diamond" size={14} />}
                             </span>
                           </button>
@@ -152,7 +155,7 @@ export default function UpgradeTab() {
                           <div className="text-center py-2 text-xs font-bold text-yellow-400">
                             <span className="inline-flex items-center justify-center gap-1">
                               <AssetIcon id="status/check" size={14} />
-                              已满级
+                              {t('已满级')}
                             </span>
                           </div>
                         )}
@@ -172,14 +175,18 @@ export default function UpgradeTab() {
 function getEffectLabel(effectType: string, totalEffect: number): string {
   switch (effectType) {
     case 'cycle_reduce_all':
-      return `生产加速 ${(totalEffect * 100).toFixed(0)}%`;
+      return `${translateEffectText('生产加速')} ${(totalEffect * 100).toFixed(0)}%`;
     case 'profit_mult_all':
-      return `利润加成 +${(totalEffect * 100).toFixed(0)}%`;
+      return `${translateEffectText('利润加成')} +${(totalEffect * 100).toFixed(0)}%`;
     case 'offline_cap_increase':
-      return `离线上限 +${(totalEffect * 60)}分钟`;
+      return `${translateEffectText('离线上限')} +${(totalEffect * 60)}${translateEffectText('分钟')}`;
     case 'offline_mult':
-      return `离线倍率 ×${(1 + totalEffect).toFixed(2)}`;
+      return `${translateEffectText('离线倍率')} ×${(1 + totalEffect).toFixed(2)}`;
     default:
       return `${totalEffect}`;
   }
+}
+
+function translateEffectText(text: string): string {
+  return translateText(text);
 }

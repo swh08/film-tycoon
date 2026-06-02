@@ -8,6 +8,7 @@ import { useGameStore } from '@/store/gameStore';
 import { DAILY_REWARDS } from '@/game/config/daily-rewards';
 import { formatCash } from '@/game/formulas';
 import { playDailyReward } from '@/game/sound';
+import { useTranslation } from '@/i18n/useTranslation';
 import AssetIcon from './AssetIcon';
 import DailyRewardIcon from './DailyRewardIcon';
 
@@ -17,6 +18,7 @@ interface DailyRewardPopupProps {
 }
 
 export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupProps) {
+  const { t } = useTranslation();
   const loginStreak = useGameStore(s => s.loginStreak);
   const lastLoginDate = useGameStore(s => s.lastLoginDate);
 
@@ -57,9 +59,9 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
               />
             ))}
           </div>
-          <DailyRewardIcon day={currentReward.day} alt={currentReward.name} size={72} className="mb-2" />
-          <h2 className="text-xl font-black">每日登录奖励</h2>
-          <p className="text-sm text-white/80 mt-1">连续登录第 {loginStreak} 天</p>
+          <DailyRewardIcon day={currentReward.day} alt={t(currentReward.name)} size={72} className="mb-2" />
+          <h2 className="text-xl font-black">{t('每日登录奖励')}</h2>
+          <p className="text-sm text-white/80 mt-1">{t('连续登录第')} {loginStreak} {t('天')}</p>
         </div>
 
         {/* 7天奖励预览 */}
@@ -85,10 +87,10 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
                     }
                   `}
                 >
-                  <span className="text-[8px] text-gray-400 mb-0.5">Day{reward.day}</span>
+                  <span className="text-[8px] text-gray-400 mb-0.5">{t('第')}{reward.day}{t('天')}</span>
                   <DailyRewardIcon
                     day={reward.day}
-                    alt={reward.name}
+                    alt={t(reward.name)}
                     size={24}
                     className={isPast ? 'grayscale opacity-50' : ''}
                   />
@@ -106,10 +108,10 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
           {/* 今日奖励详情 */}
           <div className="bg-gradient-to-r from-yellow-900/30 to-amber-900/20 rounded-xl p-4 mb-4">
             <div className="flex items-center gap-3">
-              <DailyRewardIcon day={currentReward.day} alt={currentReward.name} size={64} />
+              <DailyRewardIcon day={currentReward.day} alt={t(currentReward.name)} size={64} />
               <div className="flex-1">
-                <h3 className="text-base font-bold text-yellow-400">{currentReward.name}</h3>
-                <p className="text-[10px] text-gray-400 mt-0.5">{currentReward.description}</p>
+                <h3 className="text-base font-bold text-yellow-400">{t(currentReward.name)}</h3>
+                <p className="text-[10px] text-gray-400 mt-0.5">{t(currentReward.description)}</p>
                 <div className="flex gap-2 mt-2">
                   {currentReward.rewards.map((reward, idx) => (
                     <span
@@ -122,7 +124,7 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
                             : 'bg-yellow-900/40 text-yellow-300'
                         }`}
                     >
-                      {reward.label}
+                      {t(reward.label)}
                     </span>
                   ))}
                 </div>
@@ -140,7 +142,7 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
           >
             <span className="inline-flex items-center justify-center gap-2">
               <AssetIcon id="boost/gift" size={24} />
-              领取奖励
+              {t('领取奖励')}
             </span>
           </button>
         </div>

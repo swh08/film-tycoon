@@ -7,6 +7,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { startMusic, stopMusic, setMusicVolume, setSfxVolumeValue, isMusicPlaying } from '@/game/sound';
+import { useTranslation, type LanguagePreference } from '@/i18n/useTranslation';
 import StatsPanel from './StatsPanel';
 import AssetIcon from './AssetIcon';
 import BusinessIcon from './BusinessIcon';
@@ -21,6 +22,8 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
   const setSoundEnabled = useGameStore(s => s.setSoundEnabled);
   const numberFormat = useGameStore(s => s.numberFormat);
   const setNumberFormat = useGameStore(s => s.setNumberFormat);
+  const languagePreference = useGameStore(s => s.languagePreference);
+  const setLanguagePreference = useGameStore(s => s.setLanguagePreference);
   const musicVolume = useGameStore(s => s.musicVolume);
   const setMusicVolumeStore = useGameStore(s => s.setMusicVolume);
   const sfxVolume = useGameStore(s => s.sfxVolume);
@@ -34,6 +37,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
   const [showStatsView, setShowStatsView] = useState(false);
   const [importText, setImportText] = useState('');
   const [toastMsg, setToastMsg] = useState('');
+  const { t } = useTranslation();
 
   // Sync BGM with store state
   useEffect(() => {
@@ -62,7 +66,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
       const state = useGameStore.getState();
       const json = JSON.stringify(state, null, 2);
       navigator.clipboard.writeText(json).then(() => {
-        showToast('存档已复制到剪贴板');
+        showToast(t('存档已复制到剪贴板'));
       }).catch(() => {
         // fallback
         const ta = document.createElement('textarea');
@@ -71,27 +75,27 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
         ta.select();
         document.execCommand('copy');
         document.body.removeChild(ta);
-        showToast('存档已复制到剪贴板');
+        showToast(t('存档已复制到剪贴板'));
       });
     } catch {
-      showToast('导出失败');
+      showToast(t('导出失败'));
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   const handleImport = useCallback(() => {
     try {
       const data = JSON.parse(importText);
       if (!data || typeof data !== 'object') {
-        showToast('存档格式无效');
+        showToast(t('存档格式无效'));
         return;
       }
       // 验证关键字段
       if (typeof data.cash !== 'number' || data.cash < 0) {
-        showToast('存档格式无效：现金数据错误');
+        showToast(t('存档格式无效：现金数据错误'));
         return;
       }
       if (!Array.isArray(data.businesses) || data.businesses.length === 0) {
-        showToast('存档格式无效：缺少产线数据');
+        showToast(t('存档格式无效：缺少产线数据'));
         return;
       }
       // 数值范围校验
@@ -102,20 +106,26 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
       // 直接 setState 覆盖（不需要先 resetGame，避免竞态）
       useGameStore.setState(data);
       useGameStore.getState().save();
-      showToast('存档导入成功');
+      showToast(t('存档导入成功'));
       setShowImportArea(false);
       setImportText('');
     } catch {
-      showToast('JSON 解析失败');
+      showToast(t('JSON 解析失败'));
     }
-  }, [importText, showToast]);
+  }, [importText, showToast, t]);
 
   const handleReset = useCallback(() => {
     resetGame();
     setShowResetConfirm(false);
-    showToast('游戏已重置');
+    showToast(t('游戏已重置'));
     onClose();
-  }, [resetGame, onClose]);
+  }, [resetGame, onClose, t]);
+
+  const languageOptions: { value: LanguagePreference; label: string }[] = [
+    { value: 'system', label: t('跟随浏览器') },
+    { value: 'zh-CN', label: t('中文') },
+    { value: 'en', label: 'English' },
+  ];
 
   return (
     <AnimatePresence>
@@ -144,8 +154,8 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 <div className="flex items-center gap-2">
                   <AssetIcon id="system/settings" size={28} />
                   <div>
-                    <h2 className="text-base font-black text-gray-200">设置</h2>
-                    <p className="text-[10px] text-gray-400">游戏偏好与存档管理</p>
+                    <h2 className="text-base font-black text-gray-200">{t('设置')}</h2>
+                    <p className="text-[10px] text-gray-400">{t('游戏偏好与存档管理')}</p>
                   </div>
                 </div>
                 <button
@@ -163,14 +173,14 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
               <section>
                 <h3 className="text-xs font-bold text-gray-400 mb-3 inline-flex items-center gap-1">
                   <AssetIcon id="system/settings" size={14} />
-                  音频设置
+                  {t('音频设置')}
                 </h3>
                 <div className="space-y-3">
                   {/* 音效总开关 */}
                   <div className="flex items-center justify-between bg-gray-800/60 rounded-xl p-3">
                     <div>
-                      <p className="text-xs font-medium text-gray-200">音效开关</p>
-                      <p className="text-[10px] text-gray-500">关闭后所有音效静音</p>
+                      <p className="text-xs font-medium text-gray-200">{t('音效开关')}</p>
+                      <p className="text-[10px] text-gray-500">{t('关闭后所有音效静音')}</p>
                     </div>
                     <button
                       onClick={() => setSoundEnabled(!soundEnabled)}
@@ -190,7 +200,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   <div className="bg-gray-800/60 rounded-xl p-3">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="text-xs font-medium text-gray-200">背景音乐</p>
+                        <p className="text-xs font-medium text-gray-200">{t('背景音乐')}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
@@ -225,7 +235,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   <div className="bg-gray-800/60 rounded-xl p-3">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="text-xs font-medium text-gray-200">音效音量</p>
+                        <p className="text-xs font-medium text-gray-200">{t('音效音量')}</p>
                       </div>
                       <span className="text-xs text-gray-400 tabular-nums">{Math.round(sfxVolume * 100)}%</span>
                     </div>
@@ -244,6 +254,29 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 </div>
               </section>
 
+              {/* 语言设置 */}
+              <section>
+                <h3 className="text-xs font-bold text-gray-400 mb-3">{t('语言')}</h3>
+                <div className="bg-gray-800/60 rounded-xl p-3">
+                  <p className="text-[10px] text-gray-500 mb-2">{t('默认根据浏览器语言显示，手动切换后会保存')}</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {languageOptions.map(option => (
+                      <button
+                        key={option.value}
+                        onClick={() => setLanguagePreference(option.value)}
+                        className={`rounded-xl p-2 text-center text-[10px] font-bold transition-all ${
+                          languagePreference === option.value
+                            ? 'bg-amber-900/40 text-yellow-300 ring-1 ring-amber-500/30'
+                            : 'bg-gray-900/60 text-gray-400'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
               {/* 游戏统计 */}
               <section>
                 <button
@@ -252,8 +285,8 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 >
                   <AssetIcon id="nav/achievement" size={22} />
                   <div className="text-left flex-1">
-                    <p className="text-xs font-medium text-blue-300">游戏统计</p>
-                    <p className="text-[10px] text-gray-500">查看收入、产线、转生等详细数据</p>
+                    <p className="text-xs font-medium text-blue-300">{t('游戏统计')}</p>
+                    <p className="text-[10px] text-gray-500">{t('查看收入、产线、转生等详细数据')}</p>
                   </div>
                   <span className="text-xs text-gray-500">›</span>
                 </button>
@@ -261,7 +294,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
               {/* 数字显示 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-3">数字显示</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-3">{t('数字显示')}</h3>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setNumberFormat('abbreviation')}
@@ -272,7 +305,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                     }`}
                   >
                     <p className="text-sm font-bold text-yellow-300 tabular-nums">1.23M</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">缩写格式</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5">{t('缩写格式')}</p>
                   </button>
                   <button
                     onClick={() => setNumberFormat('scientific')}
@@ -283,14 +316,14 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                     }`}
                   >
                     <p className="text-sm font-bold text-yellow-300 tabular-nums">1.23e6</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">科学计数法</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5">{t('科学计数法')}</p>
                   </button>
                 </div>
               </section>
 
               {/* 存档管理 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-3">存档管理</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-3">{t('存档管理')}</h3>
                 <div className="space-y-2">
                   {/* 导出 */}
                   <button
@@ -299,8 +332,8 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   >
                     <AssetIcon id="status/check" size={22} />
                     <div className="text-left">
-                      <p className="text-xs font-medium text-gray-200">导出存档</p>
-                      <p className="text-[10px] text-gray-500">复制存档 JSON 到剪贴板</p>
+                      <p className="text-xs font-medium text-gray-200">{t('导出存档')}</p>
+                      <p className="text-[10px] text-gray-500">{t('复制存档 JSON 到剪贴板')}</p>
                     </div>
                   </button>
 
@@ -312,8 +345,8 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                     >
                       <AssetIcon id="boost/gift" size={22} />
                       <div className="text-left flex-1">
-                        <p className="text-xs font-medium text-gray-200">导入存档</p>
-                        <p className="text-[10px] text-gray-500">粘贴 JSON 恢复存档</p>
+                        <p className="text-xs font-medium text-gray-200">{t('导入存档')}</p>
+                        <p className="text-[10px] text-gray-500">{t('粘贴 JSON 恢复存档')}</p>
                       </div>
                       <span className={`text-xs text-gray-500 transition-transform ${showImportArea ? 'rotate-180' : ''}`}>
                         ▼
@@ -328,7 +361,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                         <textarea
                           value={importText}
                           onChange={(e) => setImportText(e.target.value)}
-                          placeholder="在此粘贴存档 JSON..."
+                          placeholder={t('在此粘贴存档 JSON...')}
                           className="w-full h-24 bg-gray-900 rounded-lg p-2 text-[10px] text-gray-300 border border-gray-600/50 focus:border-amber-500/50 focus:outline-none resize-none font-mono"
                         />
                         <button
@@ -336,7 +369,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                           disabled={!importText.trim()}
                           className="mt-2 w-full py-3 rounded-xl bg-gradient-to-b from-amber-400 to-amber-600 disabled:from-gray-500 disabled:to-gray-700 disabled:text-gray-400 disabled:shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.3)] text-white text-xs font-bold transition-all duration-150 shadow-[0_4px_0_0_#92400e,0_6px_12px_rgba(120,53,15,0.3)] active:shadow-[0_2px_0_0_#92400e,0_3px_6px_rgba(120,53,15,0.2)] active:translate-y-[2px]"
                         >
-                          确认导入
+                          {t('确认导入')}
                         </button>
                       </motion.div>
                     )}
@@ -350,8 +383,8 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                     >
                       <AssetIcon id="status/cross" size={22} />
                       <div className="text-left flex-1">
-                        <p className="text-xs font-medium text-red-400">重置游戏</p>
-                        <p className="text-[10px] text-gray-500">清除所有进度，不可恢复</p>
+                        <p className="text-xs font-medium text-red-400">{t('重置游戏')}</p>
+                        <p className="text-[10px] text-gray-500">{t('清除所有进度，不可恢复')}</p>
                       </div>
                       <span className={`text-xs text-gray-500 transition-transform ${showResetConfirm ? 'rotate-180' : ''}`}>
                         ▼
@@ -365,20 +398,20 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                       >
                         <p className="text-[10px] text-red-300 mb-2 inline-flex items-center gap-1">
                           <AssetIcon id="status/cross" size={12} />
-                          确定要重置吗？所有进度将被永久删除！
+                          {t('确定要重置吗？所有进度将被永久删除！')}
                         </p>
                         <div className="flex gap-2">
                           <button
                             onClick={() => setShowResetConfirm(false)}
                             className="flex-1 py-3 rounded-xl bg-gradient-to-b from-gray-400 to-gray-600 hover:from-gray-300 hover:to-gray-500 text-gray-200 text-xs font-bold transition-all duration-150 shadow-[0_3px_0_0_#374151] active:shadow-[0_1px_0_0_#374151] active:translate-y-[2px]"
                           >
-                            取消
+                            {t('取消')}
                           </button>
                           <button
                             onClick={handleReset}
                             className="flex-1 py-3 rounded-xl bg-gradient-to-b from-red-400 to-red-600 hover:from-red-300 hover:to-red-500 text-white text-xs font-bold transition-all duration-150 shadow-[0_3px_0_0_#991b1b,0_4px_8px_rgba(127,29,29,0.3)] active:shadow-[0_1px_0_0_#991b1b,0_2px_4px_rgba(127,29,29,0.2)] active:translate-y-[2px]"
                           >
-                            确认重置
+                            {t('确认重置')}
                           </button>
                         </div>
                       </motion.div>
@@ -389,11 +422,11 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
               {/* 关于 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-3">关于</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-3">{t('关于')}</h3>
                 <div className="bg-gray-800/60 rounded-xl p-3">
                   <div className="text-center">
                     <BusinessIcon icon="stall" className="text-lg" />
-                    <p className="text-sm font-bold text-yellow-400">贴膜大亨</p>
+                    <p className="text-sm font-bold text-yellow-400">{t('贴膜大亨')}</p>
                     <p className="text-[10px] text-gray-500 mt-0.5">Screen Protector Tycoon</p>
                     <p className="text-[10px] text-gray-600 mt-1">v1.0.0</p>
                   </div>
