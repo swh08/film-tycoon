@@ -15,7 +15,7 @@ export const GLOBAL_UPGRADES: GlobalUpgradeDef[] = [
     currency: 'cash',
     effectType: 'cycle_reduce_all',
     effectPerLevel: 0.02, // 每级减2%生产周期
-    icon: '⚙️',
+    icon: 'system/settings',
     description: '升级贴膜设备，全产线生产速度+2%',
   },
   {
@@ -28,7 +28,7 @@ export const GLOBAL_UPGRADES: GlobalUpgradeDef[] = [
     currency: 'cash',
     effectType: 'cycle_reduce_all',
     effectPerLevel: 0.03, // 每级减3%生产周期
-    icon: '🎯',
+    icon: 'nav/achievement',
     description: '纳米级对齐精度，生产速度再+3%',
   },
   {
@@ -41,7 +41,7 @@ export const GLOBAL_UPGRADES: GlobalUpgradeDef[] = [
     currency: 'cash',
     effectType: 'cycle_reduce_all',
     effectPerLevel: 0.05, // 每级减5%生产周期
-    icon: '🤖',
+    icon: 'nav/manager',
     description: '全自动贴膜流水线，生产速度+5%',
   },
   // === 渠道升级组 ===
@@ -55,7 +55,7 @@ export const GLOBAL_UPGRADES: GlobalUpgradeDef[] = [
     currency: 'cash',
     effectType: 'offline_mult',
     effectPerLevel: 0.05, // 每级离线收益+5%
-    icon: '📱',
+    icon: 'nav/business',
     description: '建立社区团购网络，离线收益+5%',
   },
   {
@@ -68,7 +68,7 @@ export const GLOBAL_UPGRADES: GlobalUpgradeDef[] = [
     currency: 'cash',
     effectType: 'offline_cap_increase',
     effectPerLevel: 0.5, // 每级离线上限+0.5小时
-    icon: '📦',
+    icon: 'boost/gift',
     description: '扩大仓储能力，离线收益上限+30分钟',
   },
   {
@@ -81,7 +81,7 @@ export const GLOBAL_UPGRADES: GlobalUpgradeDef[] = [
     currency: 'cash',
     effectType: 'offline_mult',
     effectPerLevel: 0.1, // 每级离线收益+10%
-    icon: '🌐',
+    icon: 'nav/prestige',
     description: '打通全球供应链，离线收益+10%',
   },
   // === 品牌升级组 ===
@@ -95,7 +95,7 @@ export const GLOBAL_UPGRADES: GlobalUpgradeDef[] = [
     currency: 'cash',
     effectType: 'profit_mult_all',
     effectPerLevel: 0.03, // 每级全局利润+3%
-    icon: '🏷️',
+    icon: 'nav/shop',
     description: '设计专业品牌形象，全产线利润+3%',
   },
   {
@@ -108,7 +108,7 @@ export const GLOBAL_UPGRADES: GlobalUpgradeDef[] = [
     currency: 'cash',
     effectType: 'profit_mult_all',
     effectPerLevel: 0.05, // 每级全局利润+5%
-    icon: '📣',
+    icon: 'boost/ad',
     description: '全网KOL矩阵推广，全产线利润+5%',
   },
   {
@@ -121,7 +121,7 @@ export const GLOBAL_UPGRADES: GlobalUpgradeDef[] = [
     currency: 'cash',
     effectType: 'profit_mult_all',
     effectPerLevel: 0.08, // 每级全局利润+8%
-    icon: '🌟',
+    icon: 'boost/lightning',
     description: '请顶级明星代言，全产线利润+8%',
   },
   // === 钻石升级 ===
@@ -135,7 +135,7 @@ export const GLOBAL_UPGRADES: GlobalUpgradeDef[] = [
     currency: 'diamond',
     effectType: 'cycle_reduce_all',
     effectPerLevel: 0.1, // 每级减10%
-    icon: '⚛️',
+    icon: 'nav/prestige',
     description: '量子级贴膜技术，生产速度暴涨10%',
   },
   {
@@ -148,13 +148,13 @@ export const GLOBAL_UPGRADES: GlobalUpgradeDef[] = [
     currency: 'diamond',
     effectType: 'profit_mult_all',
     effectPerLevel: 0.15, // 每级+15%
-    icon: '🏛️',
+    icon: 'nav/achievement',
     description: '建立品牌授权体系，利润暴涨15%',
   },
 ];
 
 export const UPGRADE_GROUP_INFO: Record<string, { name: string; icon: string; description: string }> = {
-  equipment: { name: '设备升级', icon: '⚙️', description: '提升全产线生产效率' },
-  channel: { name: '渠道升级', icon: '📦', description: '提升离线收益上限和倍率' },
-  brand: { name: '品牌升级', icon: '🏷️', description: '提升全局利润倍率' },
+  equipment: { name: '设备升级', icon: 'system/settings', description: '提升全产线生产效率' },
+  channel: { name: '渠道升级', icon: 'boost/gift', description: '提升离线收益上限和倍率' },
+  brand: { name: '品牌升级', icon: 'nav/shop', description: '提升全局利润倍率' },
 };

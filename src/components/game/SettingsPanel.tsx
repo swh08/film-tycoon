@@ -62,7 +62,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
       const state = useGameStore.getState();
       const json = JSON.stringify(state, null, 2);
       navigator.clipboard.writeText(json).then(() => {
-        showToast('✅ 存档已复制到剪贴板');
+        showToast('存档已复制到剪贴板');
       }).catch(() => {
         // fallback
         const ta = document.createElement('textarea');
@@ -71,10 +71,10 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
         ta.select();
         document.execCommand('copy');
         document.body.removeChild(ta);
-        showToast('✅ 存档已复制到剪贴板');
+        showToast('存档已复制到剪贴板');
       });
     } catch {
-      showToast('❌ 导出失败');
+      showToast('导出失败');
     }
   }, [showToast]);
 
@@ -82,16 +82,16 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
     try {
       const data = JSON.parse(importText);
       if (!data || typeof data !== 'object') {
-        showToast('❌ 存档格式无效');
+        showToast('存档格式无效');
         return;
       }
       // 验证关键字段
       if (typeof data.cash !== 'number' || data.cash < 0) {
-        showToast('❌ 存档格式无效：现金数据错误');
+        showToast('存档格式无效：现金数据错误');
         return;
       }
       if (!Array.isArray(data.businesses) || data.businesses.length === 0) {
-        showToast('❌ 存档格式无效：缺少产线数据');
+        showToast('存档格式无效：缺少产线数据');
         return;
       }
       // 数值范围校验
@@ -102,18 +102,18 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
       // 直接 setState 覆盖（不需要先 resetGame，避免竞态）
       useGameStore.setState(data);
       useGameStore.getState().save();
-      showToast('✅ 存档导入成功');
+      showToast('存档导入成功');
       setShowImportArea(false);
       setImportText('');
     } catch {
-      showToast('❌ JSON 解析失败');
+      showToast('JSON 解析失败');
     }
   }, [importText, showToast]);
 
   const handleReset = useCallback(() => {
     resetGame();
     setShowResetConfirm(false);
-    showToast('✅ 游戏已重置');
+    showToast('游戏已重置');
     onClose();
   }, [resetGame, onClose]);
 

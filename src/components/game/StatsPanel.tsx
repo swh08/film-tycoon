@@ -115,7 +115,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
 
             {/* 统计内容 */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
-              {/* 💰 资源统计 */}
+              {/* 资源统计 */}
               <section>
                 <h3 className="text-xs font-bold text-gray-400 mb-2">资源统计</h3>
                 <div className="grid grid-cols-3 gap-2">
@@ -140,7 +140,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                 </div>
               </section>
 
-              {/* 📈 收入统计 */}
+              {/* 收入统计 */}
               <section>
                 <h3 className="text-xs font-bold text-gray-400 mb-2">收入统计</h3>
                 <div className="grid grid-cols-1 gap-2">
@@ -160,7 +160,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                 </div>
               </section>
 
-              {/* 🎯 产线统计 */}
+              {/* 产线统计 */}
               <section>
                 <h3 className="text-xs font-bold text-gray-400 mb-2">产线统计</h3>
                 <div className="bg-gray-800/60 rounded-xl p-3">
@@ -196,7 +196,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                 </div>
               </section>
 
-              {/* ⏱️ 游戏时长 & 👆 操作统计 */}
+              {/* 游戏时长 & 操作统计 */}
               <section>
                 <h3 className="text-xs font-bold text-gray-400 mb-2">游戏数据</h3>
                 <div className="grid grid-cols-2 gap-2">
@@ -227,7 +227,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                 </div>
               </section>
 
-              {/* 🔄 转生统计 */}
+              {/* 转生统计 */}
               <section>
                 <h3 className="text-xs font-bold text-gray-400 mb-2">转生统计</h3>
                 <div className="grid grid-cols-3 gap-2">
@@ -252,7 +252,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                 </div>
               </section>
 
-              {/* 🏆 成就进度 */}
+              {/* 成就进度 */}
               <section>
                 <h3 className="text-xs font-bold text-gray-400 mb-2">成就进度</h3>
                 <div className="bg-gray-800/60 rounded-xl p-3">

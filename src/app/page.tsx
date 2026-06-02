@@ -13,6 +13,7 @@ import OfflineRewardPopup from '@/components/game/OfflineRewardPopup';
 import SettingsPanel from '@/components/game/SettingsPanel';
 import DailyRewardPopup from '@/components/game/DailyRewardPopup';
 import EventNotification from '@/components/game/EventNotification';
+import BusinessIcon from '@/components/game/BusinessIcon';
 
 import BusinessTab from '@/components/game/tabs/BusinessTab';
 import UpgradeTab from '@/components/game/tabs/UpgradeTab';
@@ -92,7 +93,7 @@ export default function GamePage() {
             transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
             className="text-5xl mb-4 inline-block"
           >
-            📱
+            <BusinessIcon icon="stall" />
           </motion.div>
           <p className="text-yellow-400 font-bold text-lg">贴膜大亨</p>
           <p className="text-gray-500 text-sm">加载中...</p>

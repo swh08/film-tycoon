@@ -770,9 +770,9 @@ export function calcDetailedBreakdown(
   // 11. 利润/速度模式
   const businessMode = state.businessModes?.[businessDef.id] as BusinessMode | undefined;
   if (businessMode === 'profit') {
-    items.push({ label: '💰 利润模式', value: 1.5, displayValue: '×1.5', color: 'text-yellow-300' });
+    items.push({ label: '利润模式', value: 1.5, displayValue: '×1.5', color: 'text-yellow-300' });
   } else if (businessMode === 'speed') {
-    items.push({ label: '⚡ 速度模式', value: 0.8, displayValue: '×0.8', color: 'text-blue-300' });
+    items.push({ label: '速度模式', value: 0.8, displayValue: '×0.8', color: 'text-blue-300' });
   }
 
   // 12. 事件增益
@@ -780,7 +780,7 @@ export function calcDetailedBreakdown(
   if (activeEvents && activeEvents.length > 0) {
     for (const evt of activeEvents) {
       if (evt.boostType === 'profit_mult' || evt.boostType === 'all_mult') {
-        items.push({ label: `🎊 ${evt.name}`, value: evt.boostValue, displayValue: `×${evt.boostValue}`, color: 'text-yellow-200' });
+        items.push({ label: evt.name, value: evt.boostValue, displayValue: `×${evt.boostValue}`, color: 'text-yellow-200' });
       }
     }
   }

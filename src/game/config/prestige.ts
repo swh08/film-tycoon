@@ -5,7 +5,7 @@ import { PrestigeRuleDef } from '../types';
 
 export const PRESTIGE_RULE: PrestigeRuleDef = {
   currencyName: '渠道人脉',
-  currencyIcon: '🤝',
+  currencyIcon: 'currency/connection',
   gainFormula: 'sqrt_total_earned',
   resetScope: ['cash', 'businesses', 'managers', 'global_upgrades', 'ad_bonuses'],
   permanentBonusCurve: {
