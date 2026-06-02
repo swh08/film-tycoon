@@ -8,6 +8,8 @@ import { useGameStore } from '@/store/gameStore';
 import { DAILY_REWARDS } from '@/game/config/daily-rewards';
 import { formatCash } from '@/game/formulas';
 import { playDailyReward } from '@/game/sound';
+import AssetIcon from './AssetIcon';
+import DailyRewardIcon from './DailyRewardIcon';
 
 interface DailyRewardPopupProps {
   isOpen: boolean;
@@ -55,7 +57,7 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
               />
             ))}
           </div>
-          <div className="text-4xl mb-2">{currentReward.icon}</div>
+          <DailyRewardIcon day={currentReward.day} alt={currentReward.name} size={72} className="mb-2" />
           <h2 className="text-xl font-black">每日登录奖励</h2>
           <p className="text-sm text-white/80 mt-1">连续登录第 {loginStreak} 天</p>
         </div>
@@ -84,14 +86,17 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
                   `}
                 >
                   <span className="text-[8px] text-gray-400 mb-0.5">Day{reward.day}</span>
-                  <span className={`text-lg ${isPast ? 'grayscale opacity-50' : ''}`}>
-                    {reward.icon}
-                  </span>
+                  <DailyRewardIcon
+                    day={reward.day}
+                    alt={reward.name}
+                    size={24}
+                    className={isPast ? 'grayscale opacity-50' : ''}
+                  />
                   {isToday && (
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping" />
                   )}
                   {isPast && (
-                    <span className="absolute bottom-0.5 right-0.5 text-[8px]">✅</span>
+                    <AssetIcon id="status/check" size={12} className="absolute bottom-0.5 right-0.5" />
                   )}
                 </div>
               );
@@ -101,7 +106,7 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
           {/* 今日奖励详情 */}
           <div className="bg-gradient-to-r from-yellow-900/30 to-amber-900/20 rounded-xl p-4 mb-4">
             <div className="flex items-center gap-3">
-              <div className="text-4xl">{currentReward.icon}</div>
+              <DailyRewardIcon day={currentReward.day} alt={currentReward.name} size={64} />
               <div className="flex-1">
                 <h3 className="text-base font-bold text-yellow-400">{currentReward.name}</h3>
                 <p className="text-[10px] text-gray-400 mt-0.5">{currentReward.description}</p>
@@ -133,7 +138,10 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
                        hover:from-yellow-200 hover:to-amber-500
                        active:shadow-[0_1px_0_0_#92400e,0_2px_4px_rgba(120,53,15,0.2)] active:translate-y-[2px]"
           >
-            🎁 领取奖励
+            <span className="inline-flex items-center justify-center gap-2">
+              <AssetIcon id="boost/gift" size={24} />
+              领取奖励
+            </span>
           </button>
         </div>
       </motion.div>

@@ -189,7 +189,10 @@ function BusinessDetailPopupContent({ businessId }: { businessId: number }) {
           {/* 乘数列表 */}
           {breakdown.items.length > 0 ? (
             <div className="bg-gray-700/50 rounded-xl p-3">
-              <h4 className="text-[10px] text-gray-500 font-bold mb-2">📊 加成倍率</h4>
+              <h4 className="text-[10px] text-gray-500 font-bold mb-2 inline-flex items-center gap-1">
+                <AssetIcon id="boost/lightning" size={12} />
+                加成倍率
+              </h4>
               <div className="space-y-1.5">
                 {breakdown.items.map((item, idx) => (
                   <div key={idx} className="flex justify-between text-xs">
@@ -293,7 +296,10 @@ export default function BusinessTab() {
           content: (
             <div className="text-center">
               <div className="text-4xl mb-2"><BusinessIcon icon={def.icon} /></div>
-              <h3 className="text-xl font-bold mb-1">🎉 倍率爆发！</h3>
+              <h3 className="text-xl font-bold mb-1 inline-flex items-center justify-center gap-1">
+                <AssetIcon id="boost/fire" size={24} />
+                倍率爆发！
+              </h3>
               <p className="text-lg mb-1">{def.name}</p>
               <p className="text-2xl font-black text-yellow-200">{ms.label}</p>
               <p className="text-sm text-white/80 mt-2">
@@ -381,7 +387,10 @@ export default function BusinessTab() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-gradient-to-r from-cyan-600 to-blue-600 rounded-xl p-3 text-white text-sm"
         >
-          <p className="font-bold">👆 点击第一个产线开始贴膜！</p>
+          <p className="font-bold inline-flex items-center gap-1">
+            <AssetIcon id="nav/business" size={16} />
+            点击第一个产线开始贴膜！
+          </p>
           <p className="text-xs text-white/70 mt-1">赚到第一笔钱后，开始购买更多产线</p>
         </motion.div>
       )}
@@ -392,7 +401,10 @@ export default function BusinessTab() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl p-3 text-white text-sm"
         >
-          <p className="font-bold">📈 继续购买产线，达到10级触发倍率爆发！</p>
+          <p className="font-bold inline-flex items-center gap-1">
+            <AssetIcon id="boost/lightning" size={16} />
+            继续购买产线，达到10级触发倍率爆发！
+          </p>
         </motion.div>
       )}
 

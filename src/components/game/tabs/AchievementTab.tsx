@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { ACHIEVEMENTS } from '@/game/config/achievements';
 import { formatCash } from '@/game/formulas';
+import AssetIcon, { type SharedAssetId } from '../AssetIcon';
 import AchievementIcon from '../AchievementIcon';
 
 export default function AchievementTab() {
@@ -17,21 +18,21 @@ export default function AchievementTab() {
   const progressPct = totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0;
 
   // 分类成就
-  const categories = [
-    { name: '💰 收入里程碑', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'total_earned').map(a => a.id) },
-    { name: '🏪 产线成就', ids: ACHIEVEMENTS.filter(a => ['businesses_unlocked', 'business_quantity_min'].includes(a.condition.type)).map(a => a.id) },
-    { name: '👥 店长成就', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'managers_hired').map(a => a.id) },
-    { name: '🔄 转生成就', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'prestige_count').map(a => a.id) },
-    { name: '⬆️ 升级成就', ids: ACHIEVEMENTS.filter(a => ['global_upgrade_level', 'business_upgrades_bought'].includes(a.condition.type)).map(a => a.id) },
-    { name: '🤝 人脉成就', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'angel_upgrades_bought').map(a => a.id) },
-    { name: '🎯 其他成就', ids: ACHIEVEMENTS.filter(a => ['manual_taps', 'total_purchases'].includes(a.condition.type)).map(a => a.id) },
+  const categories: { name: string; icon: SharedAssetId; ids: string[] }[] = [
+    { name: '收入里程碑', icon: 'currency/coin', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'total_earned').map(a => a.id) },
+    { name: '产线成就', icon: 'nav/business', ids: ACHIEVEMENTS.filter(a => ['businesses_unlocked', 'business_quantity_min'].includes(a.condition.type)).map(a => a.id) },
+    { name: '店长成就', icon: 'nav/manager', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'managers_hired').map(a => a.id) },
+    { name: '转生成就', icon: 'nav/prestige', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'prestige_count').map(a => a.id) },
+    { name: '升级成就', icon: 'nav/upgrade', ids: ACHIEVEMENTS.filter(a => ['global_upgrade_level', 'business_upgrades_bought'].includes(a.condition.type)).map(a => a.id) },
+    { name: '人脉成就', icon: 'currency/connection', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'angel_upgrades_bought').map(a => a.id) },
+    { name: '其他成就', icon: 'nav/achievement', ids: ACHIEVEMENTS.filter(a => ['manual_taps', 'total_purchases'].includes(a.condition.type)).map(a => a.id) },
   ];
 
   return (
     <div className="flex flex-col px-3 py-3 pb-4">
       {/* 头部 + 进度 */}
       <div className="flex items-center gap-3 mb-4 px-1">
-        <span className="text-2xl">🏅</span>
+        <AssetIcon id="nav/achievement" size={28} />
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1">
             <h2 className="text-sm font-black text-yellow-400">成就殿堂</h2>
@@ -58,7 +59,10 @@ export default function AchievementTab() {
 
           return (
             <div key={cat.name}>
-              <h3 className="text-xs font-bold text-gray-400 mb-2 px-1">{cat.name}</h3>
+              <h3 className="text-xs font-bold text-gray-400 mb-2 px-1 inline-flex items-center gap-1">
+                <AssetIcon id={cat.icon} size={14} />
+                {cat.name}
+              </h3>
               <div className="grid grid-cols-1 gap-1.5">
                 {achievements.map(ach => {
                   const isUnlocked = unlockedAchievements.includes(ach.id);
@@ -86,8 +90,8 @@ export default function AchievementTab() {
                             className={isUnlocked ? '' : 'grayscale opacity-45'}
                           />
                           {!isUnlocked && (
-                            <span className="absolute inset-0 flex items-center justify-center bg-gray-900/35 text-sm">
-                              🔒
+                            <span className="absolute inset-0 flex items-center justify-center bg-gray-900/35">
+                              <AssetIcon id="status/lock" size={18} />
                             </span>
                           )}
                         </div>
@@ -97,8 +101,9 @@ export default function AchievementTab() {
                               {ach.name}
                             </span>
                             {isUnlocked && ach.reward && (
-                              <span className="text-[10px] font-bold text-green-400">
-                                +{ach.reward.type === 'cash' ? formatCash(ach.reward.value) : `${ach.reward.value}💎`}
+                              <span className="text-[10px] font-bold text-green-400 inline-flex items-center gap-0.5">
+                                +{ach.reward.type === 'cash' ? formatCash(ach.reward.value) : ach.reward.value}
+                                {ach.reward.type === 'diamond' && <AssetIcon id="currency/diamond" size={11} />}
                               </span>
                             )}
                           </div>
@@ -107,7 +112,7 @@ export default function AchievementTab() {
                           </p>
                         </div>
                         {isUnlocked && (
-                          <span className="text-green-400 text-xs flex-shrink-0">✅</span>
+                          <AssetIcon id="status/check" size={14} className="flex-shrink-0" />
                         )}
                       </div>
                     </div>

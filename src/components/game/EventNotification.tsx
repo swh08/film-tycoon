@@ -7,10 +7,11 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { playEventStart } from '@/game/sound';
-import { GAME_EVENTS } from '@/game/config/events';
+import AssetIcon from './AssetIcon';
+import { ShopEventIcon } from './ShopIcon';
 
 interface QueuedEvent {
-  icon: string;
+  eventDefId: number;
   name: string;
   description: string;
   remainingSec: number;
@@ -57,7 +58,7 @@ export default function EventNotification() {
     for (const evt of activeEvents) {
       if (!prevIds.has(evt.id)) {
         newEvents.push({
-          icon: evt.icon,
+          eventDefId: evt.eventDefId,
           name: evt.name,
           description: evt.description,
           remainingSec: evt.remainingSec,
@@ -124,9 +125,9 @@ export default function EventNotification() {
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ repeat: Infinity, duration: 1.5 }}
-                className="text-3xl flex-shrink-0"
+                className="flex-shrink-0"
               >
-                {currentEvent.icon}
+                <ShopEventIcon eventId={currentEvent.eventDefId} alt={currentEvent.name} size={48} />
               </motion.div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -141,8 +142,9 @@ export default function EventNotification() {
                   )}
                 </div>
                 <p className="text-[10px] text-white/70 truncate">{currentEvent.description}</p>
-                <p className="text-[10px] text-purple-300 mt-0.5">
-                  ⏱ {Math.ceil(currentEvent.remainingSec)}秒
+                <p className="text-[10px] text-purple-300 mt-0.5 inline-flex items-center gap-1">
+                  <AssetIcon id="boost/timer" size={12} />
+                  {Math.ceil(currentEvent.remainingSec)}秒
                 </p>
               </div>
             </div>

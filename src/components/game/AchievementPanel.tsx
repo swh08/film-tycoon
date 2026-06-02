@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { ACHIEVEMENTS } from '@/game/config/achievements';
 import { formatCash } from '@/game/formulas';
+import AssetIcon, { type SharedAssetId } from './AssetIcon';
 import AchievementIcon from './AchievementIcon';
 
 interface AchievementPanelProps {
@@ -22,14 +23,14 @@ export default function AchievementPanel({ isOpen, onClose }: AchievementPanelPr
   const progressPct = totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0;
 
   // 分类成就
-  const categories = [
-    { name: '💰 收入里程碑', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'total_earned').map(a => a.id) },
-    { name: '🏪 产线成就', ids: ACHIEVEMENTS.filter(a => ['businesses_unlocked', 'business_quantity_min'].includes(a.condition.type)).map(a => a.id) },
-    { name: '👥 店长成就', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'managers_hired').map(a => a.id) },
-    { name: '🔄 转生成就', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'prestige_count').map(a => a.id) },
-    { name: '⬆️ 升级成就', ids: ACHIEVEMENTS.filter(a => ['global_upgrade_level', 'business_upgrades_bought'].includes(a.condition.type)).map(a => a.id) },
-    { name: '🤝 人脉成就', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'angel_upgrades_bought').map(a => a.id) },
-    { name: '🎯 其他成就', ids: ACHIEVEMENTS.filter(a => ['manual_taps', 'total_purchases'].includes(a.condition.type)).map(a => a.id) },
+  const categories: { name: string; icon: SharedAssetId; ids: string[] }[] = [
+    { name: '收入里程碑', icon: 'currency/coin', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'total_earned').map(a => a.id) },
+    { name: '产线成就', icon: 'nav/business', ids: ACHIEVEMENTS.filter(a => ['businesses_unlocked', 'business_quantity_min'].includes(a.condition.type)).map(a => a.id) },
+    { name: '店长成就', icon: 'nav/manager', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'managers_hired').map(a => a.id) },
+    { name: '转生成就', icon: 'nav/prestige', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'prestige_count').map(a => a.id) },
+    { name: '升级成就', icon: 'nav/upgrade', ids: ACHIEVEMENTS.filter(a => ['global_upgrade_level', 'business_upgrades_bought'].includes(a.condition.type)).map(a => a.id) },
+    { name: '人脉成就', icon: 'currency/connection', ids: ACHIEVEMENTS.filter(a => a.condition.type === 'angel_upgrades_bought').map(a => a.id) },
+    { name: '其他成就', icon: 'nav/achievement', ids: ACHIEVEMENTS.filter(a => ['manual_taps', 'total_purchases'].includes(a.condition.type)).map(a => a.id) },
   ];
 
   return (
@@ -57,7 +58,7 @@ export default function AchievementPanel({ isOpen, onClose }: AchievementPanelPr
             <div className="flex-shrink-0 px-4 pt-4 pb-3 bg-gradient-to-r from-yellow-900/40 to-amber-900/30 border-b border-yellow-600/20">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">🏅</span>
+                  <AssetIcon id="nav/achievement" size={28} />
                   <div>
                     <h2 className="text-base font-black text-yellow-400">成就殿堂</h2>
                     <p className="text-[10px] text-gray-400">完成挑战，赢取奖励</p>
@@ -95,7 +96,10 @@ export default function AchievementPanel({ isOpen, onClose }: AchievementPanelPr
 
                 return (
                   <div key={cat.name}>
-                    <h3 className="text-xs font-bold text-gray-400 mb-2">{cat.name}</h3>
+                    <h3 className="text-xs font-bold text-gray-400 mb-2 inline-flex items-center gap-1">
+                      <AssetIcon id={cat.icon} size={14} />
+                      {cat.name}
+                    </h3>
                     <div className="grid grid-cols-1 gap-1.5">
                       {achievements.map(ach => {
                         const isUnlocked = unlockedAchievements.includes(ach.id);
@@ -123,8 +127,8 @@ export default function AchievementPanel({ isOpen, onClose }: AchievementPanelPr
                                   className={isUnlocked ? '' : 'grayscale opacity-45'}
                                 />
                                 {!isUnlocked && (
-                                  <span className="absolute inset-0 flex items-center justify-center bg-gray-900/35 text-sm">
-                                    🔒
+                                  <span className="absolute inset-0 flex items-center justify-center bg-gray-900/35">
+                                    <AssetIcon id="status/lock" size={18} />
                                   </span>
                                 )}
                               </div>
@@ -134,8 +138,9 @@ export default function AchievementPanel({ isOpen, onClose }: AchievementPanelPr
                                     {ach.name}
                                   </span>
                                   {isUnlocked && ach.reward && (
-                                    <span className="text-[10px] font-bold text-green-400">
-                                      +{ach.reward.type === 'cash' ? formatCash(ach.reward.value) : `${ach.reward.value}💎`}
+                                    <span className="text-[10px] font-bold text-green-400 inline-flex items-center gap-0.5">
+                                      +{ach.reward.type === 'cash' ? formatCash(ach.reward.value) : ach.reward.value}
+                                      {ach.reward.type === 'diamond' && <AssetIcon id="currency/diamond" size={11} />}
                                     </span>
                                   )}
                                 </div>
@@ -144,7 +149,7 @@ export default function AchievementPanel({ isOpen, onClose }: AchievementPanelPr
                                 </p>
                               </div>
                               {isUnlocked && (
-                                <span className="text-green-400 text-xs flex-shrink-0">✅</span>
+                                <AssetIcon id="status/check" size={14} className="flex-shrink-0" />
                               )}
                             </div>
                           </div>

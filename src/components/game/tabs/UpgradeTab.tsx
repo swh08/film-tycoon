@@ -85,9 +85,7 @@ export default function UpgradeTab() {
                 const cost = actualCount > 0 ? calcUpgradeCostBulk(def.id, level, actualCount) : 0;
                 const canAfford = !isMaxed && actualCount > 0 && budget >= cost;
 
-                const costLabel = def.currency === 'cash'
-                  ? formatCash(cost)
-                  : `💎${cost}`;
+                const costLabel = def.currency === 'cash' ? formatCash(cost) : cost.toString();
 
                 // 计算当前总效果
                 const totalEffect = def.effectPerLevel * level;
@@ -143,13 +141,19 @@ export default function UpgradeTab() {
                               }
                             `}
                           >
-                            升级 ×{actualCount} → {costLabel}
+                            <span className="inline-flex items-center justify-center gap-1">
+                              升级 ×{actualCount} → {costLabel}
+                              {def.currency === 'diamond' && <AssetIcon id="currency/diamond" size={14} />}
+                            </span>
                           </button>
                         )}
 
                         {isMaxed && (
                           <div className="text-center py-2 text-xs font-bold text-yellow-400">
-                            ✨ 已满级
+                            <span className="inline-flex items-center justify-center gap-1">
+                              <AssetIcon id="status/check" size={14} />
+                              已满级
+                            </span>
                           </div>
                         )}
                       </div>

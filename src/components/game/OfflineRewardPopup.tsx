@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { calcOfflineEarnings, formatCash, formatTime } from '@/game/formulas';
+import AssetIcon from './AssetIcon';
 
 export default function OfflineRewardPopup() {
   const lastOnlineTimestamp = useGameStore(s => s.lastOnlineTimestamp);
@@ -63,9 +64,9 @@ export default function OfflineRewardPopup() {
               <motion.div
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ repeat: Infinity, duration: 1.5 }}
-                className="text-5xl mb-3"
+                className="mb-3 flex justify-center"
               >
-                💰
+                <AssetIcon id="currency/coin" size={72} />
               </motion.div>
               <h2 className="text-xl font-black mb-1">离线收益</h2>
               <p className="text-sm text-white/70 mb-4">你离开期间，店铺自动营业中...</p>
@@ -87,7 +88,10 @@ export default function OfflineRewardPopup() {
                            transition-all duration-150 shadow-[0_3px_0_0_#166534,0_4px_8px_rgba(21,128,61,0.3)]
                            hover:from-green-300 hover:to-green-500"
               >
-                🎉 一键领取！
+                <span className="inline-flex items-center justify-center gap-2">
+                  <AssetIcon id="boost/gift" size={22} />
+                  一键领取！
+                </span>
               </button>
             </div>
           </motion.div>

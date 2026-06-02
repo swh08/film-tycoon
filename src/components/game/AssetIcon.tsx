@@ -74,40 +74,6 @@ export function sharedAssetPath(id: SharedAssetId): string {
   return `/assets/game/shared/${id}.png`;
 }
 
-const GENERATED_ASSETS = new Set<SharedAssetId>([
-  'currency/coin',
-  'currency/diamond',
-  'currency/connection',
-  'nav/business',
-  'nav/upgrade',
-  'nav/manager',
-  'nav/prestige',
-  'nav/shop',
-  'nav/achievement',
-]);
-
-const FALLBACK_ICON_MAP: Record<SharedAssetId, string> = {
-  'currency/coin': '🪙',
-  'currency/diamond': '💎',
-  'currency/connection': '🤝',
-  'nav/business': '💼',
-  'nav/upgrade': '⬆️',
-  'nav/manager': '👥',
-  'nav/prestige': '🤝',
-  'nav/shop': '🛒',
-  'nav/achievement': '🏅',
-  'status/lock': '🔒',
-  'status/check': '✅',
-  'status/cross': '❌',
-  'system/settings': '⚙️',
-  'boost/ad': '📺',
-  'boost/gift': '🎁',
-  'boost/fire': '🔥',
-  'boost/rocket': '🚀',
-  'boost/lightning': '⚡',
-  'boost/timer': '⏰',
-};
-
 interface AssetIconProps {
   id: SharedAssetId;
   alt?: string;
@@ -116,18 +82,6 @@ interface AssetIconProps {
 }
 
 export default function AssetIcon({ id, alt = '', size = 20, className = '' }: AssetIconProps) {
-  if (!GENERATED_ASSETS.has(id)) {
-    return (
-      <span
-        aria-label={alt}
-        className={`inline-flex items-center justify-center select-none ${className}`}
-        style={{ width: size, height: size, fontSize: size }}
-      >
-        {FALLBACK_ICON_MAP[id]}
-      </span>
-    );
-  }
-
   return (
     <img
       src={sharedAssetPath(id)}

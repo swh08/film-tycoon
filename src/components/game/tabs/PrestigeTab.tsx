@@ -32,7 +32,7 @@ function PrestigeConfirmPopup() {
 
   return (
     <div className="text-center">
-      <div className="text-5xl mb-3">🔄</div>
+      <AssetIcon id="nav/prestige" size={64} className="mb-3" />
       <h3 className="text-xl font-black mb-2">确认转生？</h3>
       <p className="text-sm text-white/80 mb-3">
         你将卖掉当前所有商业版图，换取渠道人脉
@@ -56,9 +56,15 @@ function PrestigeConfirmPopup() {
         </div>
       </div>
 
-      <div className="text-[10px] text-white/50">
-        ⚠️ 重置: 现金、产线、店长、升级、广告增益
-        <br />✅ 保留: 钻石、{PRESTIGE_RULE.currencyName}、人脉升级、商城一次性购买
+      <div className="text-[10px] text-white/50 space-y-1">
+        <p className="inline-flex items-center justify-center gap-1">
+          <AssetIcon id="status/cross" size={12} />
+          重置: 现金、产线、店长、升级、广告增益
+        </p>
+        <p className="inline-flex items-center justify-center gap-1">
+          <AssetIcon id="status/check" size={12} />
+          保留: 钻石、{PRESTIGE_RULE.currencyName}、人脉升级、商城一次性购买
+        </p>
       </div>
 
       <div className="flex gap-2 mt-4">
@@ -158,7 +164,10 @@ function AngelUpgradeCard({ upgrade, onBuy }: { upgrade: typeof ANGEL_UPGRADES[0
               {business ? <BusinessIcon icon={business.icon} className="inline" /> : null} {upgrade.name}
             </span>
             {isPurchased ? (
-              <span className="text-green-400 text-[10px] font-bold">✅ 已购买</span>
+              <span className="text-green-400 text-[10px] font-bold inline-flex items-center gap-0.5">
+                <AssetIcon id="status/check" size={12} />
+                已购买
+              </span>
             ) : (
               <span className="inline-flex items-center gap-0.5 text-yellow-400 text-[10px] font-bold">
                 {upgrade.cost}
@@ -292,7 +301,10 @@ export default function PrestigeTab() {
 
       {/* 转生操作区 */}
       <div className="rounded-2xl p-4 bg-gray-800">
-        <h3 className="text-sm font-bold text-white mb-3">🔄 转生重置</h3>
+        <h3 className="text-sm font-bold text-white mb-3 inline-flex items-center gap-1.5">
+          <AssetIcon id="nav/prestige" size={18} />
+          转生重置
+        </h3>
 
         {!unlockMet ? (
           <div className="text-center">
@@ -336,12 +348,15 @@ export default function PrestigeTab() {
                 }
               `}
             >
-              {canDoPrestige ? '🔥 转生重置 🔥' : `再赚 ${formatCash(PRESTIGE_RULE.unlockCondition.value - totalEarned)} 即可转生`}
+              <span className="inline-flex items-center justify-center gap-1">
+                {canDoPrestige && <AssetIcon id="boost/fire" size={18} />}
+                {canDoPrestige ? '转生重置' : `再赚 ${formatCash(PRESTIGE_RULE.unlockCondition.value - totalEarned)} 即可转生`}
+              </span>
             </button>
 
             {gain < 2 && (
               <p className="text-[10px] text-yellow-400/60 mt-2">
-                💡 建议：转生获得≥2点更有价值，继续积累收入吧！
+                建议：转生获得≥2点更有价值，继续积累收入吧！
               </p>
             )}
           </div>
@@ -350,10 +365,10 @@ export default function PrestigeTab() {
         {/* 转生说明 */}
         <div className="mt-4 space-y-1.5 text-[10px] text-gray-500">
           <h4 className="text-xs font-medium text-gray-400">转生说明</h4>
-          <p>🔄 <span className="text-red-400">重置</span>: 现金、产线数量、店长雇佣、全局升级、广告增益</p>
-          <p>✅ <span className="text-green-400">保留</span>: 钻石、{PRESTIGE_RULE.currencyName}、人脉升级、商城一次性购买</p>
-          <p>📈 <span className="text-yellow-400">加成</span>: 每点{PRESTIGE_RULE.currencyName}永久+{(PRESTIGE_RULE.permanentBonusCurve.perPoint * 100).toFixed(1)}%全局利润</p>
-          <p>🎁 <span className="text-cyan-400">赠送</span>: 转生后自动获得1个路边钢化膜摊</p>
+          <p><span className="text-red-400">重置</span>: 现金、产线数量、店长雇佣、全局升级、广告增益</p>
+          <p><span className="text-green-400">保留</span>: 钻石、{PRESTIGE_RULE.currencyName}、人脉升级、商城一次性购买</p>
+          <p><span className="text-yellow-400">加成</span>: 每点{PRESTIGE_RULE.currencyName}永久+{(PRESTIGE_RULE.permanentBonusCurve.perPoint * 100).toFixed(1)}%全局利润</p>
+          <p><span className="text-cyan-400">赠送</span>: 转生后自动获得1个路边钢化膜摊</p>
         </div>
       </div>
 
@@ -369,7 +384,7 @@ export default function PrestigeTab() {
           </span>
         </div>
         <p className="text-[10px] text-gray-500 mb-3">
-          ⚠️ 消耗{PRESTIGE_RULE.currencyName}购买永久升级。购买会降低利润加成，但获得更强大的永久效果！
+          消耗{PRESTIGE_RULE.currencyName}购买永久升级。购买会降低利润加成，但获得更强大的永久效果！
         </p>
 
         {/* 按分层显示 */}
@@ -387,11 +402,14 @@ export default function PrestigeTab() {
                 <h4 className={`text-xs font-medium ${isUnlocked ? 'text-gray-300' : 'text-gray-600'}`}>
                   {isUnlocked ? (
                     <>
-                      {tier.id === 1 ? '🏭' : tier.id === 2 ? '⭐' : tier.id === 3 ? '💫' : '🌈'}{' '}
+                      <AssetIcon id={tier.id === 1 ? 'nav/business' : 'currency/connection'} size={14} className="mr-1 align-[-2px]" />
                       {tier.name}
                     </>
                   ) : (
-                    <>🔒 {tier.name}（需要转生{tier.minPrestigeCount}次解锁）</>
+                    <span className="inline-flex items-center gap-1">
+                      <AssetIcon id="status/lock" size={14} />
+                      {tier.name}（需要转生{tier.minPrestigeCount}次解锁）
+                    </span>
                   )}
                 </h4>
                 {isUnlocked && (
@@ -406,7 +424,10 @@ export default function PrestigeTab() {
                   {/* 产线加成（仅Tier 1有） */}
                   {businessUpgrades.length > 0 && (
                     <div className="mb-3">
-                      <h4 className="text-[10px] font-medium text-gray-500 mb-1.5 px-1">🏭 产线利润加成（×3）</h4>
+                      <h4 className="text-[10px] font-medium text-gray-500 mb-1.5 px-1 inline-flex items-center gap-1">
+                        <AssetIcon id="nav/business" size={12} />
+                        产线利润加成（×3）
+                      </h4>
                       <div className="flex flex-col gap-1.5">
                         {businessUpgrades.map(upgrade => (
                           <AngelUpgradeCard
@@ -422,7 +443,10 @@ export default function PrestigeTab() {
                   {/* 全局加成 */}
                   {globalUpgrades.length > 0 && (
                     <div>
-                      <h4 className="text-[10px] font-medium text-gray-500 mb-1.5 px-1">🌟 全局永久升级</h4>
+                      <h4 className="text-[10px] font-medium text-gray-500 mb-1.5 px-1 inline-flex items-center gap-1">
+                        <AssetIcon id="currency/connection" size={12} />
+                        全局永久升级
+                      </h4>
                       <div className="flex flex-col gap-1.5">
                         {globalUpgrades.map(upgrade => (
                           <AngelUpgradeCard
@@ -438,7 +462,7 @@ export default function PrestigeTab() {
               ) : (
                 /* 锁定状态 */
                 <div className="rounded-xl p-4 bg-gray-900/40 text-center">
-                  <span className="text-2xl">🔒</span>
+                  <AssetIcon id="status/lock" size={32} />
                   <p className="text-xs text-gray-600 mt-1">
                     转生{tier.minPrestigeCount}次后解锁 {tierUpgrades.length} 个人脉升级
                   </p>
@@ -464,7 +488,10 @@ export default function PrestigeTab() {
 
       {/* 成就统计 */}
       <div className="rounded-2xl p-4 bg-gray-800">
-        <h3 className="text-sm font-bold text-white mb-3">📊 商业版图统计</h3>
+        <h3 className="text-sm font-bold text-white mb-3 inline-flex items-center gap-1.5">
+          <AssetIcon id="nav/business" size={18} />
+          商业版图统计
+        </h3>
         <div className="grid grid-cols-2 gap-2">
           <StatCard label="历史总收入" value={formatCash(totalEarned)} icon="currency/coin" />
           <StatCard label="当前现金" value={formatCash(useGameStore.getState().cash)} icon="currency/coin" />

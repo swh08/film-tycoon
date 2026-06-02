@@ -10,6 +10,7 @@ import { calcManagerUpgradeCost, formatCash } from '@/game/formulas';
 import type { Rarity } from '@/game/types';
 import { playHire, playUpgrade, playUIClick } from '@/game/sound';
 import AssetIcon from '@/components/game/AssetIcon';
+import BusinessIcon from '@/components/game/BusinessIcon';
 import ManagerIcon from '@/components/game/ManagerIcon';
 
 const RARITY_CONFIG: Record<Rarity, { label: string; color: string; bg: string }> = {
@@ -54,7 +55,7 @@ export default function ManagerTab() {
 
             const costLabel = manager.currency === 'cash'
               ? formatCash(manager.unlockCost)
-              : `💎${manager.unlockCost}`;
+              : manager.unlockCost.toString();
 
             const canAfford = manager.currency === 'cash'
               ? cash >= manager.unlockCost
@@ -64,7 +65,7 @@ export default function ManagerTab() {
 
             const upgradeCostLabel = manager.upgradeCurrency === 'cash'
               ? formatCash(upgradeCost)
-              : `💎${upgradeCost}`;
+              : upgradeCost.toString();
 
             const canAffordUpgrade = manager.upgradeCurrency === 'cash'
               ? cash >= upgradeCost
@@ -99,20 +100,22 @@ export default function ManagerTab() {
                       </div>
                       {isHired && (
                         <div className="flex items-center gap-1.5">
-                          <span className="text-green-400 text-xs font-bold">✅</span>
+                          <AssetIcon id="status/check" size={12} />
                           <span className="text-[10px] font-bold text-yellow-300">Lv.{currentLevel}</span>
                         </div>
                       )}
                     </div>
 
                     <p className="text-[10px] text-gray-400 mb-0.5">
-                      {business?.icon} {business?.name}
+                      {business ? <BusinessIcon icon={business.icon} className="inline mr-1" /> : null}
+                      {business?.name}
                     </p>
                     <p className="text-[10px] text-gray-500 mb-1">{manager.description}</p>
 
                     {/* 效果 */}
                     <div className="text-[10px] text-cyan-400 mb-1">
-                      🤖 自动化生产
+                      <AssetIcon id="nav/manager" size={12} className="mr-1 align-[-2px]" />
+                      自动化生产
                       {isHired && currentLevel > 0 && (
                         <span className="text-green-400 ml-1">
                           +速度提升{Math.round(manager.upgradeEffectPerLevel * currentLevel * 100)}%
@@ -156,7 +159,10 @@ export default function ManagerTab() {
                           }
                         `}
                       >
-                        {!hasBusiness ? `需要先拥有${business?.name}` : `雇佣 → ${costLabel}`}
+                        <span className="inline-flex items-center justify-center gap-1">
+                          {!hasBusiness ? `需要先拥有${business?.name}` : `雇佣 → ${costLabel}`}
+                          {hasBusiness && manager.currency === 'diamond' && <AssetIcon id="currency/diamond" size={14} />}
+                        </span>
                       </button>
                     )}
 
@@ -176,7 +182,10 @@ export default function ManagerTab() {
                           }
                         `}
                       >
-                        升级到 Lv.{currentLevel + 1} → {upgradeCostLabel}
+                        <span className="inline-flex items-center justify-center gap-1">
+                          升级到 Lv.{currentLevel + 1} → {upgradeCostLabel}
+                          {manager.upgradeCurrency === 'diamond' && <AssetIcon id="currency/diamond" size={12} />}
+                        </span>
                         <span className="text-[8px] opacity-70 ml-1">
                           (速度+{Math.round(manager.upgradeEffectPerLevel * 100)}%)
                         </span>
@@ -186,7 +195,10 @@ export default function ManagerTab() {
                     {/* 满级提示 */}
                     {isHired && isMaxLevel && (
                       <div className="text-[10px] text-yellow-400 font-bold text-center py-1">
-                        ⭐ 已满级 Lv.{manager.maxLevel}
+                        <span className="inline-flex items-center justify-center gap-1">
+                          <AssetIcon id="status/check" size={14} />
+                          已满级 Lv.{manager.maxLevel}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -213,7 +225,7 @@ export default function ManagerTab() {
 
             const costLabel = manager.currency === 'cash'
               ? formatCash(manager.unlockCost)
-              : `💎${manager.unlockCost}`;
+              : manager.unlockCost.toString();
 
             const canAfford = manager.currency === 'cash'
               ? cash >= manager.unlockCost
@@ -221,15 +233,16 @@ export default function ManagerTab() {
 
             const upgradeCostLabel = manager.upgradeCurrency === 'cash'
               ? formatCash(upgradeCost)
-              : `💎${upgradeCost}`;
+              : upgradeCost.toString();
 
             const canAffordUpgrade = manager.upgradeCurrency === 'cash'
               ? cash >= upgradeCost
               : diamonds >= upgradeCost;
 
+            const effectIcon = manager.effectType === 'cycle_reduce' ? 'boost/lightning' : 'currency/coin';
             const effectDesc = manager.effectType === 'cycle_reduce'
-              ? `⚡ 周期-${(manager.effectValue * 100).toFixed(0)}%`
-              : `💰 利润+${(manager.effectValue * 100).toFixed(0)}%`;
+              ? `周期-${(manager.effectValue * 100).toFixed(0)}%`
+              : `利润+${(manager.effectValue * 100).toFixed(0)}%`;
 
             const bonusDesc = currentLevel > 0
               ? manager.effectType === 'cycle_reduce'
@@ -268,6 +281,7 @@ export default function ManagerTab() {
 
                     {/* 效果 */}
                     <div className="text-[10px] text-cyan-400 mb-1">
+                      <AssetIcon id={effectIcon} size={12} className="mr-1 align-[-2px]" />
                       {effectDesc}{bonusDesc}
                     </div>
 
@@ -302,7 +316,10 @@ export default function ManagerTab() {
                           }
                         `}
                       >
-                        雇佣 → {costLabel}
+                        <span className="inline-flex items-center justify-center gap-1">
+                          雇佣 → {costLabel}
+                          {manager.currency === 'diamond' && <AssetIcon id="currency/diamond" size={14} />}
+                        </span>
                       </button>
                     )}
 
@@ -321,13 +338,19 @@ export default function ManagerTab() {
                           }
                         `}
                       >
-                        升级到 Lv.{currentLevel + 1} → {upgradeCostLabel}
+                        <span className="inline-flex items-center justify-center gap-1">
+                          升级到 Lv.{currentLevel + 1} → {upgradeCostLabel}
+                          {manager.upgradeCurrency === 'diamond' && <AssetIcon id="currency/diamond" size={12} />}
+                        </span>
                       </button>
                     )}
 
                     {isHired && isMaxLevel && (
                       <div className="text-[10px] text-yellow-400 font-bold text-center py-1">
-                        ⭐ 已满级 Lv.{manager.maxLevel}
+                        <span className="inline-flex items-center justify-center gap-1">
+                          <AssetIcon id="status/check" size={14} />
+                          已满级 Lv.{manager.maxLevel}
+                        </span>
                       </div>
                     )}
                   </div>

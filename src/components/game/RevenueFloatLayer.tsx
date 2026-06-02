@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { formatCash, calcRevenuePerCycle } from '@/game/formulas';
 import { BUSINESSES } from '@/game/config/businesses';
+import BusinessIcon from './BusinessIcon';
 
 interface FloatingText {
   id: number;
@@ -80,7 +81,7 @@ export default function RevenueFloatLayer() {
               textShadow: '0 0 10px rgba(251, 191, 36, 0.8), 0 0 20px rgba(251, 191, 36, 0.3), 0 2px 4px rgba(0,0,0,0.9)',
             }}
           >
-            <span className="mr-1">{f.icon}</span>+{formatCash(f.amount)}
+            <BusinessIcon icon={f.icon} className="mr-1" />+{formatCash(f.amount)}
           </motion.div>
         ))}
       </AnimatePresence>

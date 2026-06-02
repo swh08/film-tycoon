@@ -10,6 +10,7 @@ import { formatCash, formatNumberSmart, calcTotalIncomePerSecond, calcRevenuePer
 import { BUSINESSES } from '@/game/config/businesses';
 import { ACHIEVEMENTS } from '@/game/config/achievements';
 import AssetIcon, { type SharedAssetId } from './AssetIcon';
+import BusinessIcon from './BusinessIcon';
 
 interface StatsPanelProps {
   isOpen: boolean;
@@ -173,7 +174,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                         : 0;
                       return (
                         <div key={biz.id} className="flex items-center gap-2">
-                          <span className="text-base flex-shrink-0">{biz.icon}</span>
+                          <BusinessIcon icon={biz.icon} className="text-base flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] text-gray-300 truncate">{biz.name}</span>

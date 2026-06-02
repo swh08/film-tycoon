@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { startMusic, stopMusic, setMusicVolume, setSfxVolumeValue, isMusicPlaying } from '@/game/sound';
 import StatsPanel from './StatsPanel';
+import AssetIcon from './AssetIcon';
+import BusinessIcon from './BusinessIcon';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -140,7 +142,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
             <div className="flex-shrink-0 px-4 pt-4 pb-3 bg-gradient-to-r from-gray-800/60 to-gray-800/40 border-b border-gray-600/20">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">⚙️</span>
+                  <AssetIcon id="system/settings" size={28} />
                   <div>
                     <h2 className="text-base font-black text-gray-200">设置</h2>
                     <p className="text-[10px] text-gray-400">游戏偏好与存档管理</p>
@@ -157,9 +159,12 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
             {/* 设置内容 */}
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
-              {/* 🔊 音频设置 */}
+              {/* 音频设置 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-3">🔊 音频设置</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-3 inline-flex items-center gap-1">
+                  <AssetIcon id="system/settings" size={14} />
+                  音频设置
+                </h3>
                 <div className="space-y-3">
                   {/* 音效总开关 */}
                   <div className="flex items-center justify-between bg-gray-800/60 rounded-xl p-3">
@@ -185,7 +190,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   <div className="bg-gray-800/60 rounded-xl p-3">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="text-xs font-medium text-gray-200">🎵 背景音乐</p>
+                        <p className="text-xs font-medium text-gray-200">背景音乐</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
@@ -220,7 +225,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   <div className="bg-gray-800/60 rounded-xl p-3">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="text-xs font-medium text-gray-200">🔉 音效音量</p>
+                        <p className="text-xs font-medium text-gray-200">音效音量</p>
                       </div>
                       <span className="text-xs text-gray-400 tabular-nums">{Math.round(sfxVolume * 100)}%</span>
                     </div>
@@ -239,13 +244,13 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 </div>
               </section>
 
-              {/* 📊 游戏统计 */}
+              {/* 游戏统计 */}
               <section>
                 <button
                   onClick={() => setShowStatsView(true)}
                   className="w-full bg-blue-900/30 hover:bg-blue-900/50 rounded-xl p-3 transition-colors flex items-center gap-3"
                 >
-                  <span className="text-lg">📊</span>
+                  <AssetIcon id="nav/achievement" size={22} />
                   <div className="text-left flex-1">
                     <p className="text-xs font-medium text-blue-300">游戏统计</p>
                     <p className="text-[10px] text-gray-500">查看收入、产线、转生等详细数据</p>
@@ -254,9 +259,9 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 </button>
               </section>
 
-              {/* 🔢 数字显示 */}
+              {/* 数字显示 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-3">🔢 数字显示</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-3">数字显示</h3>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setNumberFormat('abbreviation')}
@@ -283,16 +288,16 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 </div>
               </section>
 
-              {/* 💾 存档管理 */}
+              {/* 存档管理 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-3">💾 存档管理</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-3">存档管理</h3>
                 <div className="space-y-2">
                   {/* 导出 */}
                   <button
                     onClick={handleExport}
                     className="w-full bg-gray-800/60 hover:bg-gray-700/60 rounded-xl p-3 transition-colors flex items-center gap-3"
                   >
-                    <span className="text-lg">📤</span>
+                    <AssetIcon id="status/check" size={22} />
                     <div className="text-left">
                       <p className="text-xs font-medium text-gray-200">导出存档</p>
                       <p className="text-[10px] text-gray-500">复制存档 JSON 到剪贴板</p>
@@ -305,7 +310,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                       onClick={() => setShowImportArea(!showImportArea)}
                       className="w-full p-3 flex items-center gap-3 hover:bg-gray-700/30 transition-colors"
                     >
-                      <span className="text-lg">📥</span>
+                      <AssetIcon id="boost/gift" size={22} />
                       <div className="text-left flex-1">
                         <p className="text-xs font-medium text-gray-200">导入存档</p>
                         <p className="text-[10px] text-gray-500">粘贴 JSON 恢复存档</p>
@@ -343,7 +348,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                       onClick={() => setShowResetConfirm(!showResetConfirm)}
                       className="w-full p-3 flex items-center gap-3 hover:bg-red-900/20 transition-colors"
                     >
-                      <span className="text-lg">🗑️</span>
+                      <AssetIcon id="status/cross" size={22} />
                       <div className="text-left flex-1">
                         <p className="text-xs font-medium text-red-400">重置游戏</p>
                         <p className="text-[10px] text-gray-500">清除所有进度，不可恢复</p>
@@ -358,7 +363,10 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                         animate={{ height: 'auto', opacity: 1 }}
                         className="px-3 pb-3"
                       >
-                        <p className="text-[10px] text-red-300 mb-2">⚠️ 确定要重置吗？所有进度将被永久删除！</p>
+                        <p className="text-[10px] text-red-300 mb-2 inline-flex items-center gap-1">
+                          <AssetIcon id="status/cross" size={12} />
+                          确定要重置吗？所有进度将被永久删除！
+                        </p>
                         <div className="flex gap-2">
                           <button
                             onClick={() => setShowResetConfirm(false)}
@@ -379,12 +387,12 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 </div>
               </section>
 
-              {/* ℹ️ 关于 */}
+              {/* 关于 */}
               <section>
-                <h3 className="text-xs font-bold text-gray-400 mb-3">ℹ️ 关于</h3>
+                <h3 className="text-xs font-bold text-gray-400 mb-3">关于</h3>
                 <div className="bg-gray-800/60 rounded-xl p-3">
                   <div className="text-center">
-                    <p className="text-lg">📱</p>
+                    <BusinessIcon icon="stall" className="text-lg" />
                     <p className="text-sm font-bold text-yellow-400">贴膜大亨</p>
                     <p className="text-[10px] text-gray-500 mt-0.5">Screen Protector Tycoon</p>
                     <p className="text-[10px] text-gray-600 mt-1">v1.0.0</p>
