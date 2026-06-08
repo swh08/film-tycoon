@@ -173,6 +173,17 @@ export const EN_MESSAGES: Record<string, string> = {
 
   // Business tab
   '我的生意': 'My Businesses',
+  '收入': 'Revenue',
+  '时间': 'Time',
+  '状态': 'Status',
+  '自动经营': 'Automated',
+  '生产中': 'Producing',
+  '手动': 'Manual',
+  '里程碑奖励': 'Milestone Reward',
+  '倍率': 'Multiplier',
+  '贴膜': 'Apply',
+  '累计收入': 'Total Earnings',
+  '转生后解锁': 'Unlocks after prestige',
   '点击第一个产线开始贴膜！': 'Tap the first business to start applying protectors!',
   '赚到第一笔钱后，开始购买更多产线': 'After your first earnings, buy more businesses.',
   '继续购买产线，达到10级触发倍率爆发！': 'Keep buying businesses. Reach level 10 to trigger a multiplier burst!',
