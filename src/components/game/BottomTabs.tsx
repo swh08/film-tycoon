@@ -1,5 +1,5 @@
 // ============================================================
-// 底部 Tab 导航栏
+// Bottom tab navigation
 // ============================================================
 'use client';
 
@@ -34,9 +34,10 @@ export default function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) 
   const { t } = useTranslation();
 
   return (
-    <nav className="sticky bottom-0 z-40 flex items-stretch bg-gradient-to-t from-gray-950 via-gray-900 to-gray-800 
-                    border-t-2 border-yellow-600/50 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]"
-         role="tablist">
+    <nav
+      className="nav-frame-bg sticky bottom-0 z-40 grid h-[82px] grid-cols-6 gap-1.5 px-3.5 pb-3 pt-3 shadow-[0_-10px_28px_rgba(0,0,0,.55)]"
+      role="tablist"
+    >
       {TABS.map(tab => {
         const isActive = activeTab === tab.id;
         const showBadge = tab.id === 'business' && tutorialStep === 'first_tap';
@@ -47,34 +48,34 @@ export default function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) 
             role="tab"
             aria-selected={isActive}
             onClick={() => onTabChange(tab.id)}
+            style={{
+              backgroundImage: `url('/assets/game/shared/ui/nav-item-${isActive ? 'active' : 'inactive'}-image2.png')`,
+              backgroundSize: '100% 100%',
+              backgroundRepeat: 'no-repeat',
+            }}
             className={`
-              flex-1 flex flex-col items-center justify-center py-2 min-h-[56px]
-              transition-all duration-200 relative
+              relative flex h-full min-h-0 flex-col items-center justify-center rounded-md border-0 transition-all duration-200
               ${isActive
-                ? 'text-yellow-400 bg-yellow-500/10'
-                : 'text-gray-400 hover:text-gray-200 active:bg-gray-700/30'
+                ? 'text-amber-100 shadow-[0_0_14px_rgba(34,211,238,.32)]'
+                : 'text-stone-200 active:translate-y-[1px]'
               }
             `}
           >
-            {isActive && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 
-                              bg-gradient-to-r from-yellow-400 to-amber-500 rounded-b-full" />
-            )}
-
             <AssetIcon
               id={tab.icon}
               alt=""
-              size={24}
-              className={`mb-0.5 transition-transform duration-200 ${isActive ? 'scale-110 drop-shadow-[0_0_6px_rgba(250,204,21,0.45)]' : 'opacity-70'}`}
+              size={28}
+              className={`mb-1 transition-transform duration-200 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(251,191,36,.7)]' : 'opacity-80 grayscale-[15%]'}`}
             />
 
-            <span className={`text-[10px] font-medium ${isActive ? 'text-yellow-400' : ''}`}>
+            <span className={`text-[13px] font-black leading-none tracking-normal ${isActive ? 'text-amber-200' : 'text-stone-300'}`}>
               {t(tab.label)}
             </span>
 
-            {showBadge && (
-              <div className="absolute top-1 right-1/4 w-2.5 h-2.5 bg-red-500 rounded-full 
-                              animate-ping" />
+            {showBadge && !isActive && (
+              <div className="absolute right-3 top-2 grid h-5 w-5 place-items-center rounded-full border border-white/40 bg-red-500 text-[12px] font-black text-white shadow-[0_0_10px_rgba(239,68,68,.55)]">
+                !
+              </div>
             )}
           </button>
         );
