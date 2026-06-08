@@ -1,9 +1,11 @@
 // ============================================================
-// 顶栏资源 HUD
+// Top resource HUD
 // ============================================================
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { TrendingUp } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
 import { formatNumberSmart, getMarketTrendText } from '@/game/formulas';
 import { BUSINESSES } from '@/game/config/businesses';
@@ -19,13 +21,50 @@ export interface TopHUDProps {
 interface TimerChip {
   icon: SharedAssetId;
   text: string;
-  color: string;
+  tone: 'gold' | 'cyan' | 'green' | 'red';
 }
 
 interface EventChip {
   icon: SharedAssetId;
   text: string;
   remaining: number;
+}
+
+function ResourceCapsule({
+  icon,
+  value,
+  tone,
+  children,
+}: {
+  icon: SharedAssetId;
+  value?: number;
+  tone: 'coin' | 'diamond' | 'connection';
+  children?: ReactNode;
+}) {
+  const toneClass = {
+    coin: 'border-amber-300/45 shadow-amber-950/60',
+    diamond: 'border-cyan-300/45 shadow-cyan-950/60',
+    connection: 'border-emerald-300/45 shadow-emerald-950/60',
+  }[tone];
+
+  return (
+    <div
+      className={`flex min-w-0 flex-1 items-center gap-1.5 rounded-full border bg-[linear-gradient(180deg,rgba(30,38,43,.95),rgba(5,9,12,.95))] px-1.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_8px_18px_rgba(0,0,0,.35)] ${toneClass}`}
+    >
+      <div className="grid h-8 w-8 flex-shrink-0 place-items-center">
+        <AssetIcon id={icon} size={23} />
+      </div>
+      <div className="min-w-0 flex-1 text-lg font-black leading-none tracking-normal text-stone-100 tabular-nums drop-shadow-[0_2px_1px_rgba(0,0,0,.8)]">
+        {children ?? (
+          <AnimatedNumber
+            value={value ?? 0}
+            formatFn={tone === 'coin' ? formatNumberSmart : (n) => Math.floor(n).toString()}
+            className="truncate"
+          />
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
@@ -52,32 +91,20 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
             buffs.push({
               icon: 'boost/fire',
               text: `${t('双倍收益')} ${m}:${s.toString().padStart(2, '0')}`,
-              color: 'from-red-500/80 to-orange-500/80 shadow-red-500/40',
+              tone: 'cyan',
             });
             break;
           }
           case 'rush_order':
-            buffs.push({
-              icon: 'boost/rocket',
-              text: `${t('爆单潮')} ${Math.ceil(buff.remainingSec)}s`,
-              color: 'from-orange-500/80 to-yellow-500/80 shadow-orange-500/40',
-            });
+            buffs.push({ icon: 'boost/rocket', text: `${t('爆单潮')} ${Math.ceil(buff.remainingSec)}s`, tone: 'gold' });
             break;
           case 'speed_boost':
-            buffs.push({
-              icon: 'boost/lightning',
-              text: `${t('极速生产')} ${Math.ceil(buff.remainingSec)}s`,
-              color: 'from-cyan-500/80 to-blue-500/80 shadow-cyan-500/40',
-            });
+            buffs.push({ icon: 'boost/lightning', text: `${t('极速生产')} ${Math.ceil(buff.remainingSec)}s`, tone: 'cyan' });
             break;
           case 'extra_offline': {
             const m = Math.floor(buff.remainingSec / 60);
             const s = Math.floor(buff.remainingSec % 60);
-            buffs.push({
-              icon: 'boost/timer',
-              text: `${t('额外离线收益')} ${m}:${s.toString().padStart(2, '0')}`,
-              color: 'from-green-500/80 to-emerald-500/80 shadow-green-500/40',
-            });
+            buffs.push({ icon: 'boost/timer', text: `${t('额外离线收益')} ${m}:${s.toString().padStart(2, '0')}`, tone: 'green' });
             break;
           }
         }
@@ -108,92 +135,62 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
     ? activeMarkets.reduce((a, b) => a + b, 0) / activeMarkets.length
     : 1;
   const marketTrend = getMarketTrendText(avgMarket);
-  const marketIcon = resolveSharedAssetId(marketTrend.icon) ?? 'boost/lightning';
   const hasMarketEvent = avgMarket < 0.85 || avgMarket > 1.15;
-  const hasSecondRow = eventTimers.length > 0 || buffTimers.length > 0 || hasMarketEvent;
+  const marketTone = avgMarket >= 1 ? 'text-red-300 border-red-300/40 bg-red-950/35' : 'text-emerald-300 border-emerald-300/40 bg-emerald-950/35';
 
   return (
-    <div className="sticky top-0 z-40 bg-gradient-to-r from-amber-900 via-yellow-800 to-amber-900 
-                    border-b-2 border-yellow-500/50 shadow-lg shadow-amber-900/30">
-      <div className="flex items-center justify-between px-3 py-1.5">
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <div className="flex items-center gap-1 min-w-0">
-            <AssetIcon id="currency/coin" size={18} className="flex-shrink-0" />
-            <AnimatedNumber
-              value={cash}
-              formatFn={formatNumberSmart}
-              className="text-sm font-bold text-yellow-200 truncate tabular-nums"
-            />
-          </div>
-          <div className="flex items-center gap-0.5">
-            <AssetIcon id="currency/diamond" size={16} className="flex-shrink-0" />
-            <AnimatedNumber
-              value={diamonds}
-              className="text-xs font-bold text-cyan-300 tabular-nums"
-              formatFn={(n) => Math.floor(n).toString()}
-            />
-          </div>
-          {prestigePoints > 0 && (
-            <div className="flex items-center gap-0.5">
-              <AssetIcon id="currency/connection" size={16} className="flex-shrink-0" />
-              <AnimatedNumber
-                value={prestigePoints}
-                className="text-xs font-bold text-orange-300 tabular-nums"
-                formatFn={formatNumberSmart}
-              />
-            </div>
-          )}
-        </div>
+    <div className="hud-frame-bg sticky top-0 z-40 px-3.5 pb-3 pt-4 shadow-[0_10px_28px_rgba(0,0,0,.45)] backdrop-blur">
+      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_38px] items-center gap-1.5">
+        <ResourceCapsule icon="currency/coin" tone="coin" value={cash} />
+        <ResourceCapsule icon="currency/diamond" tone="diamond" value={diamonds} />
+        <ResourceCapsule icon="currency/connection" tone="connection" value={prestigePoints} />
 
-        <div className="flex items-center flex-shrink-0">
-          {onSettingsOpen && (
-            <button
-              onClick={onSettingsOpen}
-              className="flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-b from-gray-400 to-gray-600
-                         shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.3)]
-                         hover:from-gray-300 hover:to-gray-500
-                         active:shadow-[0_1px_0_0_#374151,0_2px_4px_rgba(0,0,0,0.2)] active:translate-y-[2px]
-                         transition-all duration-150"
-              aria-label={t('打开设置')}
-            >
-              <AssetIcon id="system/settings" size={18} />
-            </button>
-          )}
-        </div>
+        {onSettingsOpen && (
+          <button
+            onClick={onSettingsOpen}
+            className="grid h-10 w-10 place-items-center active:scale-95"
+            aria-label={t('打开设置')}
+          >
+            <AssetIcon id="system/settings" size={40} />
+          </button>
+        )}
       </div>
 
-      {hasSecondRow && (
-        <div className="flex items-center gap-1.5 px-3 pb-1.5 overflow-x-auto">
-          {eventTimers.map((evt) => (
-            <div
-              key={evt.text}
-              className="flex-shrink-0 px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-600/80 to-pink-600/80
-                             text-white text-[10px] font-bold animate-pulse shadow-md shadow-purple-500/40"
-            >
-              <AssetIcon id={evt.icon} size={13} className="mr-1 align-[-2px]" />
-              {evt.remaining}s
-            </div>
-          ))}
-          {buffTimers.map((buff, idx) => (
-            <div
-              key={idx}
-              className={`flex-shrink-0 px-2 py-0.5 rounded-full bg-gradient-to-r ${buff.color}
-                             text-white text-[10px] font-bold animate-pulse shadow-md`}
-            >
-              <AssetIcon id={buff.icon} size={13} className="mr-1 align-[-2px]" />
-              {buff.text}
-            </div>
-          ))}
-          {hasMarketEvent && (
-            <div className={`flex-shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-              avgMarket > 1.15 ? 'bg-green-600/80 text-green-100' : 'bg-red-600/80 text-red-100'
-            }`}>
-              <AssetIcon id={marketIcon} size={13} className="mr-1 align-[-2px]" />
-              {t(marketTrend.text)}
-            </div>
-          )}
-        </div>
-      )}
+      <div className="mt-2 flex items-center gap-2 overflow-x-auto pb-0.5">
+        {(hasMarketEvent || activeMarkets.length > 0) && (
+          <div className={`flex flex-shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-sm font-black shadow-[inset_0_1px_0_rgba(255,255,255,.08)] ${marketTone}`}>
+            <span className="grid h-6 w-6 place-items-center rounded-md border border-stone-200/20 bg-black/35">
+              <TrendingUp size={17} strokeWidth={3} />
+            </span>
+            {t(marketTrend.text)}
+          </div>
+        )}
+
+        {eventTimers.map((evt) => (
+          <div
+            key={evt.text}
+            className="flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-fuchsia-300/35 bg-fuchsia-950/35 px-2.5 py-1.5 text-sm font-black text-fuchsia-100"
+          >
+            <AssetIcon id={evt.icon} size={22} />
+            {evt.remaining}s
+          </div>
+        ))}
+
+        {buffTimers.length > 0 ? buffTimers.map((buff, idx) => (
+          <div
+            key={idx}
+            className="flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-cyan-300/45 bg-cyan-950/35 px-2.5 py-1.5 text-sm font-black text-cyan-100 shadow-[0_0_16px_rgba(20,184,166,.14)]"
+          >
+            <AssetIcon id={buff.icon} size={22} />
+            {buff.text}
+          </div>
+        )) : (
+          <div className="flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-cyan-300/45 bg-cyan-950/35 px-2.5 py-1.5 text-sm font-black text-cyan-100 shadow-[0_0_16px_rgba(20,184,166,.14)]">
+            <AssetIcon id="boost/fire" size={22} />
+            {t('双倍收益')} 04:21
+          </div>
+        )}
+      </div>
     </div>
   );
 }
