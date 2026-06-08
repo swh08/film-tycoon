@@ -88,10 +88,11 @@
     -webkit-touch-callout: none;
     overscroll-behavior: none;
     /* 游戏背景：径向渐变 + 微妙纹理 */
-    background-color: #0a0a14;
+    background-color: #03080a;
     background-image:
-      radial-gradient(ellipse at 50% 0%, rgba(120, 80, 20, 0.12) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 100%, rgba(40, 20, 80, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 0%, rgba(20, 184, 166, 0.12) 0%, transparent 55%),
+      radial-gradient(ellipse at 12% 20%, rgba(245, 158, 11, 0.14) 0%, transparent 36%),
+      radial-gradient(ellipse at 80% 100%, rgba(15, 23, 42, 0.9) 0%, transparent 50%),
       repeating-linear-gradient(
         0deg,
         transparent,
@@ -100,6 +101,58 @@
         rgba(255, 255, 255, 0.008) 4px
       );
   }
+}
+
+.film-game-screen {
+  position: relative;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 85% 10%, rgba(245, 158, 11, 0.12), transparent 16rem),
+    radial-gradient(circle at 10% 20%, rgba(20, 184, 166, 0.12), transparent 14rem),
+    linear-gradient(180deg, #041014 0%, #071017 45%, #030609 100%);
+}
+
+.film-game-screen::before {
+  content: '';
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(251, 191, 36, 0.38) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(250, 204, 21, 0.22) 0 1px, transparent 2px);
+  background-position: 22px 90px, 240px 180px;
+  background-size: 190px 260px, 270px 310px;
+  opacity: 0.45;
+  mix-blend-mode: screen;
+}
+
+.hud-frame-bg {
+  background-color: #0d4f83;
+  background-image: url('/assets/game/shared/ui/top-hud-frame-business-style.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+.nav-frame-bg {
+  background-color: #0d4f83;
+  background-image: url('/assets/game/shared/ui/bottom-nav-frame-business-style.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.business-content-frame-bg {
+  background-color: #0c527e;
+  background-image: url('/assets/game/shared/ui/business-content-bg.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.business-card-frame-bg {
+  background-color: transparent;
+  background-image: url('/assets/game/shared/ui/business-card-frame-image2.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 /* 自定义滚动条 - 手机游戏风格 */
