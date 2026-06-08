@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useGameStore } from '@/store/gameStore';
 import {
@@ -12,8 +12,15 @@ import {
 import { formatTranslated, translateText } from './index';
 
 export function useTranslation() {
+  const [isMounted, setIsMounted] = useState(false);
   const languagePreference = useGameStore(s => s.languagePreference);
-  const language = resolveLanguagePreference(languagePreference, getBrowserLanguage());
+  const language = isMounted
+    ? resolveLanguagePreference(languagePreference, getBrowserLanguage())
+    : resolveLanguagePreference('system', undefined);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   setActiveLanguage(language);
 
