@@ -1,5 +1,5 @@
 // ============================================================
-// 店长Tab — 自动化雇佣 & 效率专精 & 升级系统
+// 店长Tab - 自动化雇佣 & 效率专精 & 升级系统
 // ============================================================
 'use client';
 
@@ -7,359 +7,250 @@ import { useGameStore } from '@/store/gameStore';
 import { MANAGERS } from '@/game/config/managers';
 import { BUSINESSES } from '@/game/config/businesses';
 import { calcManagerUpgradeCost, formatCash } from '@/game/formulas';
-import type { Rarity } from '@/game/types';
+import type { ManagerDef, Rarity } from '@/game/types';
 import { playHire, playUpgrade, playUIClick } from '@/game/sound';
 import { useTranslation } from '@/i18n/useTranslation';
-import AssetIcon from '@/components/game/AssetIcon';
-import BusinessIcon from '@/components/game/BusinessIcon';
 import ManagerIcon from '@/components/game/ManagerIcon';
 
-const RARITY_CONFIG: Record<Rarity, { label: string; color: string; bg: string }> = {
-  common: { label: '普通', color: 'text-gray-300', bg: 'bg-gray-700' },
-  rare: { label: '稀有', color: 'text-blue-400', bg: 'bg-blue-900/30' },
-  epic: { label: '史诗', color: 'text-purple-400', bg: 'bg-purple-900/30' },
-  legendary: { label: '传说', color: 'text-yellow-400', bg: 'bg-yellow-900/20' },
+const RARITY_CONFIG: Record<Rarity, { label: string; color: string; bg: string; ring: string; progress: string }> = {
+  common: {
+    label: '普通',
+    color: 'text-gray-200',
+    bg: 'bg-gray-700/70',
+    ring: 'ring-white/8',
+    progress: 'from-slate-400 to-zinc-200',
+  },
+  rare: {
+    label: '稀有',
+    color: 'text-blue-300',
+    bg: 'bg-blue-900/35',
+    ring: 'ring-blue-400/25',
+    progress: 'from-sky-500 to-cyan-300',
+  },
+  epic: {
+    label: '史诗',
+    color: 'text-fuchsia-300',
+    bg: 'bg-fuchsia-900/35',
+    ring: 'ring-fuchsia-400/25',
+    progress: 'from-fuchsia-500 to-pink-300',
+  },
+  legendary: {
+    label: '传说',
+    color: 'text-yellow-300',
+    bg: 'bg-yellow-900/30',
+    ring: 'ring-yellow-400/35',
+    progress: 'from-amber-400 to-yellow-200',
+  },
 };
+
+type Translate = (key: string) => string;
+
+function getManagerEffectText(manager: ManagerDef, currentLevel: number, t: Translate) {
+  if (manager.businessId > 0) {
+    const bonus = currentLevel > 0
+      ? ` · +${t('速度')} ${Math.round(manager.upgradeEffectPerLevel * currentLevel * 100)}%`
+      : '';
+    return `${t('自动化生产')}${bonus}`;
+  }
+
+  const base = manager.effectType === 'cycle_reduce'
+    ? `${t('周期')}-${(manager.effectValue * 100).toFixed(0)}%`
+    : `${t('利润')}+${(manager.effectValue * 100).toFixed(0)}%`;
+
+  const bonus = currentLevel > 0
+    ? manager.effectType === 'cycle_reduce'
+      ? ` · ${t('已额外')}-${(manager.upgradeEffectPerLevel * currentLevel * 100).toFixed(0)}%`
+      : ` · ${t('已额外')}+${(manager.upgradeEffectPerLevel * currentLevel * 100).toFixed(0)}%`
+    : '';
+
+  return `${base}${bonus}`;
+}
 
 export default function ManagerTab() {
   const { t } = useTranslation();
-  const { cash, diamonds, hiredManagers, managerLevels, businesses, hireManager, upgradeManager, tutorialStep, advanceTutorial } = useGameStore();
+  const {
+    cash,
+    diamonds,
+    hiredManagers,
+    managerLevels,
+    businesses,
+    hireManager,
+    upgradeManager,
+    tutorialStep,
+    advanceTutorial,
+  } = useGameStore();
+
+  const renderManagerCard = (manager: ManagerDef) => {
+    const isHired = hiredManagers.includes(manager.id);
+    const business = BUSINESSES.find(b => b.id === manager.businessId);
+    const businessState = businesses.find(b => b.businessId === manager.businessId);
+    const hasBusiness = manager.businessId === 0 || !!(businessState && businessState.quantity > 0);
+    const rarity = RARITY_CONFIG[manager.rarity];
+    const currentLevel = managerLevels[manager.id] ?? 0;
+    const isMaxLevel = currentLevel >= manager.maxLevel;
+    const upgradeCost = calcManagerUpgradeCost(manager.id, currentLevel);
+    const costLabel = manager.currency === 'cash'
+      ? formatCash(manager.unlockCost)
+      : manager.unlockCost.toString();
+    const upgradeCostLabel = manager.upgradeCurrency === 'cash'
+      ? formatCash(upgradeCost)
+      : upgradeCost.toString();
+    const canAffordHire = manager.currency === 'cash'
+      ? cash >= manager.unlockCost
+      : diamonds >= manager.unlockCost;
+    const canAffordUpgrade = manager.upgradeCurrency === 'cash'
+      ? cash >= upgradeCost
+      : diamonds >= upgradeCost;
+    const canHire = !isHired && hasBusiness && canAffordHire;
+    const effectText = getManagerEffectText(manager, currentLevel, t);
+    const progress = Math.min(100, (currentLevel / manager.maxLevel) * 100);
+
+    const actionButton = () => {
+      if (!isHired) {
+        return (
+          <button
+            onClick={() => {
+              const ok = hireManager(manager.id);
+              if (ok) {
+                playHire();
+                if (tutorialStep === 'buy_10') {
+                  advanceTutorial('hire_manager');
+                }
+              } else {
+                playUIClick();
+              }
+            }}
+            disabled={!canHire}
+            className={`
+              flex h-[58px] w-[96px] flex-col items-center justify-center rounded-xl px-2 text-center
+              text-[11px] font-black leading-tight transition-all duration-150
+              ${canHire
+                ? manager.currency === 'diamond'
+                  ? 'border border-cyan-100/70 bg-[linear-gradient(180deg,#67e8f9,#2563eb)] text-white shadow-[0_5px_0_rgba(30,64,175,.95),0_8px_18px_rgba(0,0,0,.34)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(30,64,175,.95),0_4px_8px_rgba(0,0,0,.25)]'
+                  : 'border border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] text-stone-950 shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(120,53,15,.9),0_4px_8px_rgba(0,0,0,.25)]'
+                : 'border border-stone-500/30 bg-[linear-gradient(180deg,#596270,#303742)] text-stone-300 shadow-none'
+              }
+            `}
+          >
+            <span>{hasBusiness ? t('雇佣') : t('需要先拥有')}</span>
+            {hasBusiness && <span className="mt-0.5 max-w-full truncate text-[11px] opacity-85">{costLabel}</span>}
+          </button>
+        );
+      }
+
+      if (isMaxLevel) {
+        return (
+          <div className="flex h-[58px] w-[96px] flex-col items-center justify-center rounded-xl border border-emerald-200/45 bg-[linear-gradient(180deg,#34d399,#15803d)] px-2 text-center text-[11px] font-black leading-tight text-white shadow-[0_5px_0_#166534,0_8px_16px_rgba(0,0,0,.28)]">
+            <span>{t('已满级')}</span>
+            <span className="mt-0.5">Lv.{manager.maxLevel}</span>
+          </div>
+        );
+      }
+
+      return (
+        <button
+          onClick={() => {
+            const ok = upgradeManager(manager.id);
+            if (ok) playUpgrade(); else playUIClick();
+          }}
+          disabled={!canAffordUpgrade}
+          className={`
+            flex h-[58px] w-[96px] flex-col items-center justify-center rounded-xl px-2 text-center
+            text-[11px] font-black leading-tight transition-all duration-150
+            ${canAffordUpgrade
+              ? manager.upgradeCurrency === 'diamond'
+                ? 'border border-cyan-100/70 bg-[linear-gradient(180deg,#67e8f9,#2563eb)] text-white shadow-[0_5px_0_rgba(30,64,175,.95),0_8px_18px_rgba(0,0,0,.34)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(30,64,175,.95),0_4px_8px_rgba(0,0,0,.25)]'
+                : 'border border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] text-stone-950 shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(120,53,15,.9),0_4px_8px_rgba(0,0,0,.25)]'
+              : 'border border-stone-500/30 bg-[linear-gradient(180deg,#596270,#303742)] text-stone-300 shadow-none'
+            }
+          `}
+        >
+          <span>{t('升级到')} Lv.{currentLevel + 1}</span>
+          <span className="mt-0.5 max-w-full truncate opacity-85">{upgradeCostLabel}</span>
+        </button>
+      );
+    };
+
+    return (
+      <section
+        key={manager.id}
+        className={`
+          business-card-frame-4x1-bg relative flex min-h-[112px] items-center gap-3 overflow-hidden px-4 py-4 pr-3 shadow-[0_10px_18px_rgba(0,0,0,.28)] transition-all duration-200
+          ${isHired ? 'saturate-110' : ''}
+          ${!hasBusiness && !isHired ? 'opacity-55' : ''}
+        `}
+      >
+        <div className="flex h-[84px] w-[72px] shrink-0 items-end justify-center">
+          <ManagerIcon
+            managerId={manager.id}
+            alt={t(manager.name)}
+            size={78}
+            className="max-h-[84px] w-auto drop-shadow-[0_16px_14px_rgba(0,0,0,0.62)]"
+          />
+        </div>
+
+        <div className="min-w-0 flex-1 py-0.5">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <h3 className="truncate text-[15px] font-black leading-tight text-amber-100">{t(manager.name)}</h3>
+            <span className={`shrink-0 rounded px-1.5 py-0.5 text-[11px] font-black ${rarity.bg} ${rarity.color}`}>
+              {t(rarity.label)}
+            </span>
+            {isHired && (
+              <span className="ml-auto shrink-0 text-xs font-black text-amber-200">Lv.{currentLevel}</span>
+            )}
+          </div>
+
+          <p className="mt-1 truncate text-xs font-black text-amber-200">
+            {business ? t(business.name) : t('专家顾问（全局加成+可升级）')}
+          </p>
+          <p className="mt-0.5 line-clamp-2 text-xs font-bold leading-snug text-stone-300">{t(manager.description)}</p>
+          <p className="mt-1 text-xs font-black text-cyan-200">{effectText}</p>
+
+          {isHired && (
+            <div className="mt-1.5">
+              <div className="mb-0.5 flex items-center justify-between text-[11px] font-black text-stone-300">
+                <span>Lv.{currentLevel}</span>
+                <span>Lv.{manager.maxLevel}</span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-gray-900/80">
+                <div
+                  className={`h-full rounded-full bg-gradient-to-r ${rarity.progress} transition-all`}
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="shrink-0">{actionButton()}</div>
+      </section>
+    );
+  };
 
   return (
-    <div className="flex flex-col gap-3 px-3 py-3 pb-4">
-      {/* 标题区 */}
-      <div className="flex items-center justify-between mb-1">
-        <h2 className="flex items-center gap-1.5 text-sm font-bold text-yellow-400">
-          <AssetIcon id="nav/manager" size={18} />
-          {t('店长管理')}
-        </h2>
-        <span className="text-[10px] text-gray-400">
+    <div className="film-game-screen business-content-frame-bg flex flex-col gap-3 px-5 py-5 pb-6">
+      <div className="mb-1 flex items-center justify-between px-1">
+        <h2 className="text-[2rem] font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">{t('店长管理')}</h2>
+        <span className="rounded-lg border border-stone-300/25 bg-black/35 px-2.5 py-1 text-xs font-black text-stone-100">
           {t('已雇佣')} {hiredManagers.length}/{MANAGERS.length}
         </span>
       </div>
 
-      {/* 产线店长 */}
       <div>
-        <h3 className="flex items-center gap-1.5 text-xs font-medium text-gray-400 mb-2 px-1">
-          <AssetIcon id="nav/business" size={15} />
+        <h3 className="mb-2 px-1 text-sm font-black text-amber-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
           {t('产线店长（自动化+可升级）')}
         </h3>
         <div className="flex flex-col gap-2">
-          {MANAGERS.filter(m => m.businessId > 0).map(manager => {
-            const isHired = hiredManagers.includes(manager.id);
-            const business = BUSINESSES.find(b => b.id === manager.businessId);
-            const bs = businesses.find(b => b.businessId === manager.businessId);
-            const hasBusiness = bs && bs.quantity > 0;
-            const rarity = RARITY_CONFIG[manager.rarity];
-            const currentLevel = managerLevels[manager.id] ?? 0;
-            const isMaxLevel = currentLevel >= manager.maxLevel;
-            const upgradeCost = calcManagerUpgradeCost(manager.id, currentLevel);
-
-            const costLabel = manager.currency === 'cash'
-              ? formatCash(manager.unlockCost)
-              : manager.unlockCost.toString();
-
-            const canAfford = manager.currency === 'cash'
-              ? cash >= manager.unlockCost
-              : diamonds >= manager.unlockCost;
-
-            const canHire = !isHired && hasBusiness && canAfford;
-
-            const upgradeCostLabel = manager.upgradeCurrency === 'cash'
-              ? formatCash(upgradeCost)
-              : upgradeCost.toString();
-
-            const canAffordUpgrade = manager.upgradeCurrency === 'cash'
-              ? cash >= upgradeCost
-              : diamonds >= upgradeCost;
-
-            return (
-              <div
-                key={manager.id}
-                className={`rounded-xl p-3 transition-all duration-200 shadow-md shadow-black/20
-                  ${isHired
-                    ? rarity.bg
-                    : 'bg-gray-800'
-                  }
-                  ${!hasBusiness && !isHired ? 'opacity-50' : ''}
-                `}
-              >
-                <div className="flex items-start gap-3">
-                  {/* 头像 */}
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden
-                    ${isHired ? 'bg-yellow-500/20 ring-2 ring-yellow-500/50' : 'bg-gray-700'}`}>
-                    <ManagerIcon managerId={manager.id} alt={t(manager.name)} size={46} />
-                  </div>
-
-                  {/* 信息 */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-bold text-white">{t(manager.name)}</h3>
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${rarity.bg} ${rarity.color}`}>
-                          {t(rarity.label)}
-                        </span>
-                      </div>
-                      {isHired && (
-                        <div className="flex items-center gap-1.5">
-                          <AssetIcon id="status/check" size={12} />
-                          <span className="text-[10px] font-bold text-yellow-300">Lv.{currentLevel}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <p className="text-[10px] text-gray-400 mb-0.5">
-                      {business ? <BusinessIcon icon={business.icon} className="inline mr-1" /> : null}
-                      {business ? t(business.name) : null}
-                    </p>
-                    <p className="text-[10px] text-gray-500 mb-1">{t(manager.description)}</p>
-
-                    {/* 效果 */}
-                    <div className="text-[10px] text-cyan-400 mb-1">
-                      <AssetIcon id="nav/manager" size={12} className="mr-1 align-[-2px]" />
-                      {t('自动化生产')}
-                      {isHired && currentLevel > 0 && (
-                        <span className="text-green-400 ml-1">
-                          +{t('速度')} {Math.round(manager.upgradeEffectPerLevel * currentLevel * 100)}%
-                        </span>
-                      )}
-                    </div>
-
-                    {/* 等级进度条 */}
-                    {isHired && (
-                      <div className="mb-2">
-                        <div className="flex items-center justify-between text-[9px] mb-0.5">
-                          <span className="text-gray-500">Lv.{currentLevel}</span>
-                          <span className="text-gray-500">Lv.{manager.maxLevel}</span>
-                        </div>
-                        <div className="h-1.5 rounded-full bg-gray-700 overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all"
-                            style={{ width: `${(currentLevel / manager.maxLevel) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 雇佣按钮 */}
-                    {!isHired && (
-                      <button
-                        onClick={() => {
-                          hireManager(manager.id);
-                          playHire();
-                          const state = useGameStore.getState();
-                          if (tutorialStep === 'buy_10') {
-                            advanceTutorial('hire_manager' as any);
-                          }
-                        }}
-                        disabled={!canHire}
-                        className={`
-                          w-full py-3 rounded-xl text-xs font-bold transition-all duration-150
-                          ${canHire
-                            ? 'bg-gradient-to-b from-green-400 to-green-600 text-white shadow-[0_4px_0_0_#166534,0_6px_12px_rgba(21,128,61,0.3)] active:shadow-[0_2px_0_0_#166534,0_3px_6px_rgba(21,128,61,0.2)] active:translate-y-[2px]'
-                            : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_4px_0_0_#374151,0_6px_8px_rgba(0,0,0,0.3)]'
-                          }
-                        `}
-                      >
-                        <span className="inline-flex items-center justify-center gap-1">
-                          {!hasBusiness ? `${t('需要先拥有')}${business ? t(business.name) : ''}` : `${t('雇佣')} → ${costLabel}`}
-                          {hasBusiness && manager.currency === 'diamond' && <AssetIcon id="currency/diamond" size={14} />}
-                        </span>
-                      </button>
-                    )}
-
-                    {/* 升级按钮 */}
-                    {isHired && !isMaxLevel && (
-                      <button
-                        onClick={() => {
-                          const ok = useGameStore.getState().upgradeManager(manager.id);
-                          if (ok) playUpgrade(); else playUIClick();
-                        }}
-                        disabled={!canAffordUpgrade}
-                        className={`
-                          w-full py-2.5 rounded-xl text-[10px] font-bold transition-all duration-150
-                          ${canAffordUpgrade
-                            ? 'bg-gradient-to-b from-blue-400 to-indigo-600 text-white shadow-[0_4px_0_0_#312e81,0_6px_12px_rgba(49,46,129,0.3)] active:shadow-[0_2px_0_0_#312e81,0_3px_6px_rgba(49,46,129,0.2)] active:translate-y-[2px]'
-                            : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.3)]'
-                          }
-                        `}
-                      >
-                        <span className="inline-flex items-center justify-center gap-1">
-                          {t('升级到')} Lv.{currentLevel + 1} → {upgradeCostLabel}
-                          {manager.upgradeCurrency === 'diamond' && <AssetIcon id="currency/diamond" size={12} />}
-                        </span>
-                        <span className="text-[8px] opacity-70 ml-1">
-                          ({t('速度')}+{Math.round(manager.upgradeEffectPerLevel * 100)}%)
-                        </span>
-                      </button>
-                    )}
-
-                    {/* 满级提示 */}
-                    {isHired && isMaxLevel && (
-                      <div className="text-[10px] text-yellow-400 font-bold text-center py-1">
-                        <span className="inline-flex items-center justify-center gap-1">
-                          <AssetIcon id="status/check" size={14} />
-                          {t('已满级')} Lv.{manager.maxLevel}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {MANAGERS.filter(manager => manager.businessId > 0).map(renderManagerCard)}
         </div>
       </div>
 
-      {/* 专家顾问 */}
       <div className="mt-2">
-        <h3 className="flex items-center gap-1.5 text-xs font-medium text-gray-400 mb-2 px-1">
-          <AssetIcon id="boost/lightning" size={15} />
+        <h3 className="mb-2 px-1 text-sm font-black text-amber-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
           {t('专家顾问（全局加成+可升级）')}
         </h3>
         <div className="flex flex-col gap-2">
-          {MANAGERS.filter(m => m.businessId === 0).map(manager => {
-            const isHired = hiredManagers.includes(manager.id);
-            const rarity = RARITY_CONFIG[manager.rarity];
-            const currentLevel = managerLevels[manager.id] ?? 0;
-            const isMaxLevel = currentLevel >= manager.maxLevel;
-            const upgradeCost = calcManagerUpgradeCost(manager.id, currentLevel);
-
-            const costLabel = manager.currency === 'cash'
-              ? formatCash(manager.unlockCost)
-              : manager.unlockCost.toString();
-
-            const canAfford = manager.currency === 'cash'
-              ? cash >= manager.unlockCost
-              : diamonds >= manager.unlockCost;
-
-            const upgradeCostLabel = manager.upgradeCurrency === 'cash'
-              ? formatCash(upgradeCost)
-              : upgradeCost.toString();
-
-            const canAffordUpgrade = manager.upgradeCurrency === 'cash'
-              ? cash >= upgradeCost
-              : diamonds >= upgradeCost;
-
-            const effectIcon = manager.effectType === 'cycle_reduce' ? 'boost/lightning' : 'currency/coin';
-            const effectDesc = manager.effectType === 'cycle_reduce'
-              ? `${t('周期')}-${(manager.effectValue * 100).toFixed(0)}%`
-              : `${t('利润')}+${(manager.effectValue * 100).toFixed(0)}%`;
-
-            const bonusDesc = currentLevel > 0
-              ? manager.effectType === 'cycle_reduce'
-                ? ` (${t('已额外')}-${(manager.upgradeEffectPerLevel * currentLevel * 100).toFixed(0)}%)`
-                : ` (${t('已额外')}+${(manager.upgradeEffectPerLevel * currentLevel * 100).toFixed(0)}%)`
-              : '';
-
-            return (
-              <div
-                key={manager.id}
-                className={`rounded-xl p-3 transition-all duration-200 shadow-md shadow-black/20
-                  ${isHired
-                    ? `${rarity.bg} ring-1 ring-yellow-500/30`
-                    : 'bg-gray-800'
-                  }
-                `}
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden
-                    ${isHired ? 'bg-yellow-500/20' : 'bg-gray-700'}`}>
-                    <ManagerIcon managerId={manager.id} alt={t(manager.name)} size={46} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-bold text-white">{t(manager.name)}</h3>
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${rarity.bg} ${rarity.color}`}>
-                          {t(rarity.label)}
-                        </span>
-                      </div>
-                      {isHired && (
-                        <span className="text-[10px] font-bold text-yellow-300">Lv.{currentLevel}</span>
-                      )}
-                    </div>
-                    <p className="text-[10px] text-gray-500 mb-1">{t(manager.description)}</p>
-
-                    {/* 效果 */}
-                    <div className="text-[10px] text-cyan-400 mb-1">
-                      <AssetIcon id={effectIcon} size={12} className="mr-1 align-[-2px]" />
-                      {effectDesc}{bonusDesc}
-                    </div>
-
-                    {/* 等级进度 */}
-                    {isHired && (
-                      <div className="mb-2">
-                        <div className="flex items-center justify-between text-[9px] mb-0.5">
-                          <span className="text-gray-500">Lv.{currentLevel}</span>
-                          <span className="text-gray-500">Lv.{manager.maxLevel}</span>
-                        </div>
-                        <div className="h-1.5 rounded-full bg-gray-700 overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-400 transition-all"
-                            style={{ width: `${(currentLevel / manager.maxLevel) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {!isHired && (
-                      <button
-                        onClick={() => {
-                          hireManager(manager.id);
-                          playHire();
-                        }}
-                        disabled={!canAfford}
-                        className={`
-                          w-full py-3 rounded-xl text-xs font-bold transition-all duration-150
-                          ${canAfford
-                            ? 'bg-gradient-to-b from-purple-400 to-pink-600 text-white shadow-[0_4px_0_0_#701a75,0_6px_12px_rgba(112,26,117,0.3)] active:shadow-[0_2px_0_0_#701a75,0_3px_6px_rgba(112,26,117,0.2)] active:translate-y-[2px]'
-                            : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_4px_0_0_#374151,0_6px_8px_rgba(0,0,0,0.3)]'
-                          }
-                        `}
-                      >
-                        <span className="inline-flex items-center justify-center gap-1">
-                          {t('雇佣')} → {costLabel}
-                          {manager.currency === 'diamond' && <AssetIcon id="currency/diamond" size={14} />}
-                        </span>
-                      </button>
-                    )}
-
-                    {isHired && !isMaxLevel && (
-                      <button
-                        onClick={() => {
-                          const ok = useGameStore.getState().upgradeManager(manager.id);
-                          if (ok) playUpgrade(); else playUIClick();
-                        }}
-                        disabled={!canAffordUpgrade}
-                        className={`
-                          w-full py-2.5 rounded-xl text-[10px] font-bold transition-all duration-150
-                          ${canAffordUpgrade
-                            ? 'bg-gradient-to-b from-purple-400 to-pink-600 text-white shadow-[0_4px_0_0_#701a75,0_6px_12px_rgba(112,26,117,0.3)] active:shadow-[0_2px_0_0_#701a75,0_3px_6px_rgba(112,26,117,0.2)] active:translate-y-[2px]'
-                            : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.3)]'
-                          }
-                        `}
-                      >
-                        <span className="inline-flex items-center justify-center gap-1">
-                          {t('升级到')} Lv.{currentLevel + 1} → {upgradeCostLabel}
-                          {manager.upgradeCurrency === 'diamond' && <AssetIcon id="currency/diamond" size={12} />}
-                        </span>
-                      </button>
-                    )}
-
-                    {isHired && isMaxLevel && (
-                      <div className="text-[10px] text-yellow-400 font-bold text-center py-1">
-                        <span className="inline-flex items-center justify-center gap-1">
-                          <AssetIcon id="status/check" size={14} />
-                          {t('已满级')} Lv.{manager.maxLevel}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {MANAGERS.filter(manager => manager.businessId === 0).map(renderManagerCard)}
         </div>
       </div>
     </div>
