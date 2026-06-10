@@ -10,9 +10,11 @@ import { BUSINESSES } from '@/game/config/businesses';
 import { calcAngelUpgradeEffects, formatCash, formatNumber, formatNumberSmart } from '@/game/formulas';
 import { usePopup } from '../PopupLayer';
 import { useTranslation } from '@/i18n/useTranslation';
-import BusinessIcon from '@/components/game/BusinessIcon';
 import AssetIcon, { type SharedAssetId } from '@/components/game/AssetIcon';
 import AngelUpgradeIcon from '@/components/game/AngelUpgradeIcon';
+
+const GOLD_BUTTON_CLASS = 'rounded-xl border border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] text-stone-950 shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(120,53,15,.9),0_4px_8px_rgba(0,0,0,.25)]';
+const DISABLED_BUTTON_CLASS = 'rounded-xl border border-stone-500/30 bg-[linear-gradient(180deg,#596270,#303742)] text-stone-300 shadow-none';
 
 // ============================================================
 // 转生确认弹窗 — 响应式组件，数据实时更新
@@ -58,7 +60,7 @@ function PrestigeConfirmPopup() {
         </div>
       </div>
 
-      <div className="text-[10px] text-white/50 space-y-1">
+      <div className="space-y-1 text-xs font-bold text-stone-300">
         <p className="inline-flex items-center justify-center gap-1">
           <AssetIcon id="status/cross" size={12} />
           {t('重置')}: {t('现金')}、{t('产线')}、{t('店长')}、{t('升级')}、{t('广告增益')}
@@ -72,8 +74,7 @@ function PrestigeConfirmPopup() {
       <div className="flex gap-2 mt-4">
         <button
           onClick={handleConfirm}
-          className="flex-1 py-3 rounded-xl font-bold bg-gradient-to-b from-orange-400 to-red-600 
-                     text-white transition-all duration-150 shadow-[0_4px_0_0_#991b1b,0_6px_12px_rgba(127,29,29,0.3)] active:shadow-[0_2px_0_0_#991b1b,0_3px_6px_rgba(127,29,29,0.2)] active:translate-y-[2px]"
+          className={`flex-1 py-3 font-black transition-all duration-150 ${GOLD_BUTTON_CLASS}`}
         >
           {t('确认转生')}
         </button>
@@ -109,7 +110,7 @@ function AngelUpgradePopup({ upgradeId }: { upgradeId: number }) {
         <AngelUpgradeIcon upgradeId={def.id} alt={t(def.name)} size={48} />
       </div>
       <h3 className="text-lg font-black mb-1">{t(def.name)}</h3>
-      <p className="text-xs text-gray-400 mb-3">{t(def.description)}</p>
+      <p className="mb-3 text-xs font-bold text-stone-300">{t(def.description)}</p>
 
       <div className="bg-red-900/30 rounded-xl p-3 mb-4">
         <p className="text-sm font-bold text-red-400">
@@ -119,15 +120,14 @@ function AngelUpgradePopup({ upgradeId }: { upgradeId: number }) {
             {t(PRESTIGE_RULE.currencyName)}
           </span>
         </p>
-        <p className="text-[10px] text-red-300/60 mt-1">
+        <p className="mt-1 text-xs font-bold text-red-300/80">
           {t('消耗后利润加成将从')} ×{formatNumber(currentMultiplier)} {t('降至')} ×{formatNumber(nextMultiplier)}
         </p>
       </div>
 
       <button
         onClick={handleBuy}
-        className="w-full py-2.5 rounded-xl font-bold bg-gradient-to-b from-orange-400 to-red-600 
-                   text-white transition-all duration-150 shadow-[0_3px_0_0_#991b1b,0_4px_8px_rgba(127,29,29,0.3)] active:shadow-[0_1px_0_0_#991b1b,0_2px_4px_rgba(127,29,29,0.2)] active:translate-y-[2px]"
+        className={`w-full py-2.5 font-black transition-all duration-150 ${GOLD_BUTTON_CLASS}`}
       >
         {t('确认购买')}
       </button>
@@ -148,55 +148,67 @@ function AngelUpgradeCard({ upgrade, onBuy }: { upgrade: typeof ANGEL_UPGRADES[0
   const business = upgrade.targetBusinessId
     ? BUSINESSES.find(b => b.id === upgrade.targetBusinessId)
     : null;
+  const targetLabel = business ? t(business.name) : t('全局永久升级');
 
   return (
-    <div
-      className={`rounded-xl p-2.5 transition-all duration-200
-        ${isPurchased
-          ? 'bg-green-900/20'
-          : 'bg-gray-700/50'
-        }`}
+    <section
+      className={`business-card-frame-4x1-bg relative flex min-h-[106px] items-center gap-3 overflow-hidden px-4 py-3 pr-3 shadow-[0_10px_18px_rgba(0,0,0,.24)] transition-all duration-200
+        ${isPurchased ? 'saturate-110' : ''}
+        ${!isPurchased && !canAfford ? 'opacity-70' : ''}
+      `}
     >
-      <div className="flex items-center gap-2">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0
-          ${isPurchased ? 'bg-green-500/20' : 'bg-gray-700'}`}>
-          <AngelUpgradeIcon upgradeId={upgrade.id} alt={t(upgrade.name)} size={30} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-white">
-              {business ? <BusinessIcon icon={business.icon} className="inline" /> : null} {t(upgrade.name)}
+      <div className="flex h-[82px] w-[74px] shrink-0 items-end justify-center">
+        <AngelUpgradeIcon
+          upgradeId={upgrade.id}
+          alt={t(upgrade.name)}
+          size={76}
+          className={`max-h-[82px] w-auto drop-shadow-[0_16px_14px_rgba(0,0,0,0.62)] ${!isPurchased && !canAfford ? 'grayscale-[35%]' : ''}`}
+        />
+      </div>
+
+      <div className="min-w-0 flex-1 py-0.5">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <h4 className={`truncate text-[15px] font-black leading-tight ${isPurchased ? 'text-amber-100' : 'text-stone-50'}`}>
+            {t(upgrade.name)}
+          </h4>
+          {isPurchased && (
+            <span className="shrink-0 rounded bg-emerald-400/15 px-1.5 py-0.5 text-[11px] font-black text-emerald-300">
+              {t('已购买')}
             </span>
-            {isPurchased ? (
-              <span className="text-green-400 text-[10px] font-bold inline-flex items-center gap-0.5">
-                <AssetIcon id="status/check" size={12} />
-                {t('已购买')}
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-0.5 text-yellow-400 text-[10px] font-bold">
-                {upgrade.cost}
-                <AssetIcon id="currency/connection" size={12} />
-              </span>
-            )}
-          </div>
-          <p className="text-[10px] text-gray-500">{t(upgrade.description)}</p>
+          )}
         </div>
-        {!isPurchased && (
+
+        <p className="mt-1 truncate text-xs font-black text-amber-200">{targetLabel}</p>
+        <p className="mt-0.5 line-clamp-2 text-xs font-bold leading-snug text-stone-300">{t(upgrade.description)}</p>
+
+        <div className="mt-2 inline-flex items-center gap-1 rounded-lg border border-stone-300/20 bg-black/30 px-2 py-1 text-xs font-black text-yellow-300">
+          <span>{t('成本')}</span>
+          <span>{upgrade.cost}</span>
+          <AssetIcon id="currency/connection" size={12} />
+        </div>
+      </div>
+
+      <div className="shrink-0">
+        {isPurchased ? (
+          <div className="flex h-[58px] w-[92px] flex-col items-center justify-center rounded-xl border border-emerald-200/45 bg-[linear-gradient(180deg,#34d399,#15803d)] px-2 text-center text-xs font-black leading-tight text-white shadow-[0_5px_0_#166534,0_8px_16px_rgba(0,0,0,.28)]">
+            <AssetIcon id="status/check" size={14} />
+            <span className="mt-0.5">{t('已购买')}</span>
+          </div>
+        ) : (
           <button
             onClick={() => onBuy(upgrade.id)}
             disabled={!canAfford}
-            className={`px-3 py-2.5 rounded-xl text-[10px] font-bold flex-shrink-0
-              transition-all duration-150
+            className={`flex h-[58px] w-[92px] flex-col items-center justify-center px-2 text-center text-xs font-black leading-tight transition-all duration-150
               ${canAfford
-                ? 'bg-gradient-to-b from-orange-400 to-red-600 text-white shadow-[0_3px_0_0_#991b1b,0_4px_8px_rgba(127,29,29,0.3)] active:shadow-[0_1px_0_0_#991b1b,0_2px_4px_rgba(127,29,29,0.2)] active:translate-y-[2px]'
-                : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_3px_0_0_#374151,0_4px_6px_rgba(0,0,0,0.3)]'
+                ? GOLD_BUTTON_CLASS
+                : DISABLED_BUTTON_CLASS
               }`}
           >
             {t('购买')}
           </button>
         )}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -256,21 +268,35 @@ export default function PrestigeTab() {
   };
 
   return (
-    <div className="flex flex-col gap-4 px-3 py-3 pb-4">
+    <div className="film-game-screen business-content-frame-bg flex flex-col gap-3 px-5 py-5 pb-6">
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-[2rem] font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">
+          {t('人脉')}
+        </h1>
+        <div className="flex-shrink-0 rounded-lg border border-stone-300/25 bg-black/35 px-2.5 py-1 text-[13px] font-black text-stone-100 tabular-nums">
+          {totalPrestigeCount}{t('次')} · ×{formatNumber(currentMultiplier)}
+        </div>
+      </div>
+
+      <div className="business-card-frame-bg relative overflow-hidden px-6 py-6">
       {/* 转生状态卡片 */}
-      <div className="rounded-2xl p-4 bg-gradient-to-br from-amber-900/50 to-yellow-900/30">
-        <div className="text-center mb-4">
-          <AssetIcon id="currency/connection" size={44} className="mb-2" />
-          <h2 className="text-lg font-black text-yellow-400">{t(PRESTIGE_RULE.currencyName)}</h2>
-          <p className="text-xs text-gray-400">{t('转生后获得的永久加成货币')}</p>
+      <div>
+        <div className="mb-4 flex items-center gap-3">
+          <div className="grid h-[72px] w-[72px] flex-shrink-0 place-items-center">
+            <AssetIcon id="currency/connection" size={54} className="drop-shadow-[0_10px_12px_rgba(0,0,0,.45)]" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-xl font-black leading-tight text-amber-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">{t(PRESTIGE_RULE.currencyName)}</h2>
+            <p className="mt-0.5 text-[13px] font-bold text-stone-300">{t('转生后获得的永久加成货币')}</p>
+          </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-2">
           {/* 当前人脉 */}
           <div className="bg-black/20 rounded-xl p-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-400">{t('当前')}{t(PRESTIGE_RULE.currencyName)}</span>
-              <span className="text-lg font-black text-yellow-400">{formatNumberSmart(prestigePoints)}</span>
+              <span className="text-[13px] font-bold text-stone-300">{t('当前')}{t(PRESTIGE_RULE.currencyName)}</span>
+              <span className="text-lg font-black text-amber-200">{formatNumberSmart(prestigePoints)}</span>
             </div>
             <div className="h-2 rounded-full bg-gray-700">
               <div
@@ -283,13 +309,13 @@ export default function PrestigeTab() {
           {/* 永久加成 */}
           <div className="bg-black/20 rounded-xl p-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400">{t('利润加成（人脉）')}</span>
-              <span className="text-sm font-black text-green-400">×{formatNumber(currentMultiplier)}{angelProfitText}</span>
+              <span className="text-[13px] font-bold text-stone-300">{t('利润加成（人脉）')}</span>
+              <span className="text-base font-black text-green-300">×{formatNumber(currentMultiplier)}{angelProfitText}</span>
             </div>
             {(angelCostText || angelSpeedText) && (
-              <div className="flex gap-3 mt-1 text-[10px]">
-                {angelCostText && <span className="text-blue-400">{angelCostText}</span>}
-                {angelSpeedText && <span className="text-cyan-400">{angelSpeedText}</span>}
+              <div className="mt-1 flex gap-3 text-xs font-bold">
+                {angelCostText && <span className="text-blue-300">{angelCostText}</span>}
+                {angelSpeedText && <span className="text-cyan-300">{angelSpeedText}</span>}
               </div>
             )}
           </div>
@@ -297,23 +323,23 @@ export default function PrestigeTab() {
           {/* 转生次数 */}
           <div className="bg-black/20 rounded-xl p-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400">{t('累计转生次数')}</span>
-              <span className="text-sm font-bold text-white">{totalPrestigeCount}{t('次')}</span>
+              <span className="text-[13px] font-bold text-stone-300">{t('累计转生次数')}</span>
+              <span className="text-base font-black text-stone-50">{totalPrestigeCount}{t('次')}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* 转生操作区 */}
-      <div className="rounded-2xl p-4 bg-gray-800">
-        <h3 className="text-sm font-bold text-white mb-3 inline-flex items-center gap-1.5">
+      <div className="mt-4 border-t border-stone-300/15 pt-4">
+        <h3 className="mb-3 inline-flex items-center gap-1.5 text-sm font-black text-amber-100">
           <AssetIcon id="nav/prestige" size={18} />
           {t('转生重置')}
         </h3>
 
         {!unlockMet ? (
           <div className="text-center">
-            <p className="text-xs text-gray-400 mb-2">
+            <p className="mb-2 text-[13px] font-bold text-stone-300">
               {t('累计收入达到')}{formatCash(PRESTIGE_RULE.unlockCondition.value)}{t('后解锁转生')}
             </p>
             <div className="h-2 rounded-full bg-gray-700">
@@ -322,7 +348,7 @@ export default function PrestigeTab() {
                 style={{ width: `${Math.min(100, (totalEarned / PRESTIGE_RULE.unlockCondition.value) * 100)}%` }}
               />
             </div>
-            <p className="text-[10px] text-gray-500 mt-1">
+            <p className="mt-1 text-xs font-bold text-stone-400">
               {t('当前进度')}: {formatCash(totalEarned)} / {formatCash(PRESTIGE_RULE.unlockCondition.value)}
             </p>
           </div>
@@ -330,14 +356,14 @@ export default function PrestigeTab() {
           <div className="text-center">
             {/* 预计获得 */}
             <div className="bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-xl p-3 mb-3">
-              <p className="text-xs text-gray-400 mb-1">{t('本次转生预计获得')}</p>
-              <div className="text-2xl font-black text-orange-400">
+              <p className="mb-1 text-[13px] font-bold text-stone-300">{t('本次转生预计获得')}</p>
+              <div className="text-2xl font-black text-amber-200">
                 <span className="inline-flex items-center justify-center gap-1">
                   +{formatNumberSmart(gain)}
                   <AssetIcon id="currency/connection" size={22} />
                 </span>
               </div>
-              <p className="text-[10px] text-gray-500 mt-1">
+              <p className="mt-1 text-xs font-bold text-stone-300">
                 {t('转生后加成')}: ×{formatNumber(currentMultiplier)} → ×{formatNumber(nextMultiplier)}
               </p>
             </div>
@@ -346,10 +372,10 @@ export default function PrestigeTab() {
               onClick={handlePrestige}
               disabled={!canDoPrestige}
               className={`
-                w-full py-3 rounded-xl font-bold text-base transition-all duration-150
+                w-full py-3 text-base font-black transition-all duration-150
                 ${canDoPrestige
-                  ? 'bg-gradient-to-b from-orange-400 to-red-600 text-white shadow-[0_4px_0_0_#991b1b,0_6px_12px_rgba(127,29,29,0.3)] active:shadow-[0_2px_0_0_#991b1b,0_3px_6px_rgba(127,29,29,0.2)] active:translate-y-[2px]'
-                  : 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-400 shadow-[0_4px_0_0_#374151,0_6px_8px_rgba(0,0,0,0.3)]'
+                  ? GOLD_BUTTON_CLASS
+                  : DISABLED_BUTTON_CLASS
                 }
               `}
             >
@@ -360,7 +386,7 @@ export default function PrestigeTab() {
             </button>
 
             {gain < 2 && (
-              <p className="text-[10px] text-yellow-400/60 mt-2">
+              <p className="mt-2 text-xs font-bold text-yellow-300/80">
                 {t('建议：转生获得≥2点更有价值，继续积累收入吧！')}
               </p>
             )}
@@ -368,27 +394,28 @@ export default function PrestigeTab() {
         )}
 
         {/* 转生说明 */}
-        <div className="mt-4 space-y-1.5 text-[10px] text-gray-500">
-          <h4 className="text-xs font-medium text-gray-400">{t('转生说明')}</h4>
-          <p><span className="text-red-400">{t('重置')}</span>: {t('现金')}、{t('产线数量')}、{t('店长雇佣')}、{t('全局升级')}、{t('广告增益')}</p>
-          <p><span className="text-green-400">{t('保留')}</span>: {t('钻石')}、{t(PRESTIGE_RULE.currencyName)}、{t('人脉升级')}、{t('商城一次性购买')}</p>
-          <p><span className="text-yellow-400">{t('加成')}</span>: {t('每点')}{t(PRESTIGE_RULE.currencyName)}{t('永久')}+{(PRESTIGE_RULE.permanentBonusCurve.perPoint * 100).toFixed(1)}%{t('全局利润')}</p>
-          <p><span className="text-cyan-400">{t('赠送')}</span>: {t('转生后自动获得1个路边钢化膜摊')}</p>
+        <div className="mt-4 space-y-1.5 text-xs font-bold leading-snug text-stone-300">
+          <h4 className="text-[13px] font-black text-amber-100">{t('转生说明')}</h4>
+          <p><span className="text-red-300">{t('重置')}</span>: {t('现金')}、{t('产线数量')}、{t('店长雇佣')}、{t('全局升级')}、{t('广告增益')}</p>
+          <p><span className="text-green-300">{t('保留')}</span>: {t('钻石')}、{t(PRESTIGE_RULE.currencyName)}、{t('人脉升级')}、{t('商城一次性购买')}</p>
+          <p><span className="text-yellow-300">{t('加成')}</span>: {t('每点')}{t(PRESTIGE_RULE.currencyName)}{t('永久')}+{(PRESTIGE_RULE.permanentBonusCurve.perPoint * 100).toFixed(1)}%{t('全局利润')}</p>
+          <p><span className="text-cyan-300">{t('赠送')}</span>: {t('转生后自动获得1个路边钢化膜摊')}</p>
         </div>
+      </div>
       </div>
 
       {/* 人脉升级商店 — 按分层显示 */}
-      <div className="rounded-2xl p-4 bg-gray-800">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="flex items-center gap-1.5 text-sm font-bold text-white">
-            <AssetIcon id="currency/connection" size={18} />
-            {t('人脉升级商店')}
+      <div className="px-1 pb-2 pt-1">
+        <div className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-stone-300/20 bg-black/30 px-3 py-2">
+          <h3 className="flex min-w-0 items-center gap-1.5 text-base font-black text-amber-100 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
+            <AssetIcon id="currency/connection" size={20} />
+            <span className="truncate">{t('人脉升级商店')}</span>
           </h3>
-          <span className="text-[10px] text-yellow-400 font-bold">
+          <span className="shrink-0 text-xs font-black text-yellow-300">
             {t('已购买')} {purchasedAngelUpgrades.length}/{ANGEL_UPGRADES.length}
           </span>
         </div>
-        <p className="text-[10px] text-gray-500 mb-3">
+        <p className="mb-4 px-1 text-xs font-bold leading-snug text-stone-300">
           {t('消耗')}{t(PRESTIGE_RULE.currencyName)}{t('购买永久升级。购买会降低利润加成，但获得更强大的永久效果！')}
         </p>
 
@@ -401,10 +428,10 @@ export default function PrestigeTab() {
           const purchasedInTier = tierUpgrades.filter(u => purchasedAngelUpgrades.includes(u.id)).length;
 
           return (
-            <div key={tier.id} className="mb-4 last:mb-0">
+            <div key={tier.id} className="mb-5 last:mb-0">
               {/* 分层标题 */}
-              <div className="flex items-center justify-between mb-2 px-1">
-                <h4 className={`text-xs font-medium ${isUnlocked ? 'text-gray-300' : 'text-gray-600'}`}>
+              <div className="mb-2 flex items-center justify-between gap-2 px-1">
+                <h4 className={`min-w-0 truncate text-sm font-black ${isUnlocked ? 'text-amber-200' : 'text-stone-500'}`}>
                   {isUnlocked ? (
                     <>
                       <AssetIcon id={tier.id === 1 ? 'nav/business' : 'currency/connection'} size={14} className="mr-1 align-[-2px]" />
@@ -418,7 +445,7 @@ export default function PrestigeTab() {
                   )}
                 </h4>
                 {isUnlocked && (
-                  <span className="text-[10px] text-gray-500">
+                  <span className="text-xs font-black text-stone-300">
                     {purchasedInTier}/{tierUpgrades.length}
                   </span>
                 )}
@@ -429,11 +456,11 @@ export default function PrestigeTab() {
                   {/* 产线加成（仅Tier 1有） */}
                   {businessUpgrades.length > 0 && (
                     <div className="mb-3">
-                      <h4 className="text-[10px] font-medium text-gray-500 mb-1.5 px-1 inline-flex items-center gap-1">
+                      <h4 className="mb-2 inline-flex items-center gap-1 px-1 text-sm font-black text-cyan-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
                         <AssetIcon id="nav/business" size={12} />
                         {t('产线利润加成')}（×3）
                       </h4>
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-2.5">
                         {businessUpgrades.map(upgrade => (
                           <AngelUpgradeCard
                             key={upgrade.id}
@@ -448,11 +475,11 @@ export default function PrestigeTab() {
                   {/* 全局加成 */}
                   {globalUpgrades.length > 0 && (
                     <div>
-                      <h4 className="text-[10px] font-medium text-gray-500 mb-1.5 px-1 inline-flex items-center gap-1">
+                      <h4 className="mb-2 inline-flex items-center gap-1 px-1 text-sm font-black text-cyan-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
                         <AssetIcon id="currency/connection" size={12} />
                         {t('全局永久升级')}
                       </h4>
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-2.5">
                         {globalUpgrades.map(upgrade => (
                           <AngelUpgradeCard
                             key={upgrade.id}
@@ -466,9 +493,9 @@ export default function PrestigeTab() {
                 </>
               ) : (
                 /* 锁定状态 */
-                <div className="rounded-xl p-4 bg-gray-900/40 text-center">
+                <div className="business-card-frame-4x1-bg relative overflow-hidden p-4 text-center opacity-75">
                   <AssetIcon id="status/lock" size={32} />
-                  <p className="text-xs text-gray-600 mt-1">
+                  <p className="mt-1 text-xs font-bold text-stone-400">
                     {t('转生')}{tier.minPrestigeCount}{t('次后解锁')} {tierUpgrades.length} {t('个人脉升级')}
                   </p>
                   {totalPrestigeCount < tier.minPrestigeCount && (
@@ -479,7 +506,7 @@ export default function PrestigeTab() {
                           style={{ width: `${(totalPrestigeCount / tier.minPrestigeCount) * 100}%` }}
                         />
                       </div>
-                      <p className="text-[9px] text-gray-600 mt-0.5">
+                      <p className="mt-0.5 text-[11px] font-black text-stone-400">
                         {totalPrestigeCount}/{tier.minPrestigeCount}{t('次')}
                       </p>
                     </div>
@@ -492,8 +519,8 @@ export default function PrestigeTab() {
       </div>
 
       {/* 成就统计 */}
-      <div className="rounded-2xl p-4 bg-gray-800">
-        <h3 className="text-sm font-bold text-white mb-3 inline-flex items-center gap-1.5">
+      <div className="px-1 pb-2 pt-1">
+        <h3 className="mb-3 inline-flex items-center gap-1.5 text-sm font-black text-amber-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
           <AssetIcon id="nav/business" size={18} />
           {t('商业版图统计')}
         </h3>
@@ -510,10 +537,10 @@ export default function PrestigeTab() {
 
 function StatCard({ label, value, icon }: { label: string; value: string; icon: SharedAssetId }) {
   return (
-    <div className="bg-gray-700/50 rounded-lg p-2.5 text-center">
+    <div className="business-card-frame-2x1-bg relative overflow-hidden p-2.5 text-center">
       <AssetIcon id={icon} size={20} className="mb-0.5" />
-      <div className="text-xs font-bold text-white tabular-nums">{value}</div>
-      <div className="text-[10px] text-gray-500">{label}</div>
+      <div className="text-sm font-black text-stone-50 tabular-nums">{value}</div>
+      <div className="text-xs font-bold text-stone-300">{label}</div>
     </div>
   );
 }
