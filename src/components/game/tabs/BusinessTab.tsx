@@ -195,12 +195,12 @@ export default function BusinessTab() {
           </h1>
         </div>
 
-        <div className="grid min-w-0 flex-1 grid-cols-4 overflow-hidden rounded-2xl border border-stone-500/40 bg-[linear-gradient(180deg,rgba(37,42,45,.96),rgba(9,12,14,.98))] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_20px_rgba(0,0,0,.35)]">
+        <div className="grid w-[250px] max-w-[66vw] flex-shrink-0 grid-cols-4 overflow-hidden rounded-2xl border border-stone-500/40 bg-[linear-gradient(180deg,rgba(37,42,45,.96),rgba(9,12,14,.98))] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_20px_rgba(0,0,0,.35)]">
           {BUY_MODES.map(m => (
             <button
               key={m.value}
               onClick={() => setBuyMode(m.value)}
-              className={`h-10 rounded-xl text-sm font-black transition-all ${
+              className={`h-9 rounded-xl text-[13px] font-black transition-all ${
                 buyMode === m.value
                   ? 'bg-[linear-gradient(180deg,#fff1a6,#f7b52c)] text-stone-950 shadow-[0_3px_0_#8a520b,inset_0_1px_0_rgba(255,255,255,.65)]'
                   : 'text-stone-400'
@@ -255,7 +255,7 @@ export default function BusinessTab() {
         return (
           <section
             key={def.id}
-            className={`business-card-frame-bg relative overflow-hidden rounded-[18px] ${
+            className={`business-card-frame-2x1-bg relative overflow-hidden ${
               isUnlocked
                 ? ''
                 : 'opacity-75 grayscale-[35%]'
@@ -269,11 +269,50 @@ export default function BusinessTab() {
               </div>
             </div>
 
-            <div className="relative grid grid-cols-2 gap-3 px-5 pb-3">
-              <div className="relative aspect-square self-start bg-transparent">
+            <div className="relative grid grid-cols-[128px_1fr] gap-3 px-6 pb-5">
+              <div
+                role={quantity > 0 && !bs.hasManager && bs.progress <= 0 ? 'button' : undefined}
+                tabIndex={quantity > 0 && !bs.hasManager && bs.progress <= 0 ? 0 : undefined}
+                aria-label={quantity > 0 && !bs.hasManager && bs.progress <= 0 ? t('贴膜') : undefined}
+                onClick={() => {
+                  if (quantity > 0 && !bs.hasManager && bs.progress <= 0) {
+                    manualProduce(def.id);
+                    playTap();
+                    if (tutorialStep === 'none') {
+                      advanceTutorial('first_tap');
+                    }
+                  }
+                }}
+                onKeyDown={(event) => {
+                  if ((event.key === 'Enter' || event.key === ' ') && quantity > 0 && !bs.hasManager && bs.progress <= 0) {
+                    event.preventDefault();
+                    manualProduce(def.id);
+                    playTap();
+                    if (tutorialStep === 'none') {
+                      advanceTutorial('first_tap');
+                    }
+                  }
+                }}
+                className={`relative aspect-square h-[128px] self-start bg-transparent ${
+                  quantity > 0 && !bs.hasManager && bs.progress <= 0
+                    ? 'cursor-pointer active:scale-[.98]'
+                    : ''
+                }`}
+              >
+                {quantity > 0 && !bs.hasManager && bs.progress <= 0 && (
+                  <>
+                    <div className="manual-tap-ring-pulse pointer-events-none absolute left-1/2 top-1/2 h-[136px] w-[136px] rounded-full border-4 border-emerald-200/75 bg-transparent shadow-[0_0_24px_rgba(110,231,183,.6)]" />
+                  </>
+                )}
+                <div
+                  className="pointer-events-none absolute left-1/2 top-[calc(50%+52px)] z-[9] h-[24px] w-[108px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                  style={{
+                    background: 'radial-gradient(ellipse, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.38) 48%, rgba(0,0,0,0) 76%)',
+                  }}
+                />
                 <BusinessIcon
                   icon={def.icon}
-                  className="absolute left-1/2 top-1/2 block aspect-square w-[92%] -translate-x-1/2 -translate-y-1/2 [&_img]:h-full [&_img]:w-full [&_img]:object-cover"
+                  className="absolute left-1/2 top-1/2 z-10 block aspect-square w-[116px] -translate-x-1/2 -translate-y-1/2 [&_img]:h-full [&_img]:w-full [&_img]:object-cover"
                 />
                 {!isUnlocked && (
                   <div className="absolute inset-0 grid place-items-center bg-transparent">
@@ -294,36 +333,67 @@ export default function BusinessTab() {
 
                 </div>
 
-                <div className="flex flex-col gap-2 p-3">
-                  <StatPill icon="cash" value={`${formatCash(revenue)}/${t('次')}`} />
-                  <StatPill icon="time" value={`${formatTime(cycleTime)}/${t('次')}`} />
-                  <StatPill
-                    icon="status"
-                    value={bs.hasManager ? t('自动经营') : bs.progress > 0 ? t('生产中') : t('手动')}
-                  />
+                <div className="flex flex-col gap-2 py-3">
+                  <div className="relative h-9 overflow-hidden rounded-full border border-black/50 bg-black/45 shadow-[inset_0_1px_3px_rgba(0,0,0,.8)]">
+                    <div
+                      className={`h-full rounded-full ${bs.hasManager ? 'progress-wave' : 'bg-[linear-gradient(90deg,#06b6d4,#22d3ee)]'} shadow-[0_0_12px_rgba(34,211,238,.55)]`}
+                      style={{ width: bs.hasManager ? '100%' : `${progress}%` }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-between gap-2 px-3 text-sm font-black text-stone-100 drop-shadow-[0_1px_1px_rgba(0,0,0,.9)]">
+                      <span className="flex min-w-0 items-center gap-1.5">
+                        <AssetIcon id="currency/coin" size={18} />
+                        <span className="truncate">{formatCash(revenue)}{t('金币')}</span>
+                      </span>
+                      <span className="flex-shrink-0 tabular-nums">{formatTime(cycleTime)}</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="mt-3 flex items-center gap-2">
-                  <div className="h-3 flex-1 overflow-hidden rounded-full border border-black/50 bg-black/45 shadow-[inset_0_1px_3px_rgba(0,0,0,.8)]">
-                    <div
-                      className={`h-full rounded-full ${bs.hasManager ? 'bg-[linear-gradient(90deg,#22c55e,#86efac)]' : 'bg-[linear-gradient(90deg,#06b6d4,#22d3ee)]'} shadow-[0_0_12px_rgba(34,211,238,.55)]`}
-                      style={{ width: `${progress}%` }}
-                    />
+                <div className="mt-3 grid grid-cols-[1fr_38%] items-center gap-2">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-black text-amber-200">{t('里程碑奖励')}</div>
+                    <div className="truncate text-xs font-bold text-stone-300">
+                      {nextMs ? `${t('达到')} ${nextMs.at} ${t('级')} · x${nextMs.multiplier}` : `${t('倍率')} x${formatNumber(milestoneMult)}`}
+                    </div>
+                    <div className="relative mt-1 h-4 overflow-hidden rounded-full bg-stone-900">
+                      <div className="h-full rounded-full bg-[linear-gradient(90deg,#f59e0b,#fde68a)]" style={{ width: `${milestoneProgress}%` }} />
+                      <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-yellow-50 tabular-nums drop-shadow-[0_1px_1px_rgba(0,0,0,.85)]">
+                        {nextMs ? `${quantity}/${nextMs.at}` : `${quantity}/${t('最大')}`}
+                      </div>
+                    </div>
                   </div>
-                  <span className="w-10 text-right text-sm font-black text-stone-100 tabular-nums">{Math.round(progress)}%</span>
+
+                  <button
+                    onClick={() => {
+                      if (canAfford) playBuy(); else playUIClick();
+                      handleBuy(def.id);
+                    }}
+                    disabled={!canAfford}
+                    className={`min-h-14 rounded-xl border px-2 py-1.5 text-center shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] active:translate-y-[2px] ${
+                      canAfford
+                        ? 'border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] text-stone-950'
+                        : 'border-stone-500/30 bg-[linear-gradient(180deg,#596270,#303742)] text-stone-300 shadow-none'
+                    }`}
+                  >
+                    <div className="text-sm font-black">{quantity > 0 ? t('购买') : t('解锁')} x{actualBuyCount}</div>
+                    <div className="text-xl font-black leading-none tabular-nums">{formatCash(cost)}</div>
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div className="relative grid grid-cols-[1fr_38%] gap-3 px-5 pb-5 pt-1">
+            <div className="hidden">
               <div className="flex min-w-0 items-center px-3 py-2">
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-black text-amber-200">{t('里程碑奖励')}</div>
                   <div className="truncate text-xs font-bold text-stone-300">
                     {nextMs ? `${t('达到')} ${nextMs.at} ${t('级')} · x${nextMs.multiplier}` : `${t('倍率')} x${formatNumber(milestoneMult)}`}
                   </div>
-                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-stone-900">
+                  <div className="relative mt-1 h-4 overflow-hidden rounded-full bg-stone-900">
                     <div className="h-full rounded-full bg-[linear-gradient(90deg,#f59e0b,#fde68a)]" style={{ width: `${milestoneProgress}%` }} />
+                    <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-yellow-50 tabular-nums drop-shadow-[0_1px_1px_rgba(0,0,0,.85)]">
+                      {nextMs ? `${quantity}/${nextMs.at}` : `${quantity}/${t('最大')}`}
+                    </div>
                   </div>
                 </div>
               </div>
