@@ -31,20 +31,29 @@ export default function AchievementTab() {
   ];
 
   return (
-    <div className="flex flex-col px-3 py-3 pb-4">
+    <div className="film-game-screen business-content-frame-bg flex flex-col gap-3 px-5 py-5 pb-6">
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-[2rem] font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">
+          {t('成就殿堂')}
+        </h1>
+        <div className="flex-shrink-0 rounded-lg border border-amber-200/35 bg-black/35 px-2.5 py-1 text-sm font-black text-amber-200 tabular-nums">
+          {unlockedCount}/{totalCount}
+        </div>
+      </div>
+
       {/* 头部 + 进度 */}
-      <div className="flex items-center gap-3 mb-4 px-1">
-        <AssetIcon id="nav/achievement" size={28} />
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="text-sm font-black text-yellow-400">{t('成就殿堂')}</h2>
-            <span className="text-xs font-bold text-yellow-400 tabular-nums">
-              {unlockedCount}/{totalCount}
-            </span>
+      <div className="business-card-frame-4x1-bg relative mb-1 grid grid-cols-[48px_minmax(0,1fr)] items-center gap-3 overflow-hidden px-5 py-4">
+        <div className="grid h-12 w-12 place-items-center">
+          <AssetIcon id="nav/achievement" size={30} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <h2 className="truncate text-sm font-black text-amber-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">{t('当前进度')}</h2>
+            <span className="flex-shrink-0 text-sm font-black text-stone-100 tabular-nums">{Math.round(progressPct)}%</span>
           </div>
-          <div className="h-2 rounded-full bg-gray-700 overflow-hidden">
+          <div className="h-3 overflow-hidden rounded-full border border-black/50 bg-black/45 shadow-[inset_0_1px_3px_rgba(0,0,0,.8)]">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400"
+              className="h-full rounded-full bg-[linear-gradient(90deg,#f59e0b,#fde68a)] shadow-[0_0_12px_rgba(251,191,36,.55)]"
               initial={{ width: 0 }}
               animate={{ width: `${progressPct}%` }}
               transition={{ duration: 0.8 }}
@@ -61,11 +70,11 @@ export default function AchievementTab() {
 
           return (
             <div key={cat.name}>
-              <h3 className="text-xs font-bold text-gray-400 mb-2 px-1 inline-flex items-center gap-1">
+              <h3 className="mb-2 inline-flex items-center gap-2 px-1 text-sm font-black text-amber-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
                 <AssetIcon id={cat.icon} size={14} />
                 {t(cat.name)}
               </h3>
-              <div className="grid grid-cols-1 gap-1.5">
+              <div className="grid grid-cols-1 gap-2">
                 {achievements.map(ach => {
                   const isUnlocked = unlockedAchievements.includes(ach.id);
 
@@ -73,49 +82,47 @@ export default function AchievementTab() {
                     <div
                       key={ach.id}
                       className={`
-                        rounded-xl p-2.5 transition-all
-                        ${isUnlocked
-                          ? 'bg-gradient-to-r from-yellow-900/30 to-amber-900/20'
-                          : 'bg-gray-800/50 opacity-70'
-                        }
+                        business-card-frame-4x1-bg relative overflow-hidden px-4 py-3 transition-all
+                        ${isUnlocked ? '' : 'opacity-70 grayscale-[35%]'}
                       `}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <div className={`
-                          relative w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden
-                          ${isUnlocked ? 'bg-yellow-500/20' : 'bg-gray-700/50'}
-                        `}>
+                      <div className="relative grid grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-3">
+                        <div className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden">
                           <AchievementIcon
                             achievementId={ach.id}
                             alt={t(ach.name)}
-                            size={36}
-                            className={isUnlocked ? '' : 'grayscale opacity-45'}
+                            size={42}
+                            className={isUnlocked ? 'drop-shadow-[0_8px_8px_rgba(0,0,0,.45)]' : 'grayscale opacity-45 drop-shadow-[0_8px_8px_rgba(0,0,0,.45)]'}
                           />
                           {!isUnlocked && (
-                            <span className="absolute inset-0 flex items-center justify-center bg-gray-900/35">
+                            <span className="absolute inset-0 flex items-center justify-center">
                               <AssetIcon id="status/lock" size={18} />
                             </span>
                           )}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <span className={`text-xs font-bold ${isUnlocked ? 'text-yellow-300' : 'text-gray-400'}`}>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className={`truncate text-[15px] font-black leading-tight ${isUnlocked ? 'text-amber-100' : 'text-stone-400'}`}>
                               {t(ach.name)}
                             </span>
-                            {isUnlocked && ach.reward && (
-                              <span className="text-[10px] font-bold text-green-400 inline-flex items-center gap-0.5">
-                                +{ach.reward.type === 'cash' ? formatCash(ach.reward.value) : ach.reward.value}
-                                {ach.reward.type === 'diamond' && <AssetIcon id="currency/diamond" size={11} />}
-                              </span>
-                            )}
                           </div>
-                          <p className={`text-[10px] ${isUnlocked ? 'text-gray-300' : 'text-gray-600'}`}>
+                          <p className={`mt-1 line-clamp-2 text-xs font-bold leading-snug ${isUnlocked ? 'text-stone-300' : 'text-stone-500'}`}>
                             {t(ach.description)}
                           </p>
                         </div>
-                        {isUnlocked && (
-                          <AssetIcon id="status/check" size={14} className="flex-shrink-0" />
-                        )}
+                        <div className="flex min-w-[92px] items-center justify-end gap-2">
+                          {isUnlocked && ach.reward && (
+                            <span className="inline-flex h-7 flex-shrink-0 items-center gap-0.5 rounded-lg border border-emerald-200/30 bg-black/30 px-2 text-xs font-black leading-none text-emerald-300">
+                              +{ach.reward.type === 'cash' ? formatCash(ach.reward.value) : ach.reward.value}
+                              {ach.reward.type === 'diamond' && <AssetIcon id="currency/diamond" size={11} />}
+                            </span>
+                          )}
+                          {isUnlocked && (
+                            <div className="grid h-7 w-7 flex-shrink-0 place-items-center rounded-lg border border-emerald-200/30 bg-black/30">
+                              <AssetIcon id="status/check" size={14} />
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
