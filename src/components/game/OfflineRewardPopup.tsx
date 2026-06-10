@@ -60,35 +60,36 @@ export default function OfflineRewardPopup() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.5, y: 50 }}
             transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-            className="fixed inset-x-4 top-1/2 -translate-y-1/2 z-50 max-w-sm mx-auto"
+            className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-sm -translate-y-1/2"
           >
-            <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-amber-700 via-yellow-600 to-amber-700 p-6 text-white text-center shadow-2xl">
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
-                className="mb-3 flex justify-center"
-              >
-                <AssetIcon id="currency/coin" size={72} />
-              </motion.div>
-              <h2 className="text-xl font-black mb-1">{t('离线收益')}</h2>
-              <p className="text-sm text-white/70 mb-4">{t('你离开期间，店铺自动营业中...')}</p>
+            <div className="business-card-frame-bg relative overflow-hidden px-5 py-5 text-center text-white shadow-[0_20px_42px_rgba(0,0,0,.55)]">
+              <div className="relative">
+                <div className="mx-auto mb-2 grid h-20 w-20 place-items-center">
+                  <AssetIcon id="currency/coin" size={76} className="drop-shadow-[0_12px_12px_rgba(0,0,0,.5)]" />
+                </div>
+                <h2 className="mb-1 text-2xl font-black leading-none text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">{t('离线收益')}</h2>
+                <p className="mx-auto max-w-[16rem] text-sm font-bold leading-snug text-stone-300">{t('你离开期间，店铺自动营业中...')}</p>
+              </div>
 
-              <div className="bg-black/20 rounded-xl p-4 mb-4">
-                <p className="text-3xl font-black text-yellow-200 mb-2">
+              <div className="relative my-5 overflow-hidden border border-black/50 bg-black/40 p-4 shadow-[inset_0_1px_3px_rgba(0,0,0,.85)]">
+                <p className="mb-3 text-4xl font-black leading-none text-amber-200 tabular-nums drop-shadow-[0_3px_1px_rgba(0,0,0,.8)]">
                   +{formatCash(offlineData.earnings)}
                 </p>
-                <p className="text-xs text-white/60">
-                  {t('离线时长')}: {formatTime(offlineData.duration)}
-                  {offlineData.capped && ` (${t('已达上限')})`}
-                </p>
+                <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-black text-stone-300">
+                  <span className="rounded-lg border border-stone-400/25 bg-black/35 px-2.5 py-1">
+                    {t('离线时长')}: {formatTime(offlineData.duration)}
+                  </span>
+                  {offlineData.capped && (
+                    <span className="rounded-lg border border-amber-200/35 bg-amber-300/15 px-2.5 py-1 text-amber-200">
+                      {t('已达上限')}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <button
                 onClick={handleClaim}
-                className="w-full py-3 rounded-xl font-bold text-lg bg-gradient-to-b from-green-400 to-green-600 
-                           text-white active:shadow-[0_1px_0_0_#166534,0_2px_4px_rgba(21,128,61,0.2)] active:translate-y-[2px]
-                           transition-all duration-150 shadow-[0_3px_0_0_#166534,0_4px_8px_rgba(21,128,61,0.3)]
-                           hover:from-green-300 hover:to-green-500"
+                className="w-full rounded-xl border border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] py-3 text-lg font-black text-stone-950 shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] transition-all duration-150 active:translate-y-[2px] active:shadow-[0_2px_0_rgba(120,53,15,.9),0_4px_8px_rgba(0,0,0,.25)]"
               >
                 <span className="inline-flex items-center justify-center gap-2">
                   <AssetIcon id="boost/gift" size={22} />

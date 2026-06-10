@@ -44,7 +44,7 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-        className="w-[90%] max-w-sm rounded-2xl overflow-hidden shadow-2xl"
+        className="w-[90%] max-w-sm overflow-hidden shadow-2xl"
       >
         {/* 头部 */}
         <div className="bg-gradient-to-br from-purple-700 via-indigo-600 to-blue-600 p-5 text-center text-white relative overflow-hidden">

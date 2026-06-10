@@ -92,23 +92,27 @@ export default function EventNotification() {
 
   if (!currentEvent) return null;
 
+  const eventDef = GAME_EVENTS.find(e => e.id === currentEvent.eventDefId);
+  const eventName = t(eventDef?.name ?? currentEvent.name);
+  const eventDescription = t(eventDef?.description ?? currentEvent.description);
+
   const boostText = (() => {
     switch (currentEvent.boostType) {
-      case 'profit_mult': return `${t('利润')} ×${currentEvent.boostValue}`;
-      case 'speed_mult': return `${t('速度')} ×${currentEvent.boostValue}`;
-      case 'all_mult': return `${t('全属性')} ×${currentEvent.boostValue}`;
+      case 'profit_mult': return `${t('利润')} x${currentEvent.boostValue}`;
+      case 'speed_mult': return `${t('速度')} x${currentEvent.boostValue}`;
+      case 'all_mult': return `${t('全属性')} x${currentEvent.boostValue}`;
       case 'cost_reduce': return `${t('成本')} ${Math.round(currentEvent.boostValue * 100)}%`;
       default: return '';
     }
   })();
 
-  const boostColor = (() => {
+  const boostToneClass = (() => {
     switch (currentEvent.boostType) {
-      case 'profit_mult': return 'text-yellow-400';
-      case 'speed_mult': return 'text-cyan-400';
-      case 'all_mult': return 'text-yellow-200';
-      case 'cost_reduce': return 'text-green-400';
-      default: return 'text-white';
+      case 'profit_mult': return 'border-amber-200/40 bg-amber-300/15 text-amber-200';
+      case 'speed_mult': return 'border-cyan-200/40 bg-cyan-300/15 text-cyan-200';
+      case 'all_mult': return 'border-yellow-100/45 bg-yellow-300/20 text-yellow-100';
+      case 'cost_reduce': return 'border-emerald-200/40 bg-emerald-300/15 text-emerald-200';
+      default: return 'border-stone-300/30 bg-black/30 text-stone-200';
     }
   })();
 
@@ -120,32 +124,38 @@ export default function EventNotification() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -30, scale: 0.9 }}
           transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-          className="fixed top-16 left-4 right-4 z-50 max-w-sm mx-auto"
+          className="pointer-events-none fixed left-4 right-4 top-16 z-50 mx-auto max-w-sm"
         >
-          <div className="bg-gradient-to-r from-purple-800/95 to-pink-800/95 backdrop-blur-md
-                         rounded-xl p-3 shadow-xl shadow-purple-900/50">
-            <div className="flex items-center gap-3">
+          <div className="business-card-frame-4x1-bg relative overflow-hidden px-4 py-3 shadow-[0_14px_30px_rgba(0,0,0,.5)]">
+            <div className="relative grid grid-cols-[70px_minmax(0,1fr)] items-center gap-3">
               <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
-                className="flex-shrink-0"
+                animate={{ scale: [1, 1.08, 1] }}
+                transition={{ repeat: Infinity, duration: 1.8 }}
+                className="grid h-[70px] w-[70px] flex-shrink-0 place-items-center"
               >
-                <ShopEventIcon eventId={currentEvent.eventDefId} alt={t(GAME_EVENTS.find(e => e.id === currentEvent.eventDefId)?.name ?? currentEvent.name)} size={48} />
+                <ShopEventIcon
+                  eventId={currentEvent.eventDefId}
+                  alt={eventName}
+                  size={62}
+                  className="drop-shadow-[0_12px_12px_rgba(0,0,0,.5)]"
+                />
               </motion.div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-black text-white truncate">{t(GAME_EVENTS.find(e => e.id === currentEvent.eventDefId)?.name ?? currentEvent.name)}</h3>
-                  <span className={`text-[10px] font-bold ${boostColor}`}>
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex items-center gap-2">
+                  <h3 className="min-w-0 flex-1 truncate text-base font-black text-amber-100 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
+                    {eventName}
+                  </h3>
+                  <span className={`flex-shrink-0 rounded-lg border px-2 py-0.5 text-[11px] font-black tabular-nums ${boostToneClass}`}>
                     {boostText}
                   </span>
                   {queueCount > 0 && (
-                    <span className="text-[9px] bg-white/20 text-white/80 px-1.5 py-0.5 rounded-full">
+                    <span className="flex-shrink-0 rounded-lg border border-stone-200/25 bg-black/35 px-1.5 py-0.5 text-[10px] font-black text-stone-200">
                       +{queueCount}
                     </span>
                   )}
                 </div>
-                <p className="text-[10px] text-white/70 truncate">{t(GAME_EVENTS.find(e => e.id === currentEvent.eventDefId)?.description ?? currentEvent.description)}</p>
-                <p className="text-[10px] text-purple-300 mt-0.5 inline-flex items-center gap-1">
+                <p className="truncate text-xs font-bold text-stone-300">{eventDescription}</p>
+                <p className="mt-2 inline-flex items-center gap-1 rounded-lg border border-stone-400/25 bg-black/35 px-2 py-1 text-[11px] font-black text-stone-200">
                   <AssetIcon id="boost/timer" size={12} />
                   {Math.ceil(currentEvent.remainingSec)}{t('秒')}
                 </p>

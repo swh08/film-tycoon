@@ -61,25 +61,18 @@ export function PopupProvider({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: 20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed inset-x-4 top-1/2 -translate-y-1/2 z-50 max-w-sm mx-auto
-                         rounded-2xl overflow-hidden shadow-2xl"
+              className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-sm -translate-y-1/2"
             >
-              <div className={`
-                ${popup.type === 'reward' ? 'bg-gradient-to-br from-amber-600 to-yellow-500' :
-                  popup.type === 'milestone' ? 'bg-gradient-to-br from-purple-600 to-pink-500' :
-                  popup.type === 'confirm' ? 'bg-gradient-to-br from-gray-800 to-gray-900' :
-                  popup.type === 'tutorial' ? 'bg-gradient-to-br from-blue-600 to-cyan-500' :
-                  'bg-gradient-to-br from-gray-800 to-gray-900'
-                }
-                p-6 text-white
-              `}>
-                {popup.content}
+              <div className="business-card-frame-bg relative overflow-hidden px-6 py-6 text-center text-white shadow-[0_20px_42px_rgba(0,0,0,.55)]">
+                <div className="[&>div>img:first-child]:mx-auto [&>div>img:first-child]:mb-4 [&>div>img:first-child]:h-24 [&>div>img:first-child]:w-24 [&>div>img:first-child]:object-contain [&>div>img:first-child]:drop-shadow-[0_18px_16px_rgba(0,0,0,.66)] [&_h3]:text-2xl [&_h3]:font-black [&_h3]:leading-tight [&_h3]:text-amber-100 [&_h3]:drop-shadow-[0_2px_1px_rgba(0,0,0,.75)] [&_p]:font-bold [&_p]:text-stone-300">
+                  {popup.content}
+                </div>
                 <button
                   onClick={closePopup}
-                  className={`mt-4 w-full py-2.5 rounded-xl font-bold text-base transition-all duration-150
+                  className={`mt-5 w-full rounded-xl border py-3 text-base font-black transition-all duration-150
                     ${popup.type === 'confirm'
-                      ? 'bg-gradient-to-b from-gray-500 to-gray-700 text-gray-200 shadow-[0_3px_0_0_#374151,0_4px_8px_rgba(0,0,0,0.3)] hover:from-gray-400 hover:to-gray-600 active:shadow-[0_1px_0_0_#374151,0_2px_4px_rgba(0,0,0,0.2)] active:translate-y-[2px]'
-                      : 'bg-gradient-to-b from-white/30 to-white/10 text-white shadow-[0_3px_0_0_rgba(0,0,0,0.3),0_4px_8px_rgba(0,0,0,0.2)] hover:from-white/40 hover:to-white/20 active:shadow-[0_1px_0_0_rgba(0,0,0,0.2),0_2px_4px_rgba(0,0,0,0.1)] active:translate-y-[2px]'
+                      ? 'border-stone-500/30 bg-[linear-gradient(180deg,#596270,#303742)] text-stone-300 shadow-none active:translate-y-[2px]'
+                      : 'border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] text-stone-950 shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(120,53,15,.9),0_4px_8px_rgba(0,0,0,.25)]'
                     }`}
                 >
                   {popup.type === 'confirm' ? '取消' : '好的！'}

@@ -95,7 +95,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] bg-gray-900 rounded-t-3xl overflow-hidden flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] bg-gray-900 overflow-hidden flex flex-col"
           >
             {/* 头部 */}
             <div className="flex-shrink-0 px-4 pt-4 pb-3 bg-gradient-to-r from-blue-900/40 to-indigo-900/30 border-b border-blue-600/20">

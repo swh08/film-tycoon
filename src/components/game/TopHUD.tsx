@@ -157,7 +157,7 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
       </div>
 
       <div className="mt-2 flex items-center gap-2 overflow-x-auto pb-0.5">
-        {(hasMarketEvent || activeMarkets.length > 0) && (
+        {hasMarketEvent && (
           <div className={`flex flex-shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-sm font-black shadow-[inset_0_1px_0_rgba(255,255,255,.08)] ${marketTone}`}>
             <span className="grid h-6 w-6 place-items-center rounded-md border border-stone-200/20 bg-black/35">
               <TrendingUp size={17} strokeWidth={3} />
@@ -176,7 +176,7 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
           </div>
         ))}
 
-        {buffTimers.length > 0 ? buffTimers.map((buff, idx) => (
+        {buffTimers.map((buff, idx) => (
           <div
             key={idx}
             className="flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-cyan-300/45 bg-cyan-950/35 px-2.5 py-1.5 text-sm font-black text-cyan-100 shadow-[0_0_16px_rgba(20,184,166,.14)]"
@@ -184,12 +184,7 @@ export default function TopHUD({ onSettingsOpen }: TopHUDProps) {
             <AssetIcon id={buff.icon} size={22} />
             {buff.text}
           </div>
-        )) : (
-          <div className="flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-cyan-300/45 bg-cyan-950/35 px-2.5 py-1.5 text-sm font-black text-cyan-100 shadow-[0_0_16px_rgba(20,184,166,.14)]">
-            <AssetIcon id="boost/fire" size={22} />
-            {t('双倍收益')} 04:21
-          </div>
-        )}
+        ))}
       </div>
     </div>
   );
