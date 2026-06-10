@@ -22,80 +22,113 @@ const BUY_MODES = [
   { value: 0, label: 'MAX' },
 ];
 
-const GROUP_STYLE: Record<UpgradeGroup, { accent: string; glow: string }> = {
-  equipment: { accent: 'cyan', glow: 'shadow-cyan-950/50' },
-  channel: { accent: 'emerald', glow: 'shadow-emerald-950/50' },
-  brand: { accent: 'amber', glow: 'shadow-amber-950/50' },
+const GROUP_TONE: Record<UpgradeGroup, {
+  divider: string;
+  text: string;
+}> = {
+  equipment: {
+    divider: 'bg-cyan-400/70',
+    text: 'text-cyan-200',
+  },
+  channel: {
+    divider: 'bg-emerald-400/70',
+    text: 'text-emerald-200',
+  },
+  brand: {
+    divider: 'bg-amber-400/70',
+    text: 'text-amber-200',
+  },
 };
+
+function UpgradeRank({ order, maxed }: { order: number; maxed: boolean }) {
+  return (
+    <div
+      className={`absolute left-4 top-0 z-10 grid h-14 w-11 place-items-center rounded-b-lg border-x border-b text-2xl font-black shadow-[0_8px_16px_rgba(0,0,0,.4)] ${
+        maxed
+          ? 'border-emerald-200/65 bg-[linear-gradient(180deg,#34d399,#047857)] text-white'
+          : 'border-amber-200/70 bg-[linear-gradient(180deg,#ef4444,#f59e0b_55%,#7c2d12)] text-white'
+      }`}
+    >
+      {order}
+    </div>
+  );
+}
+
+function BuyModeToggle({
+  buyMode,
+  setBuyMode,
+}: {
+  buyMode: number;
+  setBuyMode: (mode: number) => void;
+}) {
+  return (
+    <div className="grid w-[250px] max-w-[66vw] flex-shrink-0 grid-cols-4 overflow-hidden rounded-2xl border border-stone-500/40 bg-[linear-gradient(180deg,rgba(37,42,45,.96),rgba(9,12,14,.98))] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_20px_rgba(0,0,0,.35)]">
+      {BUY_MODES.map(m => (
+        <button
+          key={m.value}
+          onClick={() => setBuyMode(m.value)}
+          className={`h-9 rounded-xl text-[13px] font-black transition-all ${
+            buyMode === m.value
+              ? 'bg-[linear-gradient(180deg,#fff1a6,#f7b52c)] text-stone-950 shadow-[0_3px_0_#8a520b,inset_0_1px_0_rgba(255,255,255,.65)]'
+              : 'text-stone-400'
+          }`}
+        >
+          {m.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function UpgradeTab() {
   const { cash, diamonds, upgrades, buyUpgrade, buyMode, setBuyMode } = useGameStore();
   const { t } = useTranslation();
 
-  const buyableCount = GLOBAL_UPGRADES.filter(def => {
-    const uState = upgrades.find(u => u.upgradeId === def.id);
-    const level = uState?.level ?? 0;
-    const budget = def.currency === 'cash' ? cash : diamonds;
-    if (level >= def.maxLevel) return false;
-    const count = buyMode === 0
-      ? calcMaxUpgradeLevels(def.id, level, def.maxLevel, budget)
-      : Math.min(buyMode, def.maxLevel - level);
-    return count > 0 && budget >= calcUpgradeCostBulk(def.id, level, count);
-  }).length;
-
   return (
-    <div className="film-game-screen flex flex-col gap-4 px-3 py-4 pb-5">
-      <div className="flex items-end justify-between gap-3">
-        <div>
+    <div className="film-game-screen business-content-frame-bg flex flex-col gap-3 px-5 py-5 pb-6">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex-shrink-0">
           <h1 className="text-[2rem] font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">
             {t('全局升级')}
           </h1>
-          <div className="mt-1 text-xs font-black uppercase tracking-wider text-stone-400">GLOBAL BOOSTS</div>
-          <div className="mt-1 h-1 w-12 rounded-full bg-amber-300 shadow-[0_0_10px_rgba(251,191,36,.65)]" />
         </div>
 
-        <div className="rounded-xl border border-amber-300/50 bg-amber-950/35 px-3 py-2 text-sm font-black text-amber-100">
-          {buyableCount}{t('项可升级')}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4 overflow-hidden rounded-2xl border border-stone-500/40 bg-[linear-gradient(180deg,rgba(37,42,45,.96),rgba(9,12,14,.98))] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_20px_rgba(0,0,0,.35)]">
-        {BUY_MODES.map(m => (
-          <button
-            key={m.value}
-            onClick={() => setBuyMode(m.value)}
-            className={`h-10 rounded-xl text-sm font-black transition-all ${
-              buyMode === m.value
-                ? 'bg-[linear-gradient(180deg,#fff1a6,#f7b52c)] text-stone-950 shadow-[0_3px_0_#8a520b,inset_0_1px_0_rgba(255,255,255,.65)]'
-                : 'text-stone-400'
-            }`}
-          >
-            {m.label}
-          </button>
-        ))}
+        <BuyModeToggle buyMode={buyMode} setBuyMode={setBuyMode} />
       </div>
 
       {GROUP_ORDER.map(group => {
         const groupInfo = UPGRADE_GROUP_INFO[group];
         const groupUpgrades = GLOBAL_UPGRADES.filter(u => u.group === group);
-        const style = GROUP_STYLE[group];
+        const tone = GROUP_TONE[group];
+        const groupLevel = groupUpgrades.reduce((sum, def) => {
+          const level = upgrades.find(u => u.upgradeId === def.id)?.level ?? 0;
+          return sum + level;
+        }, 0);
+        const groupMax = groupUpgrades.reduce((sum, def) => sum + def.maxLevel, 0);
 
         return (
-          <section key={group} className="space-y-2.5">
-            <div className="flex items-center gap-2 px-1">
-              <div className={`grid h-10 w-10 place-items-center rounded-full border bg-black/30 ${
-                style.accent === 'cyan' ? 'border-cyan-300/35' : style.accent === 'emerald' ? 'border-emerald-300/35' : 'border-amber-300/35'
-              }`}>
-                <UpgradeIcon id={UPGRADE_GROUP_ASSETS[group]} size={28} />
+          <section key={group} className="space-y-3">
+            <div className="flex items-center gap-3 px-1 pt-1">
+              <div className="grid h-[52px] w-[52px] flex-shrink-0 place-items-center">
+                <UpgradeIcon
+                  id={UPGRADE_GROUP_ASSETS[group]}
+                  size={42}
+                  className="drop-shadow-[0_6px_6px_rgba(0,0,0,.45)]"
+                />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-xl font-black leading-none text-amber-300">{t(groupInfo.name)}</h2>
-                <p className="mt-1 truncate text-xs font-bold text-stone-400">{t(groupInfo.description)}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="truncate text-xl font-black leading-tight text-stone-50 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
+                    {t(groupInfo.name)}
+                  </h2>
+                  <div className="flex-shrink-0 rounded-lg border border-stone-300/25 bg-black/35 px-2 py-1 text-xs font-black text-stone-100 tabular-nums">
+                    Lv.{groupLevel}/{groupMax}
+                  </div>
+                </div>
+                <p className={`mt-0.5 truncate text-xs font-bold ${tone.text}`}>{t(groupInfo.description)}</p>
               </div>
             </div>
-            <div className={`mx-1 h-1 rounded-full ${
-              style.accent === 'cyan' ? 'bg-cyan-400/55' : style.accent === 'emerald' ? 'bg-emerald-400/55' : 'bg-amber-400/55'
-            }`} />
+            <div className={`mx-1 h-1 rounded-full ${tone.divider} shadow-[0_0_10px_rgba(45,212,191,.38)]`} />
 
             {groupUpgrades.map(def => {
               const uState = upgrades.find(u => u.upgradeId === def.id);
@@ -111,90 +144,145 @@ export default function UpgradeTab() {
               const cost = actualCount > 0 ? calcUpgradeCostBulk(def.id, level, actualCount) : 0;
               const canAfford = !isMaxed && actualCount > 0 && budget >= cost;
               const totalEffect = def.effectPerLevel * level;
+              const nextEffect = def.effectPerLevel * Math.max(actualCount, 1);
               const effectLabel = getEffectLabel(def.effectType, totalEffect);
+              const nextEffectLabel = getEffectDeltaLabel(def.effectType, nextEffect);
               const isDiamond = def.currency === 'diamond';
 
               return (
                 <article
                   key={def.id}
-                  className={`relative overflow-hidden rounded-xl border bg-[linear-gradient(135deg,rgba(27,35,38,.96),rgba(5,10,13,.98))] p-3 shadow-[0_14px_28px_rgba(0,0,0,.36),inset_0_1px_0_rgba(255,255,255,.08)] ${
-                    isDiamond
-                      ? 'border-cyan-300/55'
-                      : canAfford
-                        ? 'border-amber-300/50'
-                        : isMaxed
-                          ? 'border-emerald-300/45'
-                          : 'border-slate-500/30'
+                  className={`business-card-frame-2x1-bg relative overflow-hidden ${
+                    isMaxed ? 'saturate-110' : canAfford ? '' : 'opacity-85'
                   }`}
                 >
-                  {canAfford && (
-                    <div className="absolute right-3 top-0 rounded-b-lg bg-amber-400 px-4 py-1 text-xs font-black text-stone-950">
-                      {t('可买')}
-                    </div>
-                  )}
-                  {isDiamond && (
-                    <div className="absolute right-3 top-0 rounded-b-lg bg-cyan-400 px-4 py-1 text-xs font-black text-cyan-950">
-                      {t('稀有')}
+                  <UpgradeRank order={def.id} maxed={isMaxed} />
+
+                  {(canAfford || isDiamond || isMaxed) && (
+                    <div
+                      className={`absolute right-5 top-0 z-10 rounded-b-lg px-4 py-1 text-xs font-black shadow-[0_5px_12px_rgba(0,0,0,.28)] ${
+                        isMaxed
+                          ? 'bg-emerald-400 text-emerald-950'
+                          : isDiamond
+                            ? 'bg-cyan-300 text-cyan-950'
+                            : 'bg-amber-300 text-stone-950'
+                      }`}
+                    >
+                      {isMaxed ? t('已满级') : isDiamond ? t('稀有') : t('可买')}
                     </div>
                   )}
 
-                  <div className="grid grid-cols-[82px_1fr] gap-3">
-                    <div className={`grid h-20 w-20 place-items-center rounded-xl border bg-[linear-gradient(180deg,#273447,#111827)] ${
-                      isDiamond ? 'border-cyan-300/60 shadow-[0_0_16px_rgba(34,211,238,.22)]' : 'border-amber-300/45'
-                    }`}>
-                      <UpgradeIcon id={GLOBAL_UPGRADE_ASSETS[def.id]} size={66} />
+                  <div className="relative px-5 pb-2 pt-5">
+                    <div className="flex min-w-0 items-start gap-2 pl-12 pr-20">
+                      <h3 className="min-w-0 flex-1 truncate text-[1.55rem] font-black leading-tight text-stone-100 drop-shadow-[0_2px_1px_rgba(0,0,0,.8)]">
+                        {t(def.name)}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="relative grid grid-cols-[128px_1fr] gap-3 px-5 pb-3">
+                    <div className="grid aspect-square h-[128px] place-items-center self-start">
+                      <UpgradeIcon
+                        id={GLOBAL_UPGRADE_ASSETS[def.id]}
+                        size={116}
+                        className="drop-shadow-[0_10px_12px_rgba(0,0,0,.32)]"
+                      />
                     </div>
 
-                    <div className="min-w-0">
-                      <div className="flex items-start justify-between gap-2 pr-20">
-                        <h3 className="truncate text-xl font-black leading-tight text-stone-100">{t(def.name)}</h3>
-                        <div className="absolute right-3 top-9 rounded-lg border border-stone-400/25 bg-black/35 px-2 py-1 text-sm font-black text-stone-100">
+                    <div className="min-w-0 py-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="inline-flex min-w-0 items-center gap-1.5 rounded-lg border border-emerald-300/25 bg-black/25 px-2 py-1 text-sm font-black text-emerald-100">
+                          <Sparkles size={15} className="flex-shrink-0 text-emerald-200" />
+                          <span className="truncate">{effectLabel}</span>
+                        </div>
+                        <div className="flex-shrink-0 rounded-lg border border-stone-400/25 bg-black/35 px-2 py-1 text-sm font-black text-stone-100 tabular-nums">
                           Lv.{level}/{def.maxLevel}
                         </div>
                       </div>
 
-                      <div className="mt-1 inline-flex items-center gap-1 rounded-lg border border-emerald-300/25 bg-emerald-950/25 px-2 py-1 text-sm font-black text-emerald-200">
-                        <Sparkles size={15} />
-                        {effectLabel}
-                      </div>
-                      <p className="mt-1 line-clamp-2 text-xs font-bold leading-snug text-stone-400">{t(def.description)}</p>
+                      <p className="mt-2 line-clamp-2 min-h-8 text-xs font-bold leading-snug text-stone-300">
+                        {t(def.description)}
+                      </p>
 
-                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-black/50">
-                        <div
-                          className={`h-full rounded-full ${
-                            isDiamond ? 'bg-[linear-gradient(90deg,#22d3ee,#a5f3fc)]' : isMaxed ? 'bg-[linear-gradient(90deg,#22c55e,#86efac)]' : 'bg-[linear-gradient(90deg,#f59e0b,#fde68a)]'
-                          }`}
-                          style={{ width: `${(level / def.maxLevel) * 100}%` }}
-                        />
-                      </div>
-
-                      {isMaxed ? (
-                        <div className="mt-3 flex h-12 items-center justify-center gap-2 rounded-xl border border-emerald-200/45 bg-[linear-gradient(180deg,#22c55e,#15803d)] text-lg font-black text-white">
-                          <Check size={21} strokeWidth={3} />
-                          {t('已满级')}
+                      <div className="mt-3 grid grid-cols-[1fr_45%] items-center gap-2">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-black text-amber-200">{t('升级收益')}</div>
+                          <div className="truncate text-xs font-bold text-stone-300">
+                            {isMaxed ? t('已满级') : `${nextEffectLabel} · x${actualCount || 1}`}
+                          </div>
                         </div>
-                      ) : (
-                        <button
-                          onClick={() => buyUpgrade(def.id, actualCount)}
-                          disabled={!canAfford}
-                          className={`mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl border text-lg font-black shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.32)] active:translate-y-[2px] ${
-                            canAfford
-                              ? isDiamond
-                                ? 'border-cyan-100/70 bg-[linear-gradient(180deg,#67e8f9,#2563eb)] text-white'
-                                : 'border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] text-stone-950'
-                              : 'border-stone-500/30 bg-[linear-gradient(180deg,#596270,#303742)] text-stone-300 shadow-none'
-                          }`}
-                        >
-                          {!canAfford && <Lock size={18} />}
-                          {canAfford ? t('升级') : t('不足')} x{actualCount || 1}
-                          <span className="tabular-nums">
-                            {isDiamond ? cost : formatCash(cost)}
-                          </span>
-                          {isDiamond && <AssetIcon id="currency/diamond" size={20} />}
-                          <ChevronRight size={18} />
-                        </button>
-                      )}
+
+                        {isMaxed ? (
+                          <div className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-emerald-200/45 bg-[linear-gradient(180deg,#34d399,#15803d)] px-2 text-base font-black text-white shadow-[0_5px_0_#166534,0_8px_16px_rgba(0,0,0,.28)]">
+                            <Check size={21} strokeWidth={3} />
+                            {t('已满级')}
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => buyUpgrade(def.id, actualCount)}
+                            disabled={!canAfford}
+                            className={`min-h-14 rounded-xl border px-2 py-1.5 text-center shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] active:translate-y-[2px] ${
+                              canAfford
+                                ? isDiamond
+                                  ? 'border-cyan-100/70 bg-[linear-gradient(180deg,#67e8f9,#2563eb)] text-white'
+                                  : 'border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] text-stone-950'
+                                : 'border-stone-500/30 bg-[linear-gradient(180deg,#596270,#303742)] text-stone-300 shadow-none'
+                            }`}
+                          >
+                            <div className="flex items-center justify-center gap-1 text-sm font-black">
+                              {!canAfford && <Lock size={16} />}
+                              {canAfford ? t('升级') : t('不足')} x{actualCount || 1}
+                              <ChevronRight size={16} />
+                            </div>
+                            <div className="mt-0.5 flex items-center justify-center gap-1 text-xl font-black leading-none tabular-nums">
+                              {isDiamond ? cost : formatCash(cost)}
+                              {isDiamond && <AssetIcon id="currency/diamond" size={18} />}
+                            </div>
+                          </button>
+                        )}
+                      </div>
+
                     </div>
+                  </div>
+
+                  <div className="hidden">
+                    <div className="flex min-w-0 items-center px-3 py-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-sm font-black text-amber-200">{t('升级收益')}</div>
+                        <div className="truncate text-xs font-bold text-stone-300">
+                          {isMaxed ? t('已满级') : `${nextEffectLabel} · x${actualCount || 1}`}
+                        </div>
+                      </div>
+                    </div>
+
+                    {isMaxed ? (
+                      <div className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-emerald-200/45 bg-[linear-gradient(180deg,#34d399,#15803d)] px-2 text-base font-black text-white shadow-[0_5px_0_#166534,0_8px_16px_rgba(0,0,0,.28)]">
+                        <Check size={21} strokeWidth={3} />
+                        {t('已满级')}
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => buyUpgrade(def.id, actualCount)}
+                        disabled={!canAfford}
+                        className={`min-h-14 rounded-xl border px-2 py-1.5 text-center shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] active:translate-y-[2px] ${
+                          canAfford
+                            ? isDiamond
+                              ? 'border-cyan-100/70 bg-[linear-gradient(180deg,#67e8f9,#2563eb)] text-white'
+                              : 'border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] text-stone-950'
+                            : 'border-stone-500/30 bg-[linear-gradient(180deg,#596270,#303742)] text-stone-300 shadow-none'
+                        }`}
+                      >
+                        <div className="flex items-center justify-center gap-1 text-sm font-black">
+                          {!canAfford && <Lock size={16} />}
+                          {canAfford ? t('升级') : t('不足')} x{actualCount || 1}
+                          <ChevronRight size={16} />
+                        </div>
+                        <div className="mt-0.5 flex items-center justify-center gap-1 text-xl font-black leading-none tabular-nums">
+                          {isDiamond ? cost : formatCash(cost)}
+                          {isDiamond && <AssetIcon id="currency/diamond" size={18} />}
+                        </div>
+                      </button>
+                    )}
                   </div>
                 </article>
               );
@@ -213,11 +301,26 @@ function getEffectLabel(effectType: string, totalEffect: number): string {
     case 'profit_mult_all':
       return `${translateEffectText('利润加成')} +${(totalEffect * 100).toFixed(0)}%`;
     case 'offline_cap_increase':
-      return `${translateEffectText('离线上限')} +${(totalEffect * 60)}${translateEffectText('分钟')}`;
+      return `${translateEffectText('离线上限')} +${totalEffect * 60}${translateEffectText('分钟')}`;
     case 'offline_mult':
       return `${translateEffectText('离线倍率')} x${(1 + totalEffect).toFixed(2)}`;
     default:
       return `${totalEffect}`;
+  }
+}
+
+function getEffectDeltaLabel(effectType: string, effect: number): string {
+  switch (effectType) {
+    case 'cycle_reduce_all':
+      return `${translateEffectText('生产加速')} +${(effect * 100).toFixed(0)}%`;
+    case 'profit_mult_all':
+      return `${translateEffectText('利润加成')} +${(effect * 100).toFixed(0)}%`;
+    case 'offline_cap_increase':
+      return `${translateEffectText('离线上限')} +${effect * 60}${translateEffectText('分钟')}`;
+    case 'offline_mult':
+      return `${translateEffectText('离线倍率')} +${(effect * 100).toFixed(0)}%`;
+    default:
+      return `${effect}`;
   }
 }
 
