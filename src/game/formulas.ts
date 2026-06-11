@@ -819,7 +819,7 @@ export function tryTriggerEvent(state: GameState): ActiveGameEvent | null {
   if (state.eventCooldownUntil && now < state.eventCooldownUntil) return null;
 
   // 检查是否已有事件在运行
-  if (state.activeEvents && state.activeEvents.length >= 2) return null;
+  if (state.activeEvents && state.activeEvents.length >= 1) return null;
 
   // 筛选可用事件（满足收入要求和冷却）
   const available = GAME_EVENTS.filter(evt => {

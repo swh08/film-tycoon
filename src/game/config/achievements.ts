@@ -12,7 +12,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: '累计收入达到 1,000',
     icon: 'currency/coin',
     condition: { type: 'total_earned', value: 1000 },
-    reward: { type: 'cash', value: 500 },
+    reward: { type: 'cash', value: 250 },
   },
   {
     id: 'earn_100k',
@@ -20,7 +20,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: '累计收入达到 100,000',
     icon: 'currency/coin',
     condition: { type: 'total_earned', value: 100000 },
-    reward: { type: 'cash', value: 50000 },
+    reward: { type: 'cash', value: 10000 },
   },
   {
     id: 'earn_1m',
@@ -28,7 +28,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: '累计收入达到 1,000,000',
     icon: 'currency/coin',
     condition: { type: 'total_earned', value: 1000000 },
-    reward: { type: 'cash', value: 500000 },
+    reward: { type: 'cash', value: 75000 },
   },
   {
     id: 'earn_1b',
@@ -62,7 +62,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: '购买第一条产线',
     icon: 'nav/business',
     condition: { type: 'businesses_unlocked', value: 1 },
-    reward: { type: 'cash', value: 100 },
+    reward: { type: 'cash', value: 50 },
   },
   {
     id: 'biz_all',
@@ -78,7 +78,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: '任意产线达到100级',
     icon: 'nav/achievement',
     condition: { type: 'business_quantity_min', value: 100 },
-    reward: { type: 'cash', value: 1000000 },
+    reward: { type: 'cash', value: 100000 },
   },
   {
     id: 'biz_500',
@@ -104,7 +104,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: '雇佣你的第一位店长',
     icon: 'nav/manager',
     condition: { type: 'managers_hired', value: 1 },
-    reward: { type: 'cash', value: 5000 },
+    reward: { type: 'cash', value: 1000 },
   },
   {
     id: 'mgr_all',
@@ -148,7 +148,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: '购买第一个全局升级',
     icon: 'nav/upgrade',
     condition: { type: 'global_upgrade_level', value: 1 },
-    reward: { type: 'cash', value: 10000 },
+    reward: { type: 'cash', value: 2500 },
   },
   {
     id: 'biz_upgrade_first',
@@ -156,7 +156,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: '购买第一个产线专属升级',
     icon: 'nav/upgrade',
     condition: { type: 'business_upgrades_bought', value: 1 },
-    reward: { type: 'cash', value: 50000 },
+    reward: { type: 'cash', value: 10000 },
   },
   {
     id: 'biz_upgrade_10',
@@ -192,7 +192,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: '手动点击贴膜100次',
     icon: 'nav/business',
     condition: { type: 'manual_taps', value: 100 },
-    reward: { type: 'cash', value: 2000 },
+    reward: { type: 'cash', value: 500 },
   },
   {
     id: 'tap_1000',
@@ -208,6 +208,6 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: '累计购买产线500次',
     icon: 'nav/shop',
     condition: { type: 'total_purchases', value: 500 },
-    reward: { type: 'cash', value: 500000 },
+    reward: { type: 'cash', value: 75000 },
   },
 ];

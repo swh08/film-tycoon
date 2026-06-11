@@ -385,7 +385,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         if (r.type === 'cash') cashReward += r.value;
         if (r.type === 'diamond') diamondReward += r.value;
         if (r.type === 'buff' && r.buffType && r.buffDuration) {
-          get().addAdBuff(r.buffType, r.buffDuration, 1);
+          get().addAdBuff(r.buffType, r.buffDuration, r.value);
         }
       }
 
@@ -467,8 +467,8 @@ export const useGameStore = create<GameStore>((set, get) => {
           if (newEvent) {
             updatedEvents = [...updatedEvents, newEvent];
             newlyTriggered = newEvent;
-            // 设置固定全局冷却（60秒），避免稀有事件的长冷却阻塞所有事件
-            eventCooldownUntil = now + 60 * 1000;
+            const eventDef = GAME_EVENTS.find(evt => evt.id === newEvent.eventDefId);
+            eventCooldownUntil = now + (eventDef?.cooldownSec ?? 180) * 1000;
           }
         }
       }
