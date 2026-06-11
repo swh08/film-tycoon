@@ -230,7 +230,7 @@ export default function ManagerTab() {
   return (
     <div className="film-game-screen business-content-frame-bg flex flex-col gap-3 px-5 py-5 pb-6">
       <div className="mb-1 flex items-center justify-between px-1">
-        <h2 className="text-[2rem] font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">{t('店长管理')}</h2>
+        <h2 className="text-2xl font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">{t('店长管理')}</h2>
         <span className="rounded-lg border border-stone-300/25 bg-black/35 px-2.5 py-1 text-xs font-black text-stone-100">
           {t('已雇佣')} {hiredManagers.length}/{MANAGERS.length}
         </span>

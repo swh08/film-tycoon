@@ -33,7 +33,7 @@ export default function AchievementTab() {
   return (
     <div className="film-game-screen business-content-frame-bg flex flex-col gap-3 px-5 py-5 pb-6">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-[2rem] font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">
+        <h1 className="text-2xl font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">
           {t('成就殿堂')}
         </h1>
         <div className="flex-shrink-0 rounded-lg border border-amber-200/35 bg-black/35 px-2.5 py-1 text-sm font-black text-amber-200 tabular-nums">

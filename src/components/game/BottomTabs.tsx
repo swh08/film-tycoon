@@ -68,12 +68,12 @@ export default function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) 
               className={`mb-1 transition-transform duration-200 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(251,191,36,.7)]' : 'opacity-80 grayscale-[15%]'}`}
             />
 
-            <span className={`text-[13px] font-black leading-none tracking-normal ${isActive ? 'text-amber-200' : 'text-stone-300'}`}>
+            <span className={`text-[11px] font-black leading-none tracking-normal ${isActive ? 'text-amber-200' : 'text-stone-300'}`}>
               {t(tab.label)}
             </span>
 
             {showBadge && !isActive && (
-              <div className="absolute right-3 top-2 grid h-5 w-5 place-items-center rounded-full border border-white/40 bg-red-500 text-[12px] font-black text-white shadow-[0_0_10px_rgba(239,68,68,.55)]">
+              <div className="absolute right-3 top-2 grid h-5 w-5 place-items-center rounded-full border border-white/40 bg-red-500 text-[10px] font-black text-white shadow-[0_0_10px_rgba(239,68,68,.55)]">
                 !
               </div>
             )}

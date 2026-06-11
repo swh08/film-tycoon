@@ -37,7 +37,7 @@ function PrestigeConfirmPopup() {
   return (
     <div className="text-center">
       <AssetIcon id="nav/prestige" size={64} className="mb-3" />
-      <h3 className="text-xl font-black mb-2">{t('确认转生？')}</h3>
+      <h3 className="text-lg font-black mb-2">{t('确认转生？')}</h3>
       <p className="text-sm text-white/80 mb-3">
         {t('你将卖掉当前所有商业版图，换取渠道人脉')}
       </p>
@@ -270,10 +270,10 @@ export default function PrestigeTab() {
   return (
     <div className="film-game-screen business-content-frame-bg flex flex-col gap-3 px-5 py-5 pb-6">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-[2rem] font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">
+        <h1 className="text-2xl font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">
           {t('人脉')}
         </h1>
-        <div className="flex-shrink-0 rounded-lg border border-stone-300/25 bg-black/35 px-2.5 py-1 text-[13px] font-black text-stone-100 tabular-nums">
+        <div className="flex-shrink-0 rounded-lg border border-stone-300/25 bg-black/35 px-2.5 py-1 text-xs font-black text-stone-100 tabular-nums">
           {totalPrestigeCount}{t('次')} · ×{formatNumber(currentMultiplier)}
         </div>
       </div>
@@ -286,8 +286,8 @@ export default function PrestigeTab() {
             <AssetIcon id="currency/connection" size={54} className="drop-shadow-[0_10px_12px_rgba(0,0,0,.45)]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-xl font-black leading-tight text-amber-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">{t(PRESTIGE_RULE.currencyName)}</h2>
-            <p className="mt-0.5 text-[13px] font-bold text-stone-300">{t('转生后获得的永久加成货币')}</p>
+            <h2 className="text-lg font-black leading-tight text-amber-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">{t(PRESTIGE_RULE.currencyName)}</h2>
+            <p className="mt-0.5 text-xs font-bold text-stone-300">{t('转生后获得的永久加成货币')}</p>
           </div>
         </div>
 
@@ -295,8 +295,8 @@ export default function PrestigeTab() {
           {/* 当前人脉 */}
           <div className="bg-black/20 rounded-xl p-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[13px] font-bold text-stone-300">{t('当前')}{t(PRESTIGE_RULE.currencyName)}</span>
-              <span className="text-lg font-black text-amber-200">{formatNumberSmart(prestigePoints)}</span>
+              <span className="text-xs font-bold text-stone-300">{t('当前')}{t(PRESTIGE_RULE.currencyName)}</span>
+              <span className="text-base font-black text-amber-200">{formatNumberSmart(prestigePoints)}</span>
             </div>
             <div className="h-2 rounded-full bg-gray-700">
               <div
@@ -309,7 +309,7 @@ export default function PrestigeTab() {
           {/* 永久加成 */}
           <div className="bg-black/20 rounded-xl p-3">
             <div className="flex items-center justify-between">
-              <span className="text-[13px] font-bold text-stone-300">{t('利润加成（人脉）')}</span>
+              <span className="text-xs font-bold text-stone-300">{t('利润加成（人脉）')}</span>
               <span className="text-base font-black text-green-300">×{formatNumber(currentMultiplier)}{angelProfitText}</span>
             </div>
             {(angelCostText || angelSpeedText) && (
@@ -323,7 +323,7 @@ export default function PrestigeTab() {
           {/* 转生次数 */}
           <div className="bg-black/20 rounded-xl p-3">
             <div className="flex items-center justify-between">
-              <span className="text-[13px] font-bold text-stone-300">{t('累计转生次数')}</span>
+              <span className="text-xs font-bold text-stone-300">{t('累计转生次数')}</span>
               <span className="text-base font-black text-stone-50">{totalPrestigeCount}{t('次')}</span>
             </div>
           </div>
@@ -339,7 +339,7 @@ export default function PrestigeTab() {
 
         {!unlockMet ? (
           <div className="text-center">
-            <p className="mb-2 text-[13px] font-bold text-stone-300">
+            <p className="mb-2 text-xs font-bold text-stone-300">
               {t('累计收入达到')}{formatCash(PRESTIGE_RULE.unlockCondition.value)}{t('后解锁转生')}
             </p>
             <div className="h-2 rounded-full bg-gray-700">
@@ -356,8 +356,8 @@ export default function PrestigeTab() {
           <div className="text-center">
             {/* 预计获得 */}
             <div className="bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-xl p-3 mb-3">
-              <p className="mb-1 text-[13px] font-bold text-stone-300">{t('本次转生预计获得')}</p>
-              <div className="text-2xl font-black text-amber-200">
+              <p className="mb-1 text-xs font-bold text-stone-300">{t('本次转生预计获得')}</p>
+              <div className="text-xl font-black text-amber-200">
                 <span className="inline-flex items-center justify-center gap-1">
                   +{formatNumberSmart(gain)}
                   <AssetIcon id="currency/connection" size={22} />
@@ -395,7 +395,7 @@ export default function PrestigeTab() {
 
         {/* 转生说明 */}
         <div className="mt-4 space-y-1.5 text-xs font-bold leading-snug text-stone-300">
-          <h4 className="text-[13px] font-black text-amber-100">{t('转生说明')}</h4>
+          <h4 className="text-xs font-black text-amber-100">{t('转生说明')}</h4>
           <p><span className="text-red-300">{t('重置')}</span>: {t('现金')}、{t('产线数量')}、{t('店长雇佣')}、{t('全局升级')}、{t('广告增益')}</p>
           <p><span className="text-green-300">{t('保留')}</span>: {t('钻石')}、{t(PRESTIGE_RULE.currencyName)}、{t('人脉升级')}、{t('商城一次性购买')}</p>
           <p><span className="text-yellow-300">{t('加成')}</span>: {t('每点')}{t(PRESTIGE_RULE.currencyName)}{t('永久')}+{(PRESTIGE_RULE.permanentBonusCurve.perPoint * 100).toFixed(1)}%{t('全局利润')}</p>

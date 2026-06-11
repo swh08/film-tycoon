@@ -66,7 +66,7 @@ function StatCard({
         <AssetIcon id={icon} size={25} className="drop-shadow-[0_6px_6px_rgba(0,0,0,.45)]" />
         <span className="min-w-0 truncate text-[11px] font-black leading-tight text-stone-300">{label}</span>
       </div>
-      <p className={`truncate text-lg font-black leading-tight tabular-nums drop-shadow-[0_2px_1px_rgba(0,0,0,.75)] ${color}`}>{value}</p>
+      <p className={`truncate text-base font-black leading-tight tabular-nums drop-shadow-[0_2px_1px_rgba(0,0,0,.75)] ${color}`}>{value}</p>
       {subValue && <p className="mt-1 truncate text-[11px] font-bold tabular-nums text-stone-400">{subValue}</p>}
     </div>
   );
@@ -125,7 +125,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                     <AssetIcon id="nav/achievement" size={46} className="drop-shadow-[0_0_12px_rgba(251,191,36,.45)]" />
                   </div>
                   <div>
-                    <h2 className="text-[1.7rem] font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">{t('游戏统计')}</h2>
+                    <h2 className="text-2xl font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">{t('游戏统计')}</h2>
                     <p className="mt-1 text-xs font-bold text-stone-200/80">{t('查看你的贴膜帝国数据')}</p>
                   </div>
                 </div>
@@ -218,7 +218,7 @@ export default function StatsPanel({ isOpen, onClose }: StatsPanelProps) {
                 <PanelSection className="p-4">
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-sm font-black text-stone-100 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">{t('已解锁成就')}</span>
-                    <span className="text-lg font-black text-yellow-300 tabular-nums drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
+                    <span className="text-base font-black text-yellow-300 tabular-nums drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
                       {unlockedAchievements.length}/{ACHIEVEMENTS.length}
                     </span>
                   </div>

@@ -252,7 +252,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                     <AssetIcon id="system/settings" size={46} className="drop-shadow-[0_0_12px_rgba(251,191,36,.45)]" />
                   </div>
                   <div>
-                    <h2 className="text-[1.7rem] font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">{t('设置')}</h2>
+                    <h2 className="text-2xl font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">{t('设置')}</h2>
                     <p className="mt-1 text-xs font-bold text-stone-200/80">{t('游戏偏好与存档管理')}</p>
                   </div>
                 </div>
@@ -350,7 +350,7 @@ export default function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                           : 'border-stone-500/30 bg-[linear-gradient(180deg,#596270,#303742)] text-stone-200 shadow-[0_4px_0_#1f2937] hover:brightness-110'
                       }`}
                     >
-                      <p className={`text-lg font-black tabular-nums ${numberFormat === option.value ? 'text-stone-950' : 'text-amber-200'}`}>{option.sample}</p>
+                      <p className={`text-base font-black tabular-nums ${numberFormat === option.value ? 'text-stone-950' : 'text-amber-200'}`}>{option.sample}</p>
                       <p className={`mt-0.5 text-xs font-bold ${numberFormat === option.value ? 'text-stone-800' : 'text-stone-300'}`}>{option.label}</p>
                     </button>
                   ))}

@@ -97,7 +97,7 @@ export default function GamePage() {
           >
             <BusinessIcon icon="stall" />
           </motion.div>
-          <p className="text-yellow-400 font-bold text-lg">{t('贴膜大亨')}</p>
+          <p className="text-yellow-400 font-bold text-base">{t('贴膜大亨')}</p>
           <p className="text-gray-500 text-sm">{t('加载中...')}</p>
         </div>
       </div>

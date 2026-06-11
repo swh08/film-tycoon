@@ -57,7 +57,7 @@ export default function ShopTab() {
           content: (
             <div className="text-center">
               <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-              <h3 className="text-xl font-black mb-1">{t('收益增益已激活！')}</h3>
+              <h3 className="text-lg font-black mb-1">{t('收益增益已激活！')}</h3>
               <p className="text-sm text-white/80">{t('10分钟内所有产线收益提升50%！')}</p>
             </div>
           ),
@@ -76,8 +76,8 @@ export default function ShopTab() {
           content: (
             <div className="text-center">
               <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-              <h3 className="text-xl font-black mb-1">{t('额外离线收益！')}</h3>
-              <p className="text-lg text-yellow-200 font-bold">+{formatCash(bonus)}</p>
+              <h3 className="text-lg font-black mb-1">{t('额外离线收益！')}</h3>
+              <p className="text-base text-yellow-200 font-bold">+{formatCash(bonus)}</p>
             </div>
           ),
         });
@@ -92,7 +92,7 @@ export default function ShopTab() {
           content: (
             <div className="text-center">
               <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-              <h3 className="text-xl font-black mb-1">{t('爆单潮来了！')}</h3>
+              <h3 className="text-lg font-black mb-1">{t('爆单潮来了！')}</h3>
               <p className="text-sm text-white/80">{t('20秒极速生产，所有产线全开！')}</p>
             </div>
           ),
@@ -109,8 +109,8 @@ export default function ShopTab() {
           content: (
             <div className="text-center">
               <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-              <h3 className="text-xl font-black mb-1">{t('精准投放成功！')}</h3>
-              <p className="text-lg text-yellow-200 font-bold">+{formatCash(instantCash)}</p>
+              <h3 className="text-lg font-black mb-1">{t('精准投放成功！')}</h3>
+              <p className="text-base text-yellow-200 font-bold">+{formatCash(instantCash)}</p>
               <p className="mt-1 text-xs font-bold text-stone-300">{t('总收入0.2%或 500 现金，取较高值')}</p>
             </div>
           ),
@@ -126,8 +126,8 @@ export default function ShopTab() {
           content: (
             <div className="text-center">
               <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-              <h3 className="text-xl font-black mb-1">{t('获得钻石！')}</h3>
-              <p className="text-lg text-cyan-200 font-bold inline-flex items-center justify-center gap-1">
+              <h3 className="text-lg font-black mb-1">{t('获得钻石！')}</h3>
+              <p className="text-base text-cyan-200 font-bold inline-flex items-center justify-center gap-1">
                 +{reward.value}
                 <AssetIcon id="currency/diamond" size={18} />
               </p>
@@ -144,7 +144,7 @@ export default function ShopTab() {
           content: (
             <div className="text-center">
               <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-              <h3 className="text-xl font-black mb-1">{t('极速生产激活！')}</h3>
+              <h3 className="text-lg font-black mb-1">{t('极速生产激活！')}</h3>
               <p className="text-sm text-white/80">{t('45秒内所有产线速度×2！')}</p>
             </div>
           ),
@@ -198,9 +198,9 @@ export default function ShopTab() {
       content: (
         <div className="text-center">
           <ShopOfferIcon offerId={offerId} size={56} className="mb-2" />
-          <h3 className="text-xl font-black mb-2">{t('领取成功！')}</h3>
+          <h3 className="text-lg font-black mb-2">{t('领取成功！')}</h3>
           {rewards.map((r, i) => (
-            <p key={i} className="text-lg text-yellow-200 font-bold">+{t(r.label)}</p>
+            <p key={i} className="text-base text-yellow-200 font-bold">+{t(r.label)}</p>
           ))}
         </div>
       ),
@@ -215,7 +215,7 @@ export default function ShopTab() {
   return (
     <div className="film-game-screen business-content-frame-bg flex flex-col gap-4 px-5 py-5 pb-6">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-[2rem] font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">
+        <h1 className="text-2xl font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">
           {t('商城')}
         </h1>
         <div className={`flex-shrink-0 rounded-lg border px-2.5 py-1 text-xs font-black tabular-nums ${
@@ -397,7 +397,7 @@ export default function ShopTab() {
                           content: (
                             <div className="text-center">
                               <ShopOfferIcon offerId={offer.id} size={56} className="mb-2" />
-                              <h3 className="text-xl font-black mb-1">{t('支付暂未接入')}</h3>
+                              <h3 className="text-lg font-black mb-1">{t('支付暂未接入')}</h3>
                               <p className="text-sm text-white/80">{t('该礼包会在接入支付后开放购买。')}</p>
                             </div>
                           ),
