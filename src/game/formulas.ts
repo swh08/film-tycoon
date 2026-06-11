@@ -169,12 +169,8 @@ export function calcRevenuePerCycle(
   revenue *= calcPrestigeMultiplier(state.prestigePoints);
 
   // 广告增益（双倍收益）
-  const hasDoubleRevenue = adBuffs.some(b => b.type === 'double_revenue');
-  if (hasDoubleRevenue) revenue *= 2;
-
-  // 爆单潮
-  const rushBuff = adBuffs.find(b => b.type === 'rush_order');
-  if (rushBuff) revenue *= 3;
+  const revenueBuff = adBuffs.find(b => b.type === 'double_revenue');
+  if (revenueBuff) revenue *= revenueBuff.value;
 
   // 市场波动
   const marketMult = state.marketMultipliers?.[businessDef.id] ?? 1;
@@ -220,11 +216,11 @@ export function calcCycleTime(
   const angelEffects = calcAngelUpgradeEffects(state.purchasedAngelUpgrades || []);
   cycle *= angelEffects.globalCycleReduce;
 
-  // 爆单潮（30秒极速，周期缩短80%）
+  // 爆单潮：只提升速度，倍率由配置写入 buff.value
   const rushBuff = adBuffs.find(b => b.type === 'rush_order');
-  if (rushBuff) cycle *= 0.2;
+  if (rushBuff) cycle /= rushBuff.value;
 
-  // Task 4: speed_boost buff（广告加速，value=3 means ×3 speed）
+  // 广告加速，value 表示速度倍率
   const speedBuff = adBuffs.find(b => b.type === 'speed_boost');
   if (speedBuff) cycle /= speedBuff.value;
 
@@ -748,13 +744,9 @@ export function calcDetailedBreakdown(
   }
 
   // 8. 广告增益
-  const hasDoubleRevenue = adBuffs.some(b => b.type === 'double_revenue');
-  if (hasDoubleRevenue) {
-    items.push({ label: translateText('广告·双倍'), value: 2, displayValue: '×2', color: 'text-red-400' });
-  }
-  const rushBuff = adBuffs.find(b => b.type === 'rush_order');
-  if (rushBuff) {
-    items.push({ label: translateText('爆单潮'), value: 3, displayValue: '×3', color: 'text-red-300' });
+  const revenueBuff = adBuffs.find(b => b.type === 'double_revenue');
+  if (revenueBuff) {
+    items.push({ label: translateText('广告·收益'), value: revenueBuff.value, displayValue: `×${formatNumber(revenueBuff.value)}`, color: 'text-red-400' });
   }
 
   // 9. 市场波动

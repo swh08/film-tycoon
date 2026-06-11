@@ -69,7 +69,7 @@ export function createInitialState(): GameState {
     musicEnabled: false,
     adWatchCountToday: 0,
     lastAdWatchDate: '',
-    dailyAdLimit: 20,
+    dailyAdLimit: 8,
   };
 }
 
@@ -248,7 +248,7 @@ export const useGameStore = create<GameStore>((set, get) => {
     musicEnabled: initial.musicEnabled ?? false,
     adWatchCountToday: initial.adWatchCountToday ?? 0,
     lastAdWatchDate: initial.lastAdWatchDate ?? '',
-    dailyAdLimit: initial.dailyAdLimit ?? 20,
+    dailyAdLimit: Math.min(initial.dailyAdLimit ?? 8, 8),
   };
 
   // 同步音效设置
@@ -816,7 +816,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         cycle *= angelEffects.globalCycleReduce;
         cycle *= calcManagerLevelCycleReduce(bs.businessId, managerLevels, state.hiredManagers);
         const rushBuff = state.adBuffs.find(b => b.type === 'rush_order');
-        if (rushBuff) cycle *= 0.2;
+        if (rushBuff) cycle /= rushBuff.value;
         // 利润/速度模式
         const bizMode = state.businessModes?.[bs.businessId];
         if (bizMode === 'speed') cycle *= 0.5;
@@ -846,8 +846,8 @@ export const useGameStore = create<GameStore>((set, get) => {
           revenue *= angelEffects.globalProfitMult;
           revenue *= calcPrestigeMultiplier(state.prestigePoints);
           revenue *= calcManagerLevelProfitMult(bs.businessId, managerLevels, state.hiredManagers);
-          if (state.adBuffs.some(b => b.type === 'double_revenue')) revenue *= 2;
-          if (rushBuff) revenue *= 3;
+          const revenueBuff = state.adBuffs.find(b => b.type === 'double_revenue');
+          if (revenueBuff) revenue *= revenueBuff.value;
           // 市场波动
           revenue *= marketMultipliers[bs.businessId] ?? 1;
           // 利润/速度模式

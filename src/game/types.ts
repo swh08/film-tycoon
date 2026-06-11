@@ -133,6 +133,17 @@ export interface AngelUpgradeDef {
 }
 
 /** 商城礼包定义 (OfferDef) */
+export interface OfferRewardDef {
+  type: string;
+  value: number;
+  label: string;
+  durationSec?: number;
+  multiplier?: number;
+  percentOfTotalEarned?: number;
+  minValue?: number;
+  maxPassiveSeconds?: number;
+}
+
 export interface OfferDef {
   id: number;
   name: string;
@@ -140,7 +151,7 @@ export interface OfferDef {
   cost: number;
   currency: 'cash' | 'diamond' | 'real_money';
   icon: string;
-  rewards: { type: string; value: number; label: string }[];
+  rewards: OfferRewardDef[];
   oneTime: boolean;
   showCondition?: { type: string; value: number };
 }
@@ -317,7 +328,7 @@ export interface GameState {
   // 广告每日限制
   adWatchCountToday: number;             // 今日已看广告次数
   lastAdWatchDate: string;               // YYYY-MM-DD 上次看广告日期
-  dailyAdLimit: number;                  // 每日广告上限（默认20）
+  dailyAdLimit: number;                  // 每日广告上限（默认8）
 
   // 内部运行时字段（不持久化）
   _nextMarketTick?: number;              // 下次市场波动时间戳
