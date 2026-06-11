@@ -18,7 +18,7 @@ import { setSoundEnabled } from '../game/sound';
 const SAVE_KEY = 'screen_tycoon_save_v1';
 
 /** 创建初始游戏状态 */
-function createInitialState(): GameState {
+export function createInitialState(): GameState {
   const initialMarket: Record<number, number> = {};
   for (const b of BUSINESSES) initialMarket[b.id] = 1;
 
@@ -30,7 +30,7 @@ function createInitialState(): GameState {
     totalPrestigeCount: 0,
     businesses: BUSINESSES.map(b => ({
       businessId: b.id,
-      quantity: 0,
+      quantity: b.id === 1 ? 1 : 0,
       progress: 0,
       hasManager: false,
     })),
