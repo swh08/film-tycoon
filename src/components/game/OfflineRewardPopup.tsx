@@ -72,7 +72,7 @@ export default function OfflineRewardPopup() {
               </div>
 
               <div className="relative my-5 overflow-hidden border border-black/50 bg-black/40 p-4 shadow-[inset_0_1px_3px_rgba(0,0,0,.85)]">
-                <p className="mb-3 text-4xl font-black leading-none text-amber-200 tabular-nums drop-shadow-[0_3px_1px_rgba(0,0,0,.8)]">
+                <p className="mb-3 text-[32px] font-black leading-none text-amber-200 tabular-nums drop-shadow-[0_3px_1px_rgba(0,0,0,.8)]">
                   +{formatCash(offlineData.earnings)}
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-black text-stone-300">
@@ -89,10 +89,9 @@ export default function OfflineRewardPopup() {
 
               <button
                 onClick={handleClaim}
-                className="w-full rounded-xl border border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] py-3 text-lg font-black text-stone-950 shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] transition-all duration-150 active:translate-y-[2px] active:shadow-[0_2px_0_rgba(120,53,15,.9),0_4px_8px_rgba(0,0,0,.25)]"
+                className="w-full rounded-xl border border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] py-3 text-sm font-black text-stone-950 shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] transition-all duration-150 active:translate-y-[2px] active:shadow-[0_2px_0_rgba(120,53,15,.9),0_4px_8px_rgba(0,0,0,.25)]"
               >
                 <span className="inline-flex items-center justify-center gap-2">
-                  <AssetIcon id="boost/gift" size={22} />
                   {t('一键领取！')}
                 </span>
               </button>

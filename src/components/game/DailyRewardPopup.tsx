@@ -16,7 +16,7 @@ interface DailyRewardPopupProps {
 }
 
 const GOLD_BUTTON_CLASS =
-  'w-full rounded-xl border border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] py-3 text-lg font-black text-stone-950 shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] transition-all duration-150 active:translate-y-[2px] active:shadow-[0_2px_0_rgba(120,53,15,.9),0_4px_8px_rgba(0,0,0,.25)]';
+  'w-full rounded-xl border border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] py-3 text-sm font-black text-stone-950 shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] transition-all duration-150 active:translate-y-[2px] active:shadow-[0_2px_0_rgba(120,53,15,.9),0_4px_8px_rgba(0,0,0,.25)]';
 
 export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupProps) {
   const { t } = useTranslation();
@@ -103,7 +103,7 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
 
               <div className="mb-5 border border-amber-200/25 bg-amber-300/10 p-3 text-center shadow-[inset_0_1px_3px_rgba(0,0,0,.55)]">
                 <div className="min-w-0">
-                  <h3 className="truncate text-lg font-black text-amber-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
+                  <h3 className="truncate text-base font-black text-amber-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
                     {t(currentReward.name)}
                   </h3>
                   <p className="mt-1 line-clamp-2 text-xs font-bold leading-snug text-stone-300">
