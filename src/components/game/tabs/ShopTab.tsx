@@ -391,8 +391,17 @@ export default function ShopTab() {
                   {!purchased ? (
                     <button
                       onClick={() => {
-                        // 模拟内购成功
-                        handleFreeOffer(offer.id, offer.rewards);
+                        showPopup({
+                          id: `payment_unavailable_${offer.id}_${Date.now()}`,
+                          type: 'info',
+                          content: (
+                            <div className="text-center">
+                              <ShopOfferIcon offerId={offer.id} size={56} className="mb-2" />
+                              <h3 className="text-xl font-black mb-1">{t('支付暂未接入')}</h3>
+                              <p className="text-sm text-white/80">{t('该礼包会在接入支付后开放购买。')}</p>
+                            </div>
+                          ),
+                        });
                       }}
                       className={`min-h-14 px-2 py-1.5 text-xs font-black transition-all duration-150 ${SHOP_CYAN_BUTTON_CLASS}`}
                     >
