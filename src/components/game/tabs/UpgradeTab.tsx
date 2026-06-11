@@ -11,16 +11,10 @@ import type { UpgradeGroup } from '@/game/types';
 import { translateText } from '@/i18n';
 import { useTranslation } from '@/i18n/useTranslation';
 import AssetIcon from '@/components/game/AssetIcon';
+import BuyModeButton from '@/components/game/BuyModeButton';
 import UpgradeIcon, { GLOBAL_UPGRADE_ASSETS, UPGRADE_GROUP_ASSETS } from '@/components/game/UpgradeIcon';
 
 const GROUP_ORDER: UpgradeGroup[] = ['equipment', 'channel', 'brand'];
-
-const BUY_MODES = [
-  { value: 1, label: 'x1' },
-  { value: 10, label: 'x10' },
-  { value: 100, label: 'x100' },
-  { value: 0, label: 'MAX' },
-];
 
 const GROUP_TONE: Record<UpgradeGroup, {
   divider: string;
@@ -43,39 +37,13 @@ const GROUP_TONE: Record<UpgradeGroup, {
 function UpgradeRank({ order, maxed }: { order: number; maxed: boolean }) {
   return (
     <div
-      className={`absolute left-4 top-0 z-10 grid h-14 w-11 place-items-center rounded-b-lg border-x border-b text-2xl font-black shadow-[0_8px_16px_rgba(0,0,0,.4)] ${
+      className={`absolute left-4 top-0 z-10 grid h-14 w-11 place-items-center rounded-b-lg border-x border-b text-xl font-black shadow-[0_8px_16px_rgba(0,0,0,.4)] ${
         maxed
           ? 'border-emerald-200/65 bg-[linear-gradient(180deg,#34d399,#047857)] text-white'
           : 'border-amber-200/70 bg-[linear-gradient(180deg,#ef4444,#f59e0b_55%,#7c2d12)] text-white'
       }`}
     >
       {order}
-    </div>
-  );
-}
-
-function BuyModeToggle({
-  buyMode,
-  setBuyMode,
-}: {
-  buyMode: number;
-  setBuyMode: (mode: number) => void;
-}) {
-  return (
-    <div className="grid w-[250px] max-w-[66vw] flex-shrink-0 grid-cols-4 overflow-hidden rounded-2xl border border-stone-500/40 bg-[linear-gradient(180deg,rgba(37,42,45,.96),rgba(9,12,14,.98))] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_20px_rgba(0,0,0,.35)]">
-      {BUY_MODES.map(m => (
-        <button
-          key={m.value}
-          onClick={() => setBuyMode(m.value)}
-          className={`h-9 rounded-xl text-[13px] font-black transition-all ${
-            buyMode === m.value
-              ? 'bg-[linear-gradient(180deg,#fff1a6,#f7b52c)] text-stone-950 shadow-[0_3px_0_#8a520b,inset_0_1px_0_rgba(255,255,255,.65)]'
-              : 'text-stone-400'
-          }`}
-        >
-          {m.label}
-        </button>
-      ))}
     </div>
   );
 }
@@ -88,12 +56,12 @@ export default function UpgradeTab() {
     <div className="film-game-screen business-content-frame-bg flex flex-col gap-3 px-5 py-5 pb-6">
       <div className="flex items-center justify-between gap-3">
         <div className="flex-shrink-0">
-          <h1 className="text-[2rem] font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">
+          <h1 className="text-2xl font-black leading-none tracking-normal text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">
             {t('全局升级')}
           </h1>
         </div>
 
-        <BuyModeToggle buyMode={buyMode} setBuyMode={setBuyMode} />
+        <BuyModeButton buyMode={buyMode} setBuyMode={setBuyMode} />
       </div>
 
       {GROUP_ORDER.map(group => {
@@ -118,7 +86,7 @@ export default function UpgradeTab() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <h2 className="truncate text-xl font-black leading-tight text-stone-50 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
+                  <h2 className="truncate text-lg font-black leading-tight text-stone-50 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
                     {t(groupInfo.name)}
                   </h2>
                   <div className="flex-shrink-0 rounded-lg border border-stone-300/25 bg-black/35 px-2 py-1 text-xs font-black text-stone-100 tabular-nums">
@@ -174,7 +142,7 @@ export default function UpgradeTab() {
 
                   <div className="relative px-5 pb-2 pt-5">
                     <div className="flex min-w-0 items-start gap-2 pl-12 pr-20">
-                      <h3 className="min-w-0 flex-1 truncate text-[1.55rem] font-black leading-tight text-stone-100 drop-shadow-[0_2px_1px_rgba(0,0,0,.8)]">
+                      <h3 className="min-w-0 flex-1 truncate text-xl font-black leading-tight text-stone-100 drop-shadow-[0_2px_1px_rgba(0,0,0,.8)]">
                         {t(def.name)}
                       </h3>
                     </div>
@@ -213,7 +181,7 @@ export default function UpgradeTab() {
                         </div>
 
                         {isMaxed ? (
-                          <div className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-emerald-200/45 bg-[linear-gradient(180deg,#34d399,#15803d)] px-2 text-base font-black text-white shadow-[0_5px_0_#166534,0_8px_16px_rgba(0,0,0,.28)]">
+                          <div className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-emerald-200/45 bg-[linear-gradient(180deg,#34d399,#15803d)] px-2 text-sm font-black text-white shadow-[0_5px_0_#166534,0_8px_16px_rgba(0,0,0,.28)]">
                             <Check size={21} strokeWidth={3} />
                             {t('已满级')}
                           </div>
@@ -234,7 +202,7 @@ export default function UpgradeTab() {
                               {canAfford ? t('升级') : t('不足')} x{actualCount || 1}
                               <ChevronRight size={16} />
                             </div>
-                            <div className="mt-0.5 flex items-center justify-center gap-1 text-xl font-black leading-none tabular-nums">
+                            <div className="mt-0.5 flex items-center justify-center gap-1 text-[19px] font-black leading-none tabular-nums">
                               {isDiamond ? cost : formatCash(cost)}
                               {isDiamond && <AssetIcon id="currency/diamond" size={18} />}
                             </div>
@@ -256,7 +224,7 @@ export default function UpgradeTab() {
                     </div>
 
                     {isMaxed ? (
-                      <div className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-emerald-200/45 bg-[linear-gradient(180deg,#34d399,#15803d)] px-2 text-base font-black text-white shadow-[0_5px_0_#166534,0_8px_16px_rgba(0,0,0,.28)]">
+                      <div className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-emerald-200/45 bg-[linear-gradient(180deg,#34d399,#15803d)] px-2 text-sm font-black text-white shadow-[0_5px_0_#166534,0_8px_16px_rgba(0,0,0,.28)]">
                         <Check size={21} strokeWidth={3} />
                         {t('已满级')}
                       </div>
@@ -277,7 +245,7 @@ export default function UpgradeTab() {
                           {canAfford ? t('升级') : t('不足')} x{actualCount || 1}
                           <ChevronRight size={16} />
                         </div>
-                        <div className="mt-0.5 flex items-center justify-center gap-1 text-xl font-black leading-none tabular-nums">
+                        <div className="mt-0.5 flex items-center justify-center gap-1 text-[19px] font-black leading-none tabular-nums">
                           {isDiamond ? cost : formatCash(cost)}
                           {isDiamond && <AssetIcon id="currency/diamond" size={18} />}
                         </div>
