@@ -3,13 +3,11 @@
 // ============================================================
 'use client';
 
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { DAILY_REWARDS } from '@/game/config/daily-rewards';
-import { formatCash } from '@/game/formulas';
 import { playDailyReward } from '@/game/sound';
 import { useTranslation } from '@/i18n/useTranslation';
-import AssetIcon from './AssetIcon';
 import DailyRewardIcon from './DailyRewardIcon';
 
 interface DailyRewardPopupProps {
@@ -17,14 +15,14 @@ interface DailyRewardPopupProps {
   onClose: () => void;
 }
 
+const GOLD_BUTTON_CLASS =
+  'w-full rounded-xl border border-amber-100/70 bg-[linear-gradient(180deg,#fff2a9,#f8c044_50%,#d98c13)] py-3 text-lg font-black text-stone-950 shadow-[0_5px_0_rgba(120,53,15,.9),0_8px_18px_rgba(0,0,0,.34)] transition-all duration-150 active:translate-y-[2px] active:shadow-[0_2px_0_rgba(120,53,15,.9),0_4px_8px_rgba(0,0,0,.25)]';
+
 export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupProps) {
   const { t } = useTranslation();
   const loginStreak = useGameStore(s => s.loginStreak);
-  const lastLoginDate = useGameStore(s => s.lastLoginDate);
 
-  if (!isOpen) return null;
-
-  const currentDay = ((loginStreak - 1) % 7) + 1; // 1-7循环
+  const currentDay = ((loginStreak - 1) % 7) + 1;
   const currentReward = DAILY_REWARDS.find(r => r.day === currentDay) ?? DAILY_REWARDS[0];
 
   const handleClaim = () => {
@@ -34,119 +32,111 @@ export default function DailyRewardPopup({ isOpen, onClose }: DailyRewardPopupPr
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
-    >
-      <motion.div
-        initial={{ scale: 0.5, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-        className="w-[90%] max-w-sm overflow-hidden shadow-2xl"
-      >
-        {/* 头部 */}
-        <div className="bg-gradient-to-br from-purple-700 via-indigo-600 to-blue-600 p-5 text-center text-white relative overflow-hidden">
-          <div className="absolute inset-0 opacity-20">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-2 h-2 bg-white rounded-full"
-                animate={{ y: [0, -20, 0], opacity: [0.3, 1, 0.3] }}
-                transition={{ repeat: Infinity, duration: 2, delay: i * 0.25 }}
-                style={{ left: `${10 + i * 12}%`, top: `${30 + (i % 3) * 20}%` }}
-              />
-            ))}
-          </div>
-          <DailyRewardIcon day={currentReward.day} alt={t(currentReward.name)} size={72} className="mb-2" />
-          <h2 className="text-xl font-black">{t('每日登录奖励')}</h2>
-          <p className="text-sm text-white/80 mt-1">{t('连续登录第')} {loginStreak} {t('天')}</p>
-        </div>
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+          />
 
-        {/* 7天奖励预览 */}
-        <div className="bg-gray-800 p-4">
-          <div className="grid grid-cols-7 gap-1.5 mb-4">
-            {DAILY_REWARDS.map((reward, idx) => {
-              const dayInCycle = ((loginStreak - 1) % 7) + 1;
-              const isToday = reward.day === dayInCycle;
-              const isPast = reward.day < dayInCycle;
-              const isFuture = reward.day > dayInCycle;
-              const isLast7th = reward.day === 7;
-
-              return (
-                <div
-                  key={reward.day}
-                  className={`
-                    relative flex flex-col items-center p-1.5 rounded-lg transition-all
-                    ${isToday
-                      ? 'bg-gradient-to-b from-yellow-500/30 to-amber-600/20 ring-1 ring-yellow-400/40'
-                      : isPast
-                        ? 'bg-green-900/20'
-                        : 'bg-gray-700/30'
-                    }
-                  `}
-                >
-                  <span className="text-[8px] text-gray-400 mb-0.5">{t('第')}{reward.day}{t('天')}</span>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-sm -translate-y-1/2"
+          >
+            <div className="business-card-frame-bg relative overflow-hidden px-5 py-5 text-center text-white shadow-[0_20px_42px_rgba(0,0,0,.55)]">
+              <div className="relative">
+                <div className="mx-auto mb-1 grid h-32 w-32 place-items-center">
                   <DailyRewardIcon
-                    day={reward.day}
-                    alt={t(reward.name)}
-                    size={24}
-                    className={isPast ? 'grayscale opacity-50' : ''}
+                    day={currentReward.day}
+                    alt={t(currentReward.name)}
+                    size={124}
+                    className="drop-shadow-[0_18px_16px_rgba(0,0,0,.62)]"
                   />
-                  {isToday && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping" />
-                  )}
-                  {isPast && (
-                    <AssetIcon id="status/check" size={12} className="absolute bottom-0.5 right-0.5" />
-                  )}
                 </div>
-              );
-            })}
-          </div>
+                <h2 className="mb-1 text-2xl font-black leading-none text-stone-50 drop-shadow-[0_3px_1px_rgba(0,0,0,.85)]">
+                  {t('每日登录奖励')}
+                </h2>
+                <p className="mx-auto max-w-[16rem] text-sm font-bold leading-snug text-stone-300">
+                  {t('连续登录第')} {loginStreak} {t('天')}
+                </p>
+              </div>
 
-          {/* 今日奖励详情 */}
-          <div className="bg-gradient-to-r from-yellow-900/30 to-amber-900/20 rounded-xl p-4 mb-4">
-            <div className="flex items-center gap-3">
-              <DailyRewardIcon day={currentReward.day} alt={t(currentReward.name)} size={64} />
-              <div className="flex-1">
-                <h3 className="text-base font-bold text-yellow-400">{t(currentReward.name)}</h3>
-                <p className="text-[10px] text-gray-400 mt-0.5">{t(currentReward.description)}</p>
-                <div className="flex gap-2 mt-2">
-                  {currentReward.rewards.map((reward, idx) => (
-                    <span
-                      key={idx}
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold
-                        ${reward.type === 'diamond'
-                          ? 'bg-cyan-900/40 text-cyan-300'
-                          : reward.type === 'buff'
-                            ? 'bg-red-900/40 text-red-300'
-                            : 'bg-yellow-900/40 text-yellow-300'
-                        }`}
-                    >
-                      {t(reward.label)}
-                    </span>
-                  ))}
+              <div className="relative my-4 overflow-hidden border border-black/50 bg-black/35 p-3 shadow-[inset_0_1px_3px_rgba(0,0,0,.85)]">
+                <div className="grid grid-cols-7 gap-1.5">
+                  {DAILY_REWARDS.map(reward => {
+                    const isToday = reward.day === currentDay;
+                    const isPast = reward.day < currentDay;
+
+                    return (
+                      <div
+                        key={reward.day}
+                        className={`
+                          relative flex min-h-[56px] flex-col items-center justify-center gap-1 border px-1 py-1.5 text-center transition-all
+                          ${isToday
+                            ? 'border-amber-200/60 bg-amber-300/15 shadow-[0_0_12px_rgba(251,191,36,.22)]'
+                            : isPast
+                              ? 'border-emerald-200/25 bg-emerald-400/10'
+                              : 'border-stone-400/15 bg-black/25'
+                          }
+                        `}
+                      >
+                        <span className={`text-[8px] font-black leading-none ${isToday ? 'text-amber-200' : 'text-stone-400'}`}>
+                          {t('第')}{reward.day}{t('天')}
+                        </span>
+                        <span className={`text-[10px] font-black leading-none ${isToday ? 'text-amber-100' : isPast ? 'text-emerald-200' : 'text-stone-500'}`}>
+                          {isToday ? t('今日') : isPast ? t('已领') : t('待领')}
+                        </span>
+                        {isToday && (
+                          <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_10px_rgba(251,191,36,.85)]" />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* 领取按钮 */}
-          <button
-            onClick={handleClaim}
-            className="w-full py-3 rounded-xl font-black text-lg bg-gradient-to-b from-yellow-300 to-amber-600
-                       text-gray-900 transition-all duration-150 shadow-[0_3px_0_0_#92400e,0_4px_8px_rgba(120,53,15,0.3)]
-                       hover:from-yellow-200 hover:to-amber-500
-                       active:shadow-[0_1px_0_0_#92400e,0_2px_4px_rgba(120,53,15,0.2)] active:translate-y-[2px]"
-          >
-            <span className="inline-flex items-center justify-center gap-2">
-              <AssetIcon id="boost/gift" size={24} />
-              {t('领取奖励')}
-            </span>
-          </button>
-        </div>
-      </motion.div>
-    </motion.div>
+              <div className="mb-5 border border-amber-200/25 bg-amber-300/10 p-3 text-center shadow-[inset_0_1px_3px_rgba(0,0,0,.55)]">
+                <div className="min-w-0">
+                  <h3 className="truncate text-lg font-black text-amber-200 drop-shadow-[0_2px_1px_rgba(0,0,0,.75)]">
+                    {t(currentReward.name)}
+                  </h3>
+                  <p className="mt-1 line-clamp-2 text-xs font-bold leading-snug text-stone-300">
+                    {t(currentReward.description)}
+                  </p>
+                  <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+                    {currentReward.rewards.map((reward, index) => (
+                      <span
+                        key={`${reward.type}-${index}`}
+                        className={`
+                          inline-flex items-center rounded-lg border px-2 py-1 text-[10px] font-black leading-none
+                          ${reward.type === 'diamond'
+                            ? 'border-cyan-200/30 bg-cyan-300/15 text-cyan-200'
+                            : reward.type === 'buff'
+                              ? 'border-red-200/30 bg-red-300/15 text-red-200'
+                              : 'border-amber-200/30 bg-black/25 text-amber-200'
+                          }
+                        `}
+                      >
+                        {t(reward.label)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <button onClick={handleClaim} className={GOLD_BUTTON_CLASS}>
+                {t('领取奖励')}
+              </button>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 }
